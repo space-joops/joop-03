@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- maskable 아이콘 마스터(1024) → icon-maskable-512.
+       안전영역 = 중앙 원 반지름 40%(1024 기준 r409.6). 핵심 콘텐츠(궤도+점)는 r≈342 이내로 유지(scale 1.12).
+       배경은 풀블리드 불투명(#05080a) — 베젤 없음(마스크에 잘리므로). -->
+  <defs>
+    <radialGradient id="dot-glow-m">
+      <stop offset="0%" stop-color="#39ff14" stop-opacity="0.55"/>
+      <stop offset="40%" stop-color="#39ff14" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#39ff14" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1024" height="1024" fill="#05080a"/>
+
+  <g fill="#d8e6d4">
+    <circle cx="150" cy="180" r="3" opacity="0.5"/>
+    <circle cx="870" cy="150" r="2.5" opacity="0.4"/>
+    <circle cx="180" cy="850" r="2" opacity="0.35"/>
+    <circle cx="840" cy="760" r="3" opacity="0.45"/>
+    <circle cx="120" cy="520" r="2.5" opacity="0.35"/>
+    <circle cx="900" cy="480" r="2" opacity="0.3"/>
+  </g>
+
+  <g transform="translate(512 512) scale(1.12) translate(-512 -512)">
+    <circle cx="512" cy="512" r="190" fill="#071a0d" stroke="#39ff14" stroke-width="20"/>
+    <g fill="none" stroke="#39ff14">
+      <ellipse cx="512" cy="512" rx="78" ry="190" stroke-width="9" stroke-opacity="0.55"/>
+      <path d="M322 512h380" stroke-width="9" stroke-opacity="0.55"/>
+      <path d="M343.6 424h336.8M343.6 600h336.8" stroke-width="8" stroke-opacity="0.35"/>
+    </g>
+    <ellipse cx="512" cy="512" rx="330" ry="120" fill="none" stroke="#ffb000" stroke-width="15" stroke-opacity="0.95" transform="rotate(-24 512 512)"/>
+    <circle cx="731" cy="339" r="85" fill="url(#dot-glow-m)"/>
+    <circle cx="731" cy="339" r="26" fill="#39ff14"/>
+    <circle cx="731" cy="339" r="10" fill="#d6ffcc"/>
+  </g>
+</svg>

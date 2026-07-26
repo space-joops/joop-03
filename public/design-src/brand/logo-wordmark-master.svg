@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 148 48">
+  <!-- JOOPS 워드마크 마스터 · 세븐세그먼트 레터폼 원본(배경·고스트 포함, 명시적 색).
+       셀: 20×36, 세그 두께 4, 자간 8(피치 28), 기울기 skewX(-6).
+       세그먼트 맵: J=b,c,d,e · O=a,b,c,d,e,f · P=a,b,e,f,g · S=a,c,d,f,g
+       파생물: ../../brand/logo-wordmark.svg(단색 currentColor) · logo-wordmark-glow.svg(형광+글로우 필터, 웹 전용) -->
+  <defs>
+    <path id="ma" d="M3 2 5 0 15 0 17 2 15 4 5 4Z"/>
+    <path id="mb" d="M18 3 20 5 20 15 18 17 16 15 16 5Z"/>
+    <path id="mc" d="M18 19 20 21 20 31 18 33 16 31 16 21Z"/>
+    <path id="md" d="M3 34 5 32 15 32 17 34 15 36 5 36Z"/>
+    <path id="me" d="M2 19 4 21 4 31 2 33 0 31 0 21Z"/>
+    <path id="mf" d="M2 3 4 5 4 15 2 17 0 15 0 5Z"/>
+    <path id="mg" d="M3 18 5 16 15 16 17 18 15 20 5 20Z"/>
+    <g id="m-all"><use href="#ma"/><use href="#mb"/><use href="#mc"/><use href="#md"/><use href="#me"/><use href="#mf"/><use href="#mg"/></g>
+  </defs>
+  <rect width="148" height="48" fill="#05080a"/>
+  <g transform="translate(8 6) skewX(-6)">
+    <g fill="#39ff14" opacity="0.1">
+      <use href="#m-all"/>
+      <use href="#m-all" transform="translate(28 0)"/>
+      <use href="#m-all" transform="translate(56 0)"/>
+      <use href="#m-all" transform="translate(84 0)"/>
+      <use href="#m-all" transform="translate(112 0)"/>
+    </g>
+    <g fill="#39ff14">
+      <g><use href="#mb"/><use href="#mc"/><use href="#md"/><use href="#me"/></g>
+      <g transform="translate(28 0)"><use href="#ma"/><use href="#mb"/><use href="#mc"/><use href="#md"/><use href="#me"/><use href="#mf"/></g>
+      <g transform="translate(56 0)"><use href="#ma"/><use href="#mb"/><use href="#mc"/><use href="#md"/><use href="#me"/><use href="#mf"/></g>
+      <g transform="translate(84 0)"><use href="#ma"/><use href="#mb"/><use href="#me"/><use href="#mf"/><use href="#mg"/></g>
+      <g transform="translate(112 0)"><use href="#ma"/><use href="#mc"/><use href="#md"/><use href="#mf"/><use href="#mg"/></g>
+    </g>
+  </g>
+</svg>
