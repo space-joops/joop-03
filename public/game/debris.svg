@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Space Debris set (simplified vector for canvas fallback or design ref) -->
+  <style>
+    .debris {
+      fill: none;
+      stroke: #a1a1aa; /* muted color */
+      stroke-width: 2;
+      stroke-linejoin: miter;
+    }
+  </style>
+  
+  <!-- Broken Can -->
+  <path d="M10 20 L20 15 L25 25 L15 30 Z" class="debris"/>
+  <path d="M10 20 L5 25 L10 32 L20 27" class="debris"/>
+  
+  <!-- Metal Plate -->
+  <polygon points="40,10 55,15 50,30 35,25" class="debris"/>
+  <circle cx="42" cy="15" r="1" fill="#a1a1aa"/>
+  <circle cx="51" cy="20" r="1" fill="#a1a1aa"/>
+  
+  <!-- Bolt / Small part -->
+  <polygon points="15,45 22,42 25,48 18,51" class="debris"/>
+  
+  <!-- Wire/Rod -->
+  <polyline points="35,45 40,55 50,48 55,60" class="debris"/>
+</svg>
