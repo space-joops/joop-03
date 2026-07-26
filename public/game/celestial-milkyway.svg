@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 200" width="512" height="200" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Celestial: Milky Way band">
+  <title>배경 천체 — 은하수 밴드 (가로 타일 가능)</title>
+  <!-- Transparent bg, dark-surface use. Horizontally TILEABLE: the nebula gradient is uniform
+       in x, and all stars sit inside a 16px edge margin so nothing clips at the seam.
+       Tokens: fg #e4f2e9, grid #1e5a46, primary #35e07a, accent #38e0f0, secondary #ffb23e. -->
+  <defs>
+    <linearGradient id="mwBand" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e5a46" stop-opacity="0"/>
+      <stop offset="42%" stop-color="#1e5a46" stop-opacity="0.22"/>
+      <stop offset="52%" stop-color="#2b6f57" stop-opacity="0.30"/>
+      <stop offset="62%" stop-color="#1e5a46" stop-opacity="0.20"/>
+      <stop offset="100%" stop-color="#1e5a46" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- nebula band (x-uniform → seamless tile) -->
+  <rect x="0" y="0" width="512" height="200" fill="url(#mwBand)"/>
+
+  <!-- faint drifting clouds (kept off the seam edges) -->
+  <g fill="#38e0f0" opacity="0.05">
+    <ellipse cx="128" cy="96" rx="90" ry="30"/>
+    <ellipse cx="360" cy="104" rx="110" ry="26"/>
+  </g>
+  <g fill="#ffb23e" opacity="0.045">
+    <ellipse cx="248" cy="100" rx="70" ry="20"/>
+  </g>
+
+  <!-- dust lane -->
+  <path d="M 16 108 Q 140 96 256 106 T 496 100" fill="none" stroke="#05070f" stroke-width="10" opacity="0.35"/>
+
+  <!-- star field (all x within [16,496]) -->
+  <g fill="#e4f2e9">
+    <circle cx="34" cy="62" r="1.6" opacity="0.9"/>
+    <circle cx="58" cy="120" r="1" opacity="0.6"/>
+    <circle cx="82" cy="88" r="1.3" opacity="0.8"/>
+    <circle cx="104" cy="46" r="0.9" opacity="0.5"/>
+    <circle cx="120" cy="132" r="1.5" opacity="0.85"/>
+    <circle cx="146" cy="74" r="1" opacity="0.6"/>
+    <circle cx="168" cy="110" r="1.8" opacity="0.95"/>
+    <circle cx="188" cy="54" r="1.1" opacity="0.7"/>
+    <circle cx="210" cy="140" r="1" opacity="0.55"/>
+    <circle cx="232" cy="82" r="1.4" opacity="0.85"/>
+    <circle cx="256" cy="118" r="1" opacity="0.6"/>
+    <circle cx="278" cy="60" r="1.6" opacity="0.9"/>
+    <circle cx="300" cy="128" r="1.1" opacity="0.7"/>
+    <circle cx="322" cy="92" r="1.3" opacity="0.8"/>
+    <circle cx="344" cy="50" r="0.9" opacity="0.5"/>
+    <circle cx="366" cy="136" r="1.5" opacity="0.85"/>
+    <circle cx="390" cy="78" r="1" opacity="0.6"/>
+    <circle cx="412" cy="112" r="1.7" opacity="0.9"/>
+    <circle cx="434" cy="58" r="1.1" opacity="0.7"/>
+    <circle cx="456" cy="126" r="1.3" opacity="0.8"/>
+    <circle cx="478" cy="84" r="1" opacity="0.6"/>
+    <circle cx="70" cy="150" r="0.9" opacity="0.5"/>
+    <circle cx="200" cy="98" r="0.9" opacity="0.5"/>
+    <circle cx="330" cy="150" r="1" opacity="0.6"/>
+    <circle cx="490" cy="150" r="0.9" opacity="0.5"/>
+  </g>
+  <!-- colored sparkles -->
+  <g>
+    <circle cx="96" cy="100" r="1.6" fill="#35e07a" opacity="0.9"/>
+    <circle cx="272" cy="96" r="1.4" fill="#38e0f0" opacity="0.85"/>
+    <circle cx="420" cy="94" r="1.5" fill="#ffb23e" opacity="0.8"/>
+    <circle cx="160" cy="150" r="1.2" fill="#35e07a" opacity="0.7"/>
+  </g>
+</svg>

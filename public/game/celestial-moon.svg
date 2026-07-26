@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Celestial: Moon">
+  <title>배경 천체 — 달 (크레이터)</title>
+  <!-- Transparent bg, dark-surface use. Neutral scale + faint phosphor rim. -->
+  <defs>
+    <clipPath id="moonClip"><circle cx="100" cy="100" r="80"/></clipPath>
+    <radialGradient id="moonSurf" cx="40%" cy="36%" r="72%">
+      <stop offset="0%" stop-color="#33413b"/>
+      <stop offset="60%" stop-color="#232e29"/>
+      <stop offset="100%" stop-color="#12181a"/>
+    </radialGradient>
+  </defs>
+
+  <circle cx="100" cy="100" r="80" fill="url(#moonSurf)"/>
+
+  <g clip-path="url(#moonClip)">
+    <!-- maria (dark plains) -->
+    <ellipse cx="118" cy="82" rx="26" ry="20" fill="#17201c" opacity="0.7"/>
+    <ellipse cx="78" cy="122" rx="20" ry="16" fill="#17201c" opacity="0.6"/>
+    <!-- craters -->
+    <g stroke="#4c5c54" stroke-width="1" fill="#1a231f">
+      <circle cx="70" cy="70" r="12"/>
+      <circle cx="112" cy="126" r="9"/>
+      <circle cx="140" cy="96" r="7"/>
+      <circle cx="92" cy="104" r="5"/>
+      <circle cx="60" cy="112" r="6"/>
+      <circle cx="126" cy="60" r="5"/>
+    </g>
+    <!-- crater rim highlights -->
+    <g fill="none" stroke="#5c6d63" stroke-width="1" opacity="0.6">
+      <path d="M 60 66 A 12 12 0 0 1 80 66"/>
+      <path d="M 105 122 A 9 9 0 0 1 119 122"/>
+    </g>
+    <!-- terminator shadow -->
+    <ellipse cx="150" cy="120" rx="100" ry="100" fill="#05070f" opacity="0.4"/>
+  </g>
+
+  <circle cx="100" cy="100" r="80" fill="none" stroke="#35e07a" stroke-width="1" opacity="0.18"/>
+</svg>

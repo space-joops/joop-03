@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Thrust joystick (5-ring, translucent)">
+  <title>5원 반투명 조이스틱 — 분사량 표시 상태</title>
+  <!-- Translucent HUD control built from 5 circles (labeled below) + a radial thrust gauge.
+       State shown: knob pushed up = thrust vector, ~60% jet output lit.
+       Transparent bg, dark-surface use. Tokens: primary #35e07a, grid #1e5a46, accent #38e0f0. -->
+  <defs>
+    <radialGradient id="knobFill" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#35e07a" stop-opacity="0.9"/>
+      <stop offset="70%" stop-color="#35e07a" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#35e07a" stop-opacity="0.25"/>
+    </radialGradient>
+  </defs>
+
+  <!-- (1) base ring -->
+  <circle cx="100" cy="100" r="80" fill="#35e07a" fill-opacity="0.05" stroke="#35e07a" stroke-width="2" stroke-opacity="0.35"/>
+
+  <!-- thrust gauge: 12 radial ticks; lit ticks = jet amount (~60%, biased to thrust vector) -->
+  <g stroke-linecap="round">
+    <!-- lit (green + glow) -->
+    <g stroke="#35e07a" stroke-width="3" opacity="0.95">
+      <line x1="100" y1="26" x2="100" y2="36"/>
+      <line x1="137" y1="36" x2="132" y2="45"/>
+      <line x1="164" y1="63" x2="155" y2="68"/>
+      <line x1="63" y1="36" x2="68" y2="45"/>
+      <line x1="36" y1="63" x2="45" y2="68"/>
+      <line x1="174" y1="100" x2="164" y2="100"/>
+      <line x1="26" y1="100" x2="36" y2="100"/>
+    </g>
+    <!-- unlit (grid) -->
+    <g stroke="#1e5a46" stroke-width="3" opacity="0.8">
+      <line x1="164" y1="137" x2="155" y2="132"/>
+      <line x1="137" y1="164" x2="132" y2="155"/>
+      <line x1="100" y1="174" x2="100" y2="164"/>
+      <line x1="63" y1="164" x2="68" y2="155"/>
+      <line x1="36" y1="137" x2="45" y2="132"/>
+    </g>
+  </g>
+
+  <!-- (2) mid guide ring -->
+  <circle cx="100" cy="100" r="52" fill="none" stroke="#1e5a46" stroke-width="1.5" stroke-dasharray="4 6" opacity="0.7"/>
+
+  <!-- (3) dead-zone ring -->
+  <circle cx="100" cy="100" r="20" fill="#0f1826" fill-opacity="0.4" stroke="#35e07a" stroke-width="1.25" stroke-opacity="0.4"/>
+  <circle cx="100" cy="100" r="2.5" fill="#35e07a" opacity="0.6"/>
+
+  <!-- thrust vector: center → knob -->
+  <line x1="100" y1="100" x2="100" y2="62" stroke="#35e07a" stroke-width="2" stroke-opacity="0.5"/>
+
+  <!-- jet plume above knob -->
+  <path d="M 90 46 Q 100 20 110 46 Z" fill="#38e0f0" opacity="0.35"/>
+  <path d="M 94 46 Q 100 30 106 46 Z" fill="#eafff7" opacity="0.4"/>
+
+  <!-- (4) knob outer -->
+  <circle cx="100" cy="62" r="28" fill="#0f1826" fill-opacity="0.55" stroke="#35e07a" stroke-width="2.5" stroke-opacity="0.9"/>
+  <!-- (5) knob inner -->
+  <circle cx="100" cy="62" r="13" fill="url(#knobFill)"/>
+  <circle cx="96" cy="58" r="3.5" fill="#eafff2" opacity="0.85"/>
+</svg>

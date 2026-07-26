@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Debris: bolt and nut">
+  <title>우주 쓰레기 — 볼트/너트</title>
+  <!-- Transparent bg. Tokens: surface #16202e, bezel #26374a, grid #1e5a46, primary #35e07a. -->
+  <g transform="rotate(12 32 32)">
+    <!-- hex nut -->
+    <polygon points="32,10 49,20 49,40 32,50 15,40 15,20" fill="#16202e" stroke="#26374a" stroke-width="2" stroke-linejoin="round"/>
+    <polygon points="32,16 44,23 44,37 32,44 20,37 20,23" fill="none" stroke="#33475c" stroke-width="1.25"/>
+    <!-- threaded hole -->
+    <circle cx="32" cy="30" r="9" fill="#0a1018" stroke="#1e5a46" stroke-width="1.5"/>
+    <circle cx="32" cy="30" r="5" fill="none" stroke="#1e5a46" stroke-width="1"/>
+    <circle cx="29" cy="27" r="2" fill="#35e07a" opacity="0.5"/>
+    <!-- edge highlights -->
+    <line x1="15" y1="20" x2="32" y2="10" stroke="#3a4b5f" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
+  </g>
+</svg>

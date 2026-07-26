@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" role="img" aria-label="Item: fuel">
+  <title>아이템 — 연료 (분사 가스 충전)</title>
+  <!-- Transparent bg, dark-surface use. Tokens: surface #16202e, bezel #26374a, secondary(amber) #ffb23e, grid #1e5a46. -->
+  <!-- handle -->
+  <path d="M 18 12 h 8 a 2 2 0 0 1 2 2 v 3 h -3 v -2 h -6 z" fill="#26374a"/>
+  <!-- spout -->
+  <rect x="30" y="14" width="6" height="4" rx="1" fill="#26374a" transform="rotate(18 33 16)"/>
+  <!-- canister body -->
+  <rect x="12" y="16" width="24" height="24" rx="4" fill="#16202e" stroke="#26374a" stroke-width="2"/>
+  <!-- amber fuel level window -->
+  <rect x="16" y="28" width="16" height="9" rx="1.5" fill="#ffb23e" opacity="0.85"/>
+  <rect x="16" y="21" width="16" height="7" rx="1.5" fill="#ffb23e" opacity="0.22"/>
+  <!-- level ticks -->
+  <g stroke="#1e5a46" stroke-width="1" opacity="0.9">
+    <line x1="16" y1="24.5" x2="19" y2="24.5"/>
+    <line x1="16" y1="28" x2="19" y2="28"/>
+    <line x1="16" y1="31.5" x2="19" y2="31.5"/>
+  </g>
+  <!-- drop mark -->
+  <path d="M 24 20 q 3 4 0 6 q -3 -2 0 -6 Z" fill="#fff3d6" opacity="0.7"/>
+</svg>

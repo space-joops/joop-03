@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300" role="img" aria-label="Celestial: Earth">
+  <title>배경 천체 — 지구 (경위도 그리드 + 형광 대륙)</title>
+  <!-- Transparent bg, dark-surface use. Tokens: surface #0f1826, grid #1e5a46, primary #35e07a, accent #38e0f0. -->
+  <defs>
+    <clipPath id="earthClip"><circle cx="150" cy="150" r="120"/></clipPath>
+    <radialGradient id="earthDay" cx="38%" cy="34%" r="75%">
+      <stop offset="0%" stop-color="#16273a"/>
+      <stop offset="62%" stop-color="#0f1826"/>
+      <stop offset="100%" stop-color="#070c15"/>
+    </radialGradient>
+    <radialGradient id="earthAtmo" cx="50%" cy="50%" r="50%">
+      <stop offset="86%" stop-color="#38e0f0" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#38e0f0" stop-opacity="0.5"/>
+    </radialGradient>
+  </defs>
+
+  <!-- atmosphere halo -->
+  <circle cx="150" cy="150" r="128" fill="url(#earthAtmo)"/>
+  <!-- body -->
+  <circle cx="150" cy="150" r="120" fill="url(#earthDay)"/>
+
+  <g clip-path="url(#earthClip)">
+    <!-- continents (phosphor) -->
+    <g fill="#35e07a" opacity="0.85">
+      <path d="M 96 78 q 26 -8 40 6 q 14 12 2 26 q -18 10 -30 2 q -20 -12 -12 -34 Z" opacity="0.5"/>
+      <path d="M 150 120 q 30 -6 40 14 q 8 22 -8 40 q -16 14 -30 2 q -18 -18 -14 -40 q 2 -14 12 -16 Z" opacity="0.5"/>
+      <path d="M 84 170 q 22 -4 30 14 q 6 20 -12 30 q -20 6 -28 -12 q -8 -22 10 -32 Z" opacity="0.45"/>
+      <path d="M 196 92 q 18 2 20 18 q -2 14 -18 12 q -14 -4 -12 -18 q 2 -12 10 -12 Z" opacity="0.4"/>
+    </g>
+
+    <!-- graticule: meridians -->
+    <g fill="none" stroke="#1e5a46" stroke-width="1.25" opacity="0.9">
+      <ellipse cx="150" cy="150" rx="120" ry="120"/>
+      <ellipse cx="150" cy="150" rx="84" ry="120"/>
+      <ellipse cx="150" cy="150" rx="42" ry="120"/>
+      <line x1="150" y1="30" x2="150" y2="270"/>
+    </g>
+    <!-- graticule: parallels -->
+    <g fill="none" stroke="#1e5a46" stroke-width="1.25" opacity="0.9">
+      <line x1="30" y1="150" x2="270" y2="150"/>
+      <line x1="52" y1="102" x2="248" y2="102"/>
+      <line x1="52" y1="198" x2="248" y2="198"/>
+      <line x1="86" y1="66" x2="214" y2="66"/>
+      <line x1="86" y1="234" x2="214" y2="234"/>
+    </g>
+
+    <!-- night-side terminator shadow -->
+    <ellipse cx="212" cy="176" rx="150" ry="150" fill="#05070f" opacity="0.42"/>
+  </g>
+
+  <!-- rim highlight -->
+  <circle cx="150" cy="150" r="120" fill="none" stroke="#38e0f0" stroke-width="1.5" opacity="0.35"/>
+</svg>

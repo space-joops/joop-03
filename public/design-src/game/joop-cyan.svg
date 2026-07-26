@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 320" width="240" height="320" color="#38e0f0" role="img" aria-label="JOOPS unit (cyan)">
+  <title>줍스 캐릭터 — 정면 대기 포즈 (cyan)</title>
+  <!-- Cassette-futurism companion cleaner robot. Front / idle pose.
+       Body accent color = root `color` attribute → currentColor. Swap color= for variants
+       (green #35e07a · amber #ffb23e · cyan #38e0f0). Amber beacon is fixed brand color.
+       Chassis: surface #0f1826 / #16202e, bezel #26374a. Transparent bg, place on dark. -->
+
+  <!-- soft idle hover underglow (accent) -->
+  <ellipse cx="120" cy="292" rx="52" ry="12" fill="currentColor" opacity="0.14"/>
+
+  <!-- antenna + amber beacon (brand) -->
+  <line x1="120" y1="66" x2="120" y2="42" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="120" cy="32" r="14" fill="#ffb23e" opacity="0.18"/>
+  <circle cx="120" cy="32" r="8" fill="#ffb23e"/>
+  <circle cx="120" cy="32" r="3" fill="#ffe6b0"/>
+
+  <!-- arms + pincer claws (collector) -->
+  <g fill="#16202e" stroke="#26374a" stroke-width="3">
+    <rect x="44" y="176" width="18" height="52" rx="9"/>
+    <rect x="178" y="176" width="18" height="52" rx="9"/>
+  </g>
+  <g fill="none" stroke="#0e1622" stroke-width="6" stroke-linecap="round">
+    <path d="M 46 228 Q 40 242 50 248"/>
+    <path d="M 60 228 Q 66 242 56 248"/>
+    <path d="M 180 228 Q 174 242 184 248"/>
+    <path d="M 194 228 Q 200 242 190 248"/>
+  </g>
+  <circle cx="53" cy="230" r="4" fill="currentColor"/>
+  <circle cx="187" cy="230" r="4" fill="currentColor"/>
+
+  <!-- head -->
+  <rect x="64" y="64" width="112" height="88" rx="24" fill="#16202e" stroke="#26374a" stroke-width="3"/>
+  <path d="M 84 76 Q 120 68 156 76" fill="none" stroke="#33475c" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+  <circle cx="64" cy="112" r="9" fill="#0e1622" stroke="#2a3646" stroke-width="3"/>
+  <circle cx="176" cy="112" r="9" fill="#0e1622" stroke="#2a3646" stroke-width="3"/>
+
+  <!-- visor / face screen -->
+  <rect x="80" y="82" width="80" height="54" rx="16" fill="#0a1018"/>
+  <rect x="80" y="82" width="80" height="54" rx="16" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.45"/>
+
+  <!-- eyes (accent) -->
+  <g fill="currentColor">
+    <rect x="92" y="96" width="24" height="22" rx="8" opacity="0.22"/>
+    <rect x="124" y="96" width="24" height="22" rx="8" opacity="0.22"/>
+    <rect x="96" y="100" width="16" height="14" rx="5"/>
+    <rect x="128" y="100" width="16" height="14" rx="5"/>
+  </g>
+  <rect x="99" y="102" width="6" height="4" rx="2" fill="#eafff2" opacity="0.9"/>
+  <rect x="131" y="102" width="6" height="4" rx="2" fill="#eafff2" opacity="0.9"/>
+
+  <!-- mouth segments -->
+  <g>
+    <rect x="100" y="124" width="10" height="6" rx="2" fill="currentColor"/>
+    <rect x="114" y="124" width="10" height="6" rx="2" fill="#1e5a46"/>
+    <rect x="128" y="124" width="10" height="6" rx="2" fill="currentColor"/>
+  </g>
+
+  <!-- neck -->
+  <rect x="104" y="150" width="32" height="14" rx="4" fill="#16202e" stroke="#26374a" stroke-width="3"/>
+
+  <!-- torso -->
+  <rect x="72" y="160" width="96" height="106" rx="22" fill="#0f1826" stroke="#26374a" stroke-width="3"/>
+  <!-- shoulder trim -->
+  <path d="M 82 168 Q 120 160 158 168" fill="none" stroke="currentColor" stroke-width="2" opacity="0.45"/>
+  <!-- side vents -->
+  <g fill="#1e5a46">
+    <rect x="78" y="196" width="6" height="26" rx="3"/>
+    <rect x="156" y="196" width="6" height="26" rx="3"/>
+  </g>
+
+  <!-- chest console -->
+  <rect x="90" y="178" width="60" height="56" rx="10" fill="#0a1018"/>
+  <rect x="90" y="178" width="60" height="56" rx="10" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.4"/>
+  <!-- chest level meter -->
+  <g fill="currentColor">
+    <rect x="98" y="188" width="8" height="12" rx="1.5"/>
+    <rect x="110" y="188" width="8" height="12" rx="1.5"/>
+    <rect x="122" y="188" width="8" height="12" rx="1.5"/>
+  </g>
+  <rect x="134" y="188" width="8" height="12" rx="1.5" fill="#1e5a46"/>
+  <!-- chest readout lines -->
+  <rect x="98" y="208" width="44" height="3" rx="1.5" fill="currentColor" opacity="0.7"/>
+  <rect x="98" y="216" width="30" height="3" rx="1.5" fill="#1e5a46"/>
+  <rect x="98" y="224" width="38" height="3" rx="1.5" fill="#1e5a46"/>
+
+  <!-- thruster / base -->
+  <path d="M 100 266 L 140 266 L 132 286 L 108 286 Z" fill="#16202e" stroke="#26374a" stroke-width="3" stroke-linejoin="round"/>
+  <!-- idle thrust flame (accent) -->
+  <path d="M 110 286 Q 120 306 130 286 Z" fill="currentColor" opacity="0.55"/>
+  <path d="M 114 286 Q 120 298 126 286 Z" fill="#eafff2" opacity="0.7"/>
+</svg>
