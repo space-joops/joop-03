@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "image": "debris-sheet.png",
+  "frameSize": [
+    64,
+    64
+  ],
+  "anchor": [
+    32,
+    32
+  ],
+  "spin": "코드 회전: -30~+30 deg/s 랜덤, 프레임은 1장/종",
+  "collectGlow": "수거 순간 해당 줍스 액센트 색 shadowBlur 8, 120ms 페이드",
+  "types": [
+    {
+      "name": "can",
+      "frame": 0,
+      "sizeClass": "M",
+      "value": 3,
+      "label": "음료캔"
+    },
+    {
+      "name": "bolt",
+      "frame": 1,
+      "sizeClass": "S",
+      "value": 1,
+      "label": "볼트"
+    },
+    {
+      "name": "nut",
+      "frame": 2,
+      "sizeClass": "S",
+      "value": 1,
+      "label": "너트"
+    },
+    {
+      "name": "panel",
+      "frame": 3,
+      "sizeClass": "L",
+      "value": 5,
+      "label": "태양전지판 파편"
+    },
+    {
+      "name": "strut",
+      "frame": 4,
+      "sizeClass": "M",
+      "value": 3,
+      "label": "구조재 파편"
+    },
+    {
+      "name": "chip",
+      "frame": 5,
+      "sizeClass": "S",
+      "value": 2,
+      "label": "회로기판 조각"
+    }
+  ],
+  "sizeClassScale": {
+    "S": 0.6,
+    "M": 0.85,
+    "L": 1.1
+  }
+}
