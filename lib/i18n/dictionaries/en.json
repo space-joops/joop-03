@@ -1,0 +1,24 @@
+{
+  "common": {
+    "appName": "JOOPS"
+  },
+  "firstScreen": {
+    "title": "Cleaning Earth's orbit, together",
+    "totalCollected": "Debris collected",
+    "percentCleaned": "cleaned",
+    "pieces": "pieces",
+    "ranking": "Ranking",
+    "weeklyChange": "Weekly",
+    "myRank": "You",
+    "inOrbit": "joops in orbit",
+    "cta": {
+      "startWithInvite": "Start with an invite code"
+    },
+    "reducedMotion": "Animation paused (reduced motion)."
+  },
+  "language": {
+    "label": "Language",
+    "en": "English",
+    "ko": "한국어"
+  }
+}

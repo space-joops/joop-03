@@ -1,26 +1,35 @@
 @import "tailwindcss";
 
+/*
+ * 카세트퓨처리즘 디자인 토큰 (임시 초안) — docs/design/design-tokens.md
+ * 다크가 기본. 디자이너 확정 시안이 오면 값을 정교화한다.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-bg: #050810; /* 딥스페이스 배경 */
+  --color-surface: #0d1420; /* 패널/베젤 표면 */
+  --color-fg: #e6f0e8; /* 기본 텍스트 */
+  --color-muted: #6b7d74; /* 보조 텍스트/비활성 */
+  --color-primary: #39ff14; /* 형광 그린(계기·주요 수치) */
+  --color-secondary: #ffb000; /* 앰버 */
+  --color-accent: #00e5ff; /* 시안 포인트 */
+  --color-danger: #ff3860; /* 경고·하락 */
+  --color-success: #39ff14; /* 상승·성공 */
+  --color-grid: #1f6f4a; /* 지구본/궤도 그리드 라인 */
+
+  /* 기존 유틸(배경/전경) 호환 매핑 */
+  --background: var(--color-bg);
+  --foreground: var(--color-fg);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: var(--color-bg);
+  --color-foreground: var(--color-fg);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
