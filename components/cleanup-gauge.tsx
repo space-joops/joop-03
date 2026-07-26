@@ -24,12 +24,14 @@ export function CleanupGauge({
         {Array.from({ length: segments }).map((_, i) => (
           <span
             key={i}
-            className="h-3 flex-1 rounded-[1px]"
+            className="h-3 flex-1 rounded-[var(--radius-xs)]"
             style={{
+              // 소등 세그먼트는 저휘도 인광 — docs/design/design-tokens.md §4 (primary-dim 35%)
               background:
-                i < filled ? "var(--color-primary)" : "var(--color-surface)",
-              boxShadow: i < filled ? "0 0 6px var(--color-primary)" : "none",
-              opacity: i < filled ? 1 : 0.5,
+                i < filled
+                  ? "var(--color-primary)"
+                  : "color-mix(in srgb, var(--color-primary-dim) 35%, transparent)",
+              boxShadow: i < filled ? "var(--glow-primary)" : "none",
             }}
           />
         ))}

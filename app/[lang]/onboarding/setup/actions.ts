@@ -3,10 +3,12 @@
 import { redirect } from "next/navigation";
 import { createSessionClient } from "@/lib/supabase/session";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { JOOP_COLOR_HEXES } from "@/lib/joop-colors";
 
 export type SetupState = { error?: string } | null;
 
-const ALLOWED_COLORS = ["#35e07a", "#ffb23e", "#38e0f0", "#ff5c77", "#c8ff00", "#ff00d4"];
+// 허용 색은 줍스 6색 팔레트 단일 출처를 따른다(lib/joop-colors.ts → joop-sheet.meta.json).
+const ALLOWED_COLORS = JOOP_COLOR_HEXES;
 
 // 이름(유니크)·색 설정 + 줍스 분양(지상 상태로 생성).
 export async function completeSetup(

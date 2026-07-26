@@ -42,7 +42,8 @@ export async function redeemInvite(
 
   await admin.from("joop_03_profiles").upsert({ id: uid }, { onConflict: "id" });
 
-  redirect(`/${lang}/onboarding/setup`);
+  // ② 분양 연출(보급 카트리지 부팅)로. 설정(③)은 그 다음 단계.
+  redirect(`/${lang}/onboarding/boot`);
 }
 
 // 초대 코드가 없는 사용자: 이메일 대기리스트 등록.
