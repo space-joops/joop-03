@@ -1,5 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
+import { ButtonLink } from "@/components/button";
+import { TabBar } from "@/components/tab-bar";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getMyJoop } from "@/lib/profile";
@@ -19,7 +21,7 @@ export default async function JoopPage({ params }: PageProps<"/[lang]/joop">) {
 
   return (
     <main
-      className="mx-auto flex w-full max-w-md flex-1 flex-col px-5 pt-[calc(env(safe-area-inset-top)+1.5rem)] pb-8"
+      className="mx-auto flex w-full max-w-md flex-1 flex-col px-5 pt-[calc(env(safe-area-inset-top)+1.5rem)] pb-[calc(env(safe-area-inset-bottom)+5.5rem)]"
       style={{ background: "var(--color-bg)" }}
     >
       <header className="mb-6 flex items-center justify-between">
@@ -70,25 +72,19 @@ export default async function JoopPage({ params }: PageProps<"/[lang]/joop">) {
 
       {/* 액션 */}
       <div className="mt-5 flex flex-col gap-3">
-        <Link
-          href={`/${lang}/joop/train`}
-          className="rounded-md py-3.5 text-center font-mono text-sm font-semibold uppercase tracking-widest"
-          style={{ background: "var(--color-primary)", color: "var(--color-bg)" }}
-        >
+        <ButtonLink href={`/${lang}/joop/train`} variant="primary" className="w-full">
           {j.train}
-        </Link>
-        <Link
-          href={`/${lang}/launch`}
-          className="rounded-md border py-3.5 text-center font-mono text-sm font-semibold uppercase tracking-widest text-[var(--color-fg)]"
-          style={{ borderColor: "var(--color-neutral-600)" }}
-        >
+        </ButtonLink>
+        <ButtonLink href={`/${lang}/launch`} variant="secondary" className="w-full">
           {j.launch}
-        </Link>
+        </ButtonLink>
       </div>
 
       <p className="mt-4 font-mono text-xs leading-relaxed text-[var(--color-muted)]">
         {j.hint}
       </p>
+
+      <TabBar lang={lang} tab={dict.tab} />
     </main>
   );
 }

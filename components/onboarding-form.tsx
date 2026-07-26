@@ -1,18 +1,25 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import Link from "next/link";
 import {
   redeemInvite,
   joinWaitlist,
   type OnboardingState,
 } from "@/app/[lang]/onboarding/actions";
+import { Button } from "@/components/button";
+import { useToast } from "@/components/toast";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
+
+function errorOf(state: OnboardingState): string | undefined {
+  return state && "error" in state ? state.error : undefined;
+}
 
 export function OnboardingForm({ lang, dict }: { lang: Locale; dict: Dictionary }) {
   const t = dict.onboarding;
   const errors = t.errors as Record<string, string>;
+  const { showToast } = useToast();
 
   const [inviteState, inviteAction, invitePending] = useActionState<OnboardingState, FormData>(
     redeemInvite.bind(null, lang),
@@ -23,8 +30,14 @@ export function OnboardingForm({ lang, dict }: { lang: Locale; dict: Dictionary 
     null,
   );
 
-  const inviteErr = inviteState?.error;
-  const waitErr = waitState?.error;
+  const inviteErr = errorOf(inviteState);
+  const waitErr = errorOf(waitState);
+
+  // 대기리스트 등록 성공 = "얻는 행동" → 토스트 (handoff-m6.md §4-1).
+  // waitState 는 제출마다 새 객체라 성공 1회당 1번 발화한다.
+  useEffect(() => {
+    if (waitState?.ok) showToast({ kind: "success", message: t.joined });
+  }, [waitState, showToast, t.joined]);
 
   const fieldClass =
     "w-full rounded-md border px-3 py-2.5 font-mono text-sm text-[var(--color-fg)] outline-none";
@@ -32,7 +45,6 @@ export function OnboardingForm({ lang, dict }: { lang: Locale; dict: Dictionary 
     background: "var(--color-surface)",
     borderColor: "var(--color-neutral-600)",
   };
-  const btnStyle = { background: "var(--color-primary)", color: "var(--color-bg)" };
 
   return (
     <div className="flex flex-col gap-6">
@@ -52,14 +64,9 @@ export function OnboardingForm({ lang, dict }: { lang: Locale; dict: Dictionary 
         {inviteErr && (
           <p className="font-mono text-xs text-[var(--color-danger)]">{errors[inviteErr]}</p>
         )}
-        <button
-          type="submit"
-          disabled={invitePending}
-          className="mt-1 rounded-md py-3 font-mono text-sm font-semibold uppercase tracking-widest disabled:opacity-60"
-          style={btnStyle}
-        >
+        <Button type="submit" variant="primary" disabled={invitePending} className="mt-1 w-full">
           {t.redeem}
-        </button>
+        </Button>
       </form>
 
       <div className="text-center font-mono text-xs uppercase tracking-widest text-[var(--color-muted)]">
@@ -78,21 +85,12 @@ export function OnboardingForm({ lang, dict }: { lang: Locale; dict: Dictionary 
           className={fieldClass}
           style={fieldStyle}
         />
-        {waitErr === "joined" ? (
-          <p className="font-mono text-xs text-[var(--color-primary)]">{t.joined}</p>
-        ) : (
-          waitErr && (
-            <p className="font-mono text-xs text-[var(--color-danger)]">{errors[waitErr]}</p>
-          )
+        {waitErr && (
+          <p className="font-mono text-xs text-[var(--color-danger)]">{errors[waitErr]}</p>
         )}
-        <button
-          type="submit"
-          disabled={waitPending}
-          className="mt-1 rounded-md border py-3 font-mono text-sm font-semibold uppercase tracking-widest text-[var(--color-fg)] disabled:opacity-60"
-          style={{ borderColor: "var(--color-neutral-600)" }}
-        >
+        <Button type="submit" variant="secondary" disabled={waitPending} className="mt-1 w-full">
           {t.join}
-        </button>
+        </Button>
       </form>
 
       <Link

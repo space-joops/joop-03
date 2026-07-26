@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
+  <!-- 탭: 우주 지도 -->
+  <circle cx="12" cy="12" r="8"/>
+  <path d="M4.4 12h15.2M12 4.4v15.2"/>
+  <ellipse cx="12" cy="12" rx="8" ry="3.2" stroke-width="1.5" opacity=".7" transform="rotate(-24 12 12)"/>
+</svg>

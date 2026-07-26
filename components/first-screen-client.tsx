@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import type { OrbitalSnapshot } from "@/lib/joops";
 import type { RankingRow } from "@/lib/rankings";
 import type { MyJoop } from "@/lib/profile";
@@ -11,6 +10,8 @@ import { OrbitalCanvas } from "@/components/orbital-canvas";
 import { CleanupGauge } from "@/components/cleanup-gauge";
 import { RankingList } from "@/components/ranking-list";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { ButtonLink } from "@/components/button";
+import { LogoSymbol } from "@/components/logo-symbol";
 
 export function FirstScreen({
   lang,
@@ -47,21 +48,15 @@ export function FirstScreen({
       style={{ background: "var(--color-bg)" }}
     >
       <header className="flex items-center justify-between px-4 pb-2 pt-[calc(env(safe-area-inset-top)+0.75rem)]">
-        <span className="flex items-center gap-2">
-          {/* 브랜드 심볼 — 궤도 위 반려 로봇 (public/brand/logo-symbol.svg) */}
-          <Image
-            src="/brand/logo-symbol.svg"
-            alt=""
-            width={28}
-            height={28}
-            className="block h-7 w-7"
-            aria-hidden
-          />
-          <span className="font-mono text-lg font-semibold tracking-[0.2em] text-[var(--color-primary)]">
+        <span className="flex items-center gap-2 text-[var(--color-primary)]">
+          {/* 브랜드 심볼 v1.0 — currentColor 단색(색은 여기서 주입) */}
+          <LogoSymbol size={28} />
+          <span className="font-mono text-lg font-semibold tracking-[0.2em]">
             {dict.common.appName}
           </span>
         </span>
-        <LanguageSwitcher current={lang} />
+        {/* 로그인 사용자는 설정 화면(탭바)에서 언어 변경 — 미로그인 랜딩만 헤더 스위처 유지 */}
+        {!myJoop && <LanguageSwitcher current={lang} />}
       </header>
 
       <div className="px-4">
@@ -77,7 +72,13 @@ export function FirstScreen({
       <CleanupGauge totals={snapshot.totals} dict={dict} />
       <RankingList rows={rankings} dict={dict} />
 
-      <div className="mt-auto px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-3">
+      <div
+        className={`mt-auto px-4 pt-3 ${
+          myJoop
+            ? "pb-[calc(env(safe-area-inset-bottom)+5rem)]" // 탭바(56px+safe) 가림 방지
+            : "pb-[calc(env(safe-area-inset-bottom)+1rem)]"
+        }`}
+      >
         {myJoop ? (
           <a
             href={`/${lang}/joop`}
@@ -98,13 +99,9 @@ export function FirstScreen({
             </span>
           </a>
         ) : (
-          <a
-            href={`/${lang}/onboarding`}
-            className="block w-full rounded-md py-3 text-center font-mono text-sm font-semibold uppercase tracking-widest"
-            style={{ background: "var(--color-primary)", color: "var(--color-bg)" }}
-          >
+          <ButtonLink href={`/${lang}/onboarding`} variant="primary" className="w-full">
             {dict.firstScreen.cta.startWithInvite}
-          </a>
+          </ButtonLink>
         )}
       </div>
     </main>

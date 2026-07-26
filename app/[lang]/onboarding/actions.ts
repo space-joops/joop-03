@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { createSessionClient } from "@/lib/supabase/session";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-export type OnboardingState = { error?: string } | null;
+export type OnboardingState = { ok: true } | { ok?: false; error: string } | null;
 
 // 초대 코드로 시작: 코드 검증 → 익명 세션 생성 → 코드 소진 → 프로필 생성 → 설정 단계로.
 export async function redeemInvite(
@@ -65,5 +65,5 @@ export async function joinWaitlist(
     if (error) return { error: "waitlist" };
   }
 
-  return { error: "joined" }; // 성공 신호(폼에서 안내 메시지로 처리)
+  return { ok: true }; // 성공 → 폼이 토스트로 안내 (handoff-m6.md §4-1)
 }
