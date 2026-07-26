@@ -11,6 +11,8 @@
     "weeklyChange": "주간",
     "myRank": "나",
     "inOrbit": "개의 줍스가 궤도에",
+    "orbitLabelTop": "지구 저궤도 // 실시간",
+    "pointsUnit": "PTS",
     "cta": {
       "startWithInvite": "초대코드로 시작하기"
     },

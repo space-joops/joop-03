@@ -11,6 +11,8 @@
     "weeklyChange": "Weekly",
     "myRank": "You",
     "inOrbit": "joops in orbit",
+    "orbitLabelTop": "LOW EARTH ORBIT // LIVE FEED",
+    "pointsUnit": "PTS",
     "cta": {
       "startWithInvite": "Start with an invite code"
     },

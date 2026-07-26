@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 // PWA 매니페스트 — 세로 고정 설치형 (docs/architecture/adr/0002-pwa-portrait.md).
 // 아이콘: scripts/generate-icons.mjs 로 마스터 SVG 에서 파생 → docs/design/asset-inventory.md
-// 색상: app/globals.css 의 --color-bg 와 일치(#05070f).
+// 색상: app/globals.css 의 --color-bg 와 일치(#030a05).
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "JOOPS — 함께 우주를 청소합니다",
@@ -11,8 +11,8 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/",
     display: "standalone",
     orientation: "portrait",
-    background_color: "#05070f",
-    theme_color: "#05070f",
+    background_color: "#030a05",
+    theme_color: "#030a05",
     icons: [
       { src: "/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" },
       { src: "/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },

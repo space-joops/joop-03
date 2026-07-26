@@ -196,7 +196,7 @@ export function LaunchSequence({
 
   return (
     <div className="relative flex flex-1 flex-col">
-      <div className="relative mx-4 flex-1 overflow-hidden rounded-md border" style={{ borderColor: "var(--color-neutral-600)", background: "#02040a" }}>
+      <div className="relative mx-4 flex-1 overflow-hidden rounded-md border" style={{ borderColor: "var(--color-neutral-600)", background: "var(--color-bg)" }}>
         <canvas ref={canvasRef} className="block h-full w-full" />
 
         {phase === "countdown" && (

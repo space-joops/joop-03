@@ -7,23 +7,26 @@
 
 ## 1. 컬러 (확정)
 
-**다크 기본.** 딥스페이스 위 형광 모노크롬 + 절제된 네온.
+**다크 기본.** 그린 틴트 블랙 위 형광 모노크롬 + 앰버 위계 (이슈 #5 CRT 컨셉).
+
+> **투톤 위계 원칙 (이슈 #5)**: 섹션 제목·수치·진행바·포인트는 **앰버(`--color-secondary`)**,
+> 본문·지구·이름·CTA는 **그린(`--color-primary`)/fg** 로 구분한다.
 
 | 토큰 | 역할 | HEX | 비고 |
 |---|---|---|---|
-| `--color-bg` | 기본 배경 | `#05070f` | 딥스페이스(거의 검정, 네이비 기미). 아이콘/매니페스트 배경도 동일 |
-| `--color-surface` | 패널·베젤 표면 / 지구 본체 | `#0f1826` | 배경보다 밝은 차콜 네이비 |
-| `--color-fg` | 기본 텍스트 | `#e4f2e9` | 형광 기미 오프화이트 (bg 대비 17.4:1) |
-| `--color-muted` | 보조 텍스트·비활성 | `#8a9e92` | 데새추레이트 그린그레이 (surface 대비 6.3:1) |
-| `--color-primary` | 형광 강조·계기·주요 수치·CTA | `#35e07a` | P1 phosphor 그린. CTA 배경(위 텍스트는 `--color-bg`, 11.6:1) |
-| `--color-secondary` | 보조 강조 | `#ffb23e` | P3 앰버 phosphor |
+| `--color-bg` | 기본 배경 | `#030a05` | 딥스페이스(거의 검정, 그린 틴트 — CRT phosphor). 매니페스트 배경도 동일 |
+| `--color-surface` | 패널·베젤 표면 / 지구 본체 | `#0a1c10` | 배경보다 밝은 다크 그린 |
+| `--color-fg` | 기본 텍스트 | `#e4f2e9` | 형광 기미 오프화이트 (bg 대비 17.3:1) |
+| `--color-muted` | 보조 텍스트·비활성 | `#8a9e92` | 데새추레이트 그린그레이 (bg 7.0:1 / surface 6.2:1) |
+| `--color-primary` | 형광 강조·계기·CTA | `#35e07a` | P1 phosphor 그린. CTA 배경(위 텍스트는 `--color-bg`, 11.5:1) |
+| `--color-secondary` | 섹션 제목·수치·진행바(앰버 위계) | `#ffb23e` | P3 앰버 phosphor (bg 11.1:1, 채움 위 텍스트는 `--color-bg`) |
 | `--color-accent` | 절제된 네온 포인트 | `#38e0f0` | 시안. 소량 사용 |
 | `--color-danger` | 경고·게임오버·하락 | `#ff5c77` | 레드(핑크 기미로 다크 위 가독성 확보) |
 | `--color-success` | 상승·성공 | `#7ce64b` | 라임 — primary 그린과 **색상(hue)으로 구분** |
 | `--color-grid` | 지구본/궤도 그리드 라인 | `#1e5a46` | 저채도 그린. 라인/비활성 세그먼트에 |
 
 **뉴트럴 스케일** (패널·구분선·비활성): `--color-neutral-050 … -900`
-`#eef4f0 · #cdd8d2 · #9fb0a7 · #71847b · #4c5c54 · #33413b · #232e29 · #17201c · #0f1620 · #080c14`
+`#eef4f0 · #cdd8d2 · #9fb0a7 · #71847b · #4c5c54 · #33413b · #232e29 · #17201c · #0d1a12 · #06110a`
 
 **CRT 글로우** (형광 요소 외곽; `box-shadow`/`text-shadow` 로 사용):
 `--glow-primary: 0 0 8px rgba(53,224,122,.55)` · `--glow-secondary` · `--glow-accent` · `--glow-danger`
@@ -88,4 +91,7 @@
 - 확정 토큰 → `app/globals.css` `:root` 변수 + `@theme inline` 색/폰트 매핑 → Tailwind 유틸.
 - Canvas 2D 렌더러는 `getComputedStyle` 로 동일 토큰(`--color-grid`, `--color-surface`)을 읽어
   하드코딩 중복을 피한다(→ [ADR-0003](../architecture/adr/0003-rendering-canvas2d.md)).
+  **폴백 hex 는 항상 토큰과 동일 값으로 유지**한다(토큰 값 변경 시 폴백도 함께 갱신).
+- `themeColor`(app/[lang]/layout.tsx · app/admin/layout.tsx)와 `app/manifest.ts` 의
+  `background_color`/`theme_color` 는 `--color-bg` 와 동일 값으로 동기화한다.
 - 라이트/다크는 `prefers-color-scheme` + `data-theme` 토글 대비. **현재 다크가 기본.**

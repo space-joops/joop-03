@@ -34,7 +34,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#05070f",
+  themeColor: "#030a05",
   colorScheme: "dark",
 };
 
@@ -47,7 +47,8 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
       lang={lang}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      {/* crt-scanlines: 게임 트리 전용 CRT 오버레이 (admin 은 미적용) */}
+      <body className="crt-scanlines min-h-full flex flex-col">
         {children}
         <VersionBadge />
       </body>
