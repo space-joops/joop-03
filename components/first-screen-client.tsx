@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import type { OrbitalSnapshot } from "@/lib/joops";
 import type { RankingRow } from "@/lib/rankings";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
@@ -43,8 +44,19 @@ export function FirstScreen({
       style={{ background: "var(--color-bg)" }}
     >
       <header className="flex items-center justify-between px-4 pb-2 pt-[calc(env(safe-area-inset-top)+0.75rem)]">
-        <span className="font-mono text-lg font-semibold tracking-[0.2em] text-[var(--color-primary)]">
-          {dict.common.appName}
+        <span className="flex items-center gap-2">
+          {/* 브랜드 심볼 — 궤도 위 반려 로봇 (public/brand/logo-symbol.svg) */}
+          <Image
+            src="/brand/logo-symbol.svg"
+            alt=""
+            width={28}
+            height={28}
+            className="block h-7 w-7"
+            aria-hidden
+          />
+          <span className="font-mono text-lg font-semibold tracking-[0.2em] text-[var(--color-primary)]">
+            {dict.common.appName}
+          </span>
         </span>
         <LanguageSwitcher current={lang} />
       </header>
