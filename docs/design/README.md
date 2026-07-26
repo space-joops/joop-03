@@ -15,6 +15,8 @@
 - [mockups/minigame-subscription.html](./mockups/minigame-subscription.html) — **지상 미니게임·발사체 청약·선별 결과(M3) 시안**. [스크린샷](./mockups/minigame-subscription.png)
 - [handoff-m4.md](./handoff-m4.md) — **M4 개발 핸드오프 가이드**. 카운트다운·중계 계기, 로켓 에셋·이펙트, 우주 지도 Canvas 명세(음영·궤적), 초대·아케이드 진입.
 - [mockups/launch-space-map.html](./mockups/launch-space-map.html) — **발사 카운트다운·중계·우주 지도(M4) 시안**. [스크린샷](./mockups/launch-space-map.png)
+- [handoff-m5.md](./handoff-m5.md) — **M5 개발 핸드오프 가이드**. 천체 배경·패럴럭스·구역 전환, 위성 원근, 분사 파티클, 아케이드 HUD·게임오버.
+- [mockups/arcade.html](./mockups/arcade.html) — **아케이드 모드(M5) 시안**(실제 배경 에셋 참조). [스크린샷](./mockups/arcade.png)
 
 ## 에셋을 repo로 관리하는 규칙
 
