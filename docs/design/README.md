@@ -8,7 +8,9 @@
 - [design-tokens.md](./design-tokens.md) — **디자인 토큰 v1.0(확정)**. 카세트퓨처리즘 색·타이포·간격·컴포넌트·모션의 실제 값.
 - [asset-inventory.md](./asset-inventory.md) — **에셋 인벤토리**. 필요한 모든 에셋을 우선순위·포맷·사이즈·경로로 정리한 목록(납품 상태 포함).
 - [handoff-m1.md](./handoff-m1.md) — **M1 개발 핸드오프 가이드**. 토큰 CSS 스니펫, PWA 스니펫, 화면 해부도, Canvas 수치 명세, 컴포넌트 스펙.
+- [handoff-m2.md](./handoff-m2.md) — **M2 개발 핸드오프 가이드**. 온보딩 플로우·컴포넌트 스펙, 줍스 캐릭터 스프라이트시트 계약(meta JSON), i18n 키 초안.
 - [mockups/first-screen.html](./mockups/first-screen.html) — **첫 화면 완성 시안**(393×852, Canvas 레퍼런스 구현 포함). [스크린샷](./mockups/first-screen.png)
+- [mockups/onboarding.html](./mockups/onboarding.html) — **온보딩(M2) 3단계 시안**(색 스와치 인터랙션 동작). [스크린샷](./mockups/onboarding.png)
 
 ## 에셋을 repo로 관리하는 규칙
 
