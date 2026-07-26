@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 160">
+  <!-- 발사체(로켓). anchor 하단 중앙 [32, 152](노즐 끝). 화염·연기는 이펙트 레이어 — docs/design/handoff-m4.md §3 -->
+  <path d="M32 6 Q42 22 42 38 L22 38 Q22 22 32 6 Z" fill="#c8d2c4" stroke="#5c6b5e" stroke-width="2"/>
+  <rect x="22" y="38" width="20" height="86" fill="#c8d2c4" stroke="#5c6b5e" stroke-width="2"/>
+  <rect x="22" y="46" width="20" height="8" fill="#ffb000" opacity=".9"/>
+  <circle cx="32" cy="70" r="5" fill="none" stroke="#1d7a10" stroke-width="2"/>
+  <circle cx="35.5" cy="66.5" r="1.6" fill="#39ff14"/>
+  <rect x="22" y="108" width="20" height="4" fill="#8ba08c"/>
+  <path d="M22 92h20M32 38v70" stroke="#8ba08c" stroke-width="1" opacity=".6"/>
+  <path d="M22 112 L10 138 L22 132 Z" fill="#8ba08c" stroke="#5c6b5e" stroke-width="2"/>
+  <path d="M42 112 L54 138 L42 132 Z" fill="#8ba08c" stroke="#5c6b5e" stroke-width="2"/>
+  <path d="M24 124 H40 L42 134 H22 Z" fill="#414d43" stroke="#5c6b5e" stroke-width="1.5"/>
+  <path d="M26 134 H38 L36 148 H28 Z" fill="#2a332c" stroke="#5c6b5e" stroke-width="1.5"/>
+  <ellipse cx="32" cy="149" rx="5" ry="2.5" fill="#05080a" stroke="#414d43" stroke-width="1.5"/>
+</svg>

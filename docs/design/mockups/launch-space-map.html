@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>줍스 — M4 시안 · 발사 시퀀스 + 우주 지도</title>
+<!--
+  M4 시안: [1] 발사 카운트다운(FR-5.1) · [2] 발사 중계(FR-5.2) · [3] 우주 지도/궤도 상태(FR-6.1~6.6).
+  - 393×852 프레임 3개. 토큰 v1.0, 공통 컴포넌트는 M1~M3 핸드오프와 동일 문법.
+  - 로켓은 public/game/rocket.svg 지오메트리(인라인). 지도 Canvas 수치는 handoff-m4.md §5.
+  - 지도 대륙 윤곽은 개발측 GeoJSON 데이터(스타일만 명세) — 시안은 그리드+궤도 트랙으로 표현.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Doto:wght@700;900&family=VT323&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --color-bg:#05080a; --color-surface:#0d1412; --color-surface-raised:#141c19;
+    --color-fg:#d8e6d4; --color-primary:#39ff14; --color-primary-dim:#1d7a10;
+    --color-secondary:#ffb000; --color-accent:#2de2e6; --color-danger:#ff4545;
+    --color-success:#00e08f; --color-muted:#7d8f7f;
+    --color-grid:rgba(57,255,20,.22); --color-neutral-700:#2a332c; --color-neutral-800:#141c19;
+    --glow-primary:0 0 6px rgba(57,255,20,.55),0 0 18px rgba(57,255,20,.25);
+    --glow-text:0 0 4px rgba(57,255,20,.45);
+    --font-display:"Doto","VT323",monospace;
+    --font-body:system-ui,"Apple SD Gothic Neo","Noto Sans KR","Noto Sans",sans-serif;
+    --font-mono:ui-monospace,"SFMono-Regular","Cascadia Mono","Noto Sans Mono",monospace;
+    --page-pad-x:20px; --safe-top:12px; --safe-bottom:12px;
+    --radius-xs:2px; --radius-sm:4px; --radius-md:8px;
+    --bezel-highlight:rgba(255,255,255,.06); --bezel-shadow:rgba(0,0,0,.6);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#1a1d1f;color:var(--color-fg);font-family:var(--font-body);font-size:15px;line-height:22px;padding:24px}
+  h1{font:600 15px/22px var(--font-body);color:#9aa;margin-bottom:16px}
+  .sheet{display:flex;gap:24px;align-items:flex-start;overflow-x:auto;padding-bottom:16px}
+  .col{flex:none}
+  .col>p{font-size:12px;line-height:16px;color:#889;margin-bottom:8px;max-width:393px}
+  .device{width:393px;height:852px;overflow:hidden;position:relative;background:var(--color-bg);outline:1px solid #333;border-radius:24px;display:flex;flex-direction:column}
+  .scanlines::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:5;background:repeating-linear-gradient(0deg,rgba(57,255,20,.05) 0 1px,transparent 1px 3px)}
+
+  .topbar{display:flex;align-items:center;gap:6px;height:calc(56px + var(--safe-top));padding:var(--safe-top) 8px 0;flex:none}
+  .icon-btn{width:44px;height:44px;display:grid;place-items:center;background:none;border:none;color:var(--color-muted);cursor:pointer}
+  .topbar h2{font:600 17px/24px var(--font-body)}
+  .live{margin-left:auto;margin-right:12px;display:inline-flex;align-items:center;gap:6px;font:600 12px/16px var(--font-mono);letter-spacing:.08em;color:var(--color-danger)}
+  .live i{width:8px;height:8px;border-radius:50%;background:var(--color-danger);box-shadow:0 0 6px rgba(255,69,69,.6);animation:blinkdot 1s steps(1) infinite}
+  @keyframes blinkdot{50%{opacity:.3}}
+
+  .panel{background:var(--color-surface);border:2px solid var(--color-neutral-700);border-radius:var(--radius-md);
+    box-shadow:inset 0 1px 0 var(--bezel-highlight),inset 0 -2px 6px var(--bezel-shadow);padding:14px 16px}
+  .panel-label{font-size:12px;line-height:16px;letter-spacing:.08em;color:var(--color-secondary);text-transform:uppercase}
+  .cta{width:100%;min-height:56px;cursor:pointer;font:600 17px/24px var(--font-body);letter-spacing:.02em;
+    color:#05080a;background:var(--color-primary);border:2px solid #63ff47;border-radius:var(--radius-sm);
+    box-shadow:inset 0 2px 0 rgba(255,255,255,.35),inset 0 -3px 0 rgba(0,0,0,.35),0 0 6px rgba(57,255,20,.55),0 0 18px rgba(57,255,20,.25)}
+  .btn-secondary{min-height:44px;padding:0 16px;cursor:pointer;font:600 15px/22px var(--font-body);
+    color:var(--color-secondary);background:transparent;border:2px solid var(--color-secondary);border-radius:var(--radius-sm);
+    box-shadow:0 0 6px rgba(255,176,0,.25);display:inline-flex;align-items:center;gap:8px}
+  .chip{font-size:11px;line-height:14px;padding:3px 8px;border-radius:999px;border:1.5px solid;letter-spacing:.04em}
+  .chip.ok{color:var(--color-success);border-color:var(--color-success)}
+  .chip.shadow{color:var(--color-muted);border-color:var(--color-neutral-700)}
+  .chip.link{color:var(--color-accent);border-color:var(--color-accent)}
+  .note{font-size:12px;line-height:16px;color:var(--color-muted)}
+
+  /* ①② 발사 장면 */
+  .stage{position:absolute;inset:0;overflow:hidden}
+  .overlay{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;padding:calc(var(--safe-top) + 56px) var(--page-pad-x) calc(var(--safe-bottom) + 12px);pointer-events:none}
+  .tminus{text-align:center}
+  .tminus b{font-family:var(--font-display);font-weight:900;font-size:56px;line-height:60px;letter-spacing:.03em;color:var(--color-primary);text-shadow:var(--glow-text)}
+  .tminus span{display:block;font-size:12px;line-height:16px;letter-spacing:.14em;color:var(--color-muted);margin-top:2px}
+  .tplus b{color:var(--color-secondary);text-shadow:0 0 4px rgba(255,176,0,.4)}
+  .mission{display:flex;justify-content:center;gap:8px;align-items:center;margin-top:10px}
+  .mission .name{font-family:var(--font-mono);font-size:15px}
+  .telemetry{margin-top:auto;pointer-events:auto}
+  .tele-row{display:flex;gap:12px}
+  .tele{flex:1;text-align:center;padding:10px 4px;background:rgba(13,20,18,.85);border:1px solid var(--color-neutral-700);border-radius:var(--radius-sm)}
+  .tele b{font-family:var(--font-display);font-weight:700;font-size:22px;line-height:26px;color:var(--color-fg)}
+  .tele span{display:block;font-size:11px;line-height:14px;color:var(--color-muted);margin-top:2px}
+  .stages{display:flex;gap:6px;margin-top:10px}
+  .stg{flex:1;text-align:center;font-size:11px;line-height:14px;color:var(--color-muted);padding-top:8px;border-top:3px solid var(--color-neutral-700)}
+  .stg.done{border-color:var(--color-primary-dim);color:var(--color-muted)}
+  .stg.now{border-color:var(--color-primary);color:var(--color-primary);text-shadow:var(--glow-text)}
+  .share-row{display:flex;justify-content:center;margin-top:12px}
+
+  /* ③ 지도 */
+  .page{flex:1;display:flex;flex-direction:column;gap:12px;padding:8px var(--page-pad-x) 0;min-height:0;overflow:hidden}
+  .map-wrap{position:relative;border:2px solid var(--color-neutral-700);border-radius:var(--radius-md);overflow:hidden;background:#060d09}
+  .readout{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px}
+  .ro b{font-family:var(--font-display);font-weight:700;font-size:20px;line-height:24px;color:var(--color-fg)}
+  .ro span{display:block;font-size:11px;line-height:14px;color:var(--color-muted)}
+  .invite{display:flex;align-items:center;gap:10px}
+  .invite code{flex:1;font-family:var(--font-mono);font-size:17px;letter-spacing:.12em;color:var(--color-accent);
+    background:var(--color-surface-raised);border:2px solid var(--color-neutral-700);border-radius:var(--radius-sm);padding:9px 12px;text-align:center}
+  .cta-wrap{margin-top:auto;padding:12px 0 calc(var(--safe-bottom) + 12px)}
+  @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<h1>줍스 M4 시안 — ① 발사 카운트다운 → ② 발사 중계 → ③ 우주 지도(궤도 상태)</h1>
+<div class="sheet">
+
+  <!-- ①==================== 카운트다운 ====================-->
+  <div class="col"><p>① 발사 카운트다운 — FR-5.1</p>
+  <div class="device scanlines">
+    <div class="stage">
+      <svg width="393" height="852" viewBox="0 0 393 852" style="position:absolute;inset:0">
+        <g fill="#d8e6d4">
+          <circle cx="50" cy="120" r="1.5" opacity=".4"/><circle cx="330" cy="90" r="2" opacity=".5"/>
+          <circle cx="290" cy="200" r="1.5" opacity=".35"/><circle cx="80" cy="260" r="1.8" opacity=".4"/>
+          <circle cx="200" cy="150" r="1.3" opacity=".3"/><circle cx="350" cy="320" r="1.5" opacity=".3"/>
+        </g>
+        <!-- 지면 -->
+        <rect x="0" y="700" width="393" height="152" fill="#071a0d"/>
+        <path d="M0 700 H393" stroke="rgba(57,255,20,.4)" stroke-width="1.5"/>
+        <!-- 발사대 타워 -->
+        <g fill="#141c19" stroke="#2a332c" stroke-width="2">
+          <rect x="120" y="420" width="22" height="280"/>
+          <rect x="142" y="470" width="34" height="8"/><rect x="142" y="540" width="34" height="8"/><rect x="142" y="610" width="34" height="8"/>
+        </g>
+        <circle cx="131" cy="414" r="4" fill="#ff4545" opacity=".85"/>
+        <!-- 발사대 받침 -->
+        <rect x="150" y="676" width="120" height="24" fill="#141c19" stroke="#2a332c" stroke-width="2"/>
+        <!-- 로켓 (rocket.svg 지오메트리, 2.2배 → 353px, 발사대 위) -->
+        <g transform="translate(140 345) scale(2.2)">
+          <path d="M32 6 Q42 22 42 38 L22 38 Q22 22 32 6 Z" fill="#c8d2c4" stroke="#5c6b5e" stroke-width="2"/>
+          <rect x="22" y="38" width="20" height="86" fill="#c8d2c4" stroke="#5c6b5e" stroke-width="2"/>
+          <rect x="22" y="46" width="20" height="8" fill="#ffb000" opacity=".9"/>
+          <circle cx="32" cy="70" r="5" fill="none" stroke="#1d7a10" stroke-width="2"/>
+          <circle cx="35.5" cy="66.5" r="1.6" fill="#39ff14"/>
+          <rect x="22" y="108" width="20" height="4" fill="#8ba08c"/>
+          <path d="M22 92h20M32 38v70" stroke="#8ba08c" stroke-width="1" opacity=".6"/>
+          <path d="M22 112 L10 138 L22 132 Z" fill="#8ba08c" stroke="#5c6b5e" stroke-width="2"/>
+          <path d="M42 112 L54 138 L42 132 Z" fill="#8ba08c" stroke="#5c6b5e" stroke-width="2"/>
+          <path d="M24 124 H40 L42 134 H22 Z" fill="#414d43" stroke="#5c6b5e" stroke-width="1.5"/>
+          <path d="M26 134 H38 L36 148 H28 Z" fill="#2a332c" stroke="#5c6b5e" stroke-width="1.5"/>
+        </g>
+      </svg>
+    </div>
+    <header class="topbar" style="position:relative;z-index:6">
+      <button class="icon-btn" aria-label="뒤로">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square"><path d="M15 4 L7 12 L15 20"/></svg>
+      </button>
+      <h2>발사 준비</h2>
+    </header>
+    <div class="overlay">
+      <div class="tminus"><b>T-00:18</b><span>LIFTOFF COUNTDOWN</span></div>
+      <div class="mission">
+        <span class="name">누리 KSLV-II · 나로우주센터</span>
+        <span class="chip ok">ORBITA 좌석 41</span>
+      </div>
+      <div class="telemetry">
+        <p class="note" style="text-align:center;padding-bottom:4px">발사 순간을 놓치지 마세요 — 자동으로 중계가 시작됩니다</p>
+      </div>
+    </div>
+  </div></div>
+
+  <!-- ②==================== 발사 중계 ====================-->
+  <div class="col"><p>② 발사 중계 — FR-5.2 (텔레메트리 + 단계 진행)</p>
+  <div class="device scanlines">
+    <div class="stage">
+      <svg width="393" height="852" viewBox="0 0 393 852" style="position:absolute;inset:0">
+        <g fill="#d8e6d4">
+          <circle cx="60" cy="150" r="1.5" opacity=".45"/><circle cx="320" cy="120" r="2" opacity=".5"/>
+          <circle cx="280" cy="300" r="1.5" opacity=".35"/><circle cx="90" cy="380" r="1.8" opacity=".4"/>
+          <circle cx="180" cy="90" r="1.3" opacity=".35"/><circle cx="340" cy="470" r="1.5" opacity=".3"/>
+          <circle cx="40" cy="550" r="1.5" opacity=".3"/><circle cx="300" cy="620" r="1.3" opacity=".3"/>
+        </g>
+        <!-- 지구 곡률(하단) -->
+        <path d="M-60 852 Q196 760 453 852 Z" fill="#071a0d" stroke="rgba(57,255,20,.3)" stroke-width="1.5"/>
+        <!-- 상승 중 로켓 (1.6배, 살짝 기울임) + 화염·연기 이펙트 -->
+        <g transform="translate(150 260) rotate(4 51 128) scale(1.6)">
+          <path d="M32 6 Q42 22 42 38 L22 38 Q22 22 32 6 Z" fill="#c8d2c4" stroke="#5c6b5e" stroke-width="2"/>
+          <rect x="22" y="38" width="20" height="86" fill="#c8d2c4" stroke="#5c6b5e" stroke-width="2"/>
+          <rect x="22" y="46" width="20" height="8" fill="#ffb000" opacity=".9"/>
+          <circle cx="32" cy="70" r="5" fill="none" stroke="#1d7a10" stroke-width="2"/>
+          <circle cx="35.5" cy="66.5" r="1.6" fill="#39ff14"/>
+          <path d="M22 112 L10 138 L22 132 Z" fill="#8ba08c" stroke="#5c6b5e" stroke-width="2"/>
+          <path d="M42 112 L54 138 L42 132 Z" fill="#8ba08c" stroke="#5c6b5e" stroke-width="2"/>
+          <path d="M24 124 H40 L42 134 H22 Z" fill="#414d43" stroke="#5c6b5e" stroke-width="1.5"/>
+          <path d="M26 134 H38 L36 148 H28 Z" fill="#2a332c" stroke="#5c6b5e" stroke-width="1.5"/>
+          <!-- 화염 -->
+          <path d="M27 148 Q32 186 37 148 Z" fill="#ffb000" opacity=".9"/>
+          <path d="M29 148 Q32 172 35 148 Z" fill="#f2f7f0" opacity=".85"/>
+        </g>
+        <!-- 연기 트레일 -->
+        <g fill="#8ba08c">
+          <circle cx="188" cy="562" r="10" opacity=".25"/><circle cx="176" cy="596" r="14" opacity=".2"/>
+          <circle cx="190" cy="634" r="18" opacity=".16"/><circle cx="170" cy="676" r="22" opacity=".12"/>
+          <circle cx="188" cy="720" r="26" opacity=".09"/>
+        </g>
+        <!-- 속도선 -->
+        <path d="M110 300 v46 M300 380 v38 M90 480 v42 M320 200 v34" stroke="rgba(216,230,212,.18)" stroke-width="2"/>
+      </svg>
+    </div>
+    <header class="topbar" style="position:relative;z-index:6">
+      <span style="width:44px"></span>
+      <h2 style="margin:0 auto 0 0">발사 중계</h2>
+      <span class="live"><i></i>LIVE</span>
+    </header>
+    <div class="overlay">
+      <div class="tminus tplus"><b>T+00:42</b><span>NURI KSLV-II · FLIGHT</span></div>
+      <div class="telemetry">
+        <div class="tele-row">
+          <div class="tele"><b>12.4</b><span>고도 km</span></div>
+          <div class="tele"><b>1,240</b><span>속도 m/s</span></div>
+          <div class="tele"><b>41</b><span>ORBITA 좌석</span></div>
+        </div>
+        <div class="stages">
+          <div class="stg done">리프트오프</div>
+          <div class="stg now">Max-Q</div>
+          <div class="stg">단 분리</div>
+          <div class="stg">페어링</div>
+          <div class="stg">궤도 진입</div>
+        </div>
+        <div class="share-row">
+          <button class="btn-secondary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M4 12v8h16v-8"/><path d="M12 14V4M12 4 L8 8M12 4 L16 8"/></svg>
+            발사 중계 공유
+          </button>
+        </div>
+      </div>
+    </div>
+  </div></div>
+
+  <!-- ③==================== 우주 지도 ====================-->
+  <div class="col"><p>③ 우주 지도·궤도 상태 — FR-6.1/6.3/6.5/6.6 (대륙 윤곽은 개발측 GeoJSON, 스타일만 명세)</p>
+  <div class="device scanlines">
+    <header class="topbar">
+      <button class="icon-btn" aria-label="뒤로">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square"><path d="M15 4 L7 12 L15 20"/></svg>
+      </button>
+      <h2>우주 지도</h2>
+      <span class="live" style="color:var(--color-success)"><i style="background:var(--color-success);box-shadow:0 0 6px rgba(0,224,143,.6);animation:none"></i>교신 가능</span>
+    </header>
+    <div class="page">
+      <!-- 지도 (equirectangular 353×200): 위경도 그리드 + 지상 궤적 + 음영 밴드 + 내 줍스 -->
+      <div class="map-wrap">
+        <svg width="353" height="200" viewBox="0 0 353 200" style="display:block">
+          <defs>
+            <pattern id="hatch" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
+              <rect width="8" height="8" fill="rgba(5,8,10,.55)"/>
+              <path d="M0 0V8" stroke="rgba(57,255,20,.12)" stroke-width="1.5"/>
+            </pattern>
+          </defs>
+          <!-- 위경도 그리드(30° 간격) -->
+          <g stroke="rgba(57,255,20,.16)" stroke-width="1">
+            <path d="M29.4 0V200M58.8 0V200M88.2 0V200M117.6 0V200M147 0V200M176.5 0V200M205.9 0V200M235.3 0V200M264.7 0V200M294.1 0V200M323.5 0V200"/>
+            <path d="M0 33.3H353M0 66.7H353M0 133.3H353M0 166.7H353"/>
+          </g>
+          <path d="M0 100H353" stroke="rgba(57,255,20,.4)" stroke-width="1.2"/>
+          <path d="M176.5 0V200" stroke="rgba(57,255,20,.4)" stroke-width="1.2"/>
+          <!-- 음영(통신 두절) 밴드 -->
+          <rect x="220" y="0" width="133" height="200" fill="url(#hatch)"/>
+          <path d="M220 0V200" stroke="rgba(125,143,127,.5)" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <!-- 지상 궤적(현재 패스 + 다음 패스) -->
+          <path d="M0 130 Q88 40 176.5 100 T353 70" fill="none" stroke="#ffb000" stroke-width="2" opacity=".9"/>
+          <path d="M0 168 Q88 78 176.5 138 T353 108" fill="none" stroke="#ffb000" stroke-width="1.5" stroke-dasharray="5 5" opacity=".4"/>
+          <!-- 내 줍스 마커 (anchor 중심) -->
+          <circle cx="176.5" cy="100" r="10" fill="none" stroke="rgba(57,255,20,.4)" stroke-width="1.5"/>
+          <circle cx="176.5" cy="100" r="4" fill="#39ff14"/>
+          <!-- 다른 줍스(축소 표시) -->
+          <circle cx="96" cy="72" r="2.5" fill="#2de2e6" opacity=".8"/>
+          <circle cx="258" cy="120" r="2.5" fill="#ff2e97" opacity=".5"/>
+          <circle cx="310" cy="60" r="2.5" fill="#ffd25e" opacity=".5"/>
+        </svg>
+      </div>
+
+      <section class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px">
+          <span class="panel-label">ORBITA · 궤도 상태</span>
+          <span class="chip link">자동 수거 중</span>
+        </div>
+        <div class="readout">
+          <div class="ro"><b>대한민국</b><span>현재 상공</span></div>
+          <div class="ro"><b>550 km</b><span>고도</span></div>
+          <div class="ro"><b>7.6 km/s</b><span>속도</span></div>
+          <div class="ro"><b>04:12</b><span>음영 진입까지</span></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <span class="panel-label" style="color:var(--color-accent)">Invite</span>
+        <p class="note" style="margin:2px 0 8px">친구를 초대하면 함께 청소가 빨라져요</p>
+        <div class="invite">
+          <code>JX7-Q2M</code>
+          <button class="btn-secondary" style="border-color:var(--color-accent);color:var(--color-accent);box-shadow:0 0 6px rgba(45,226,230,.25)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M4 12v8h16v-8"/><path d="M12 14V4M12 4 L8 8M12 4 L16 8"/></svg>
+            공유
+          </button>
+        </div>
+      </section>
+
+      <div class="cta-wrap">
+        <p class="note" style="text-align:center;margin-bottom:8px">지금 교신 가능 — 직접 조종해서 더 많이 수거하세요</p>
+        <button class="cta">아케이드 모드 진입</button>
+      </div>
+    </div>
+  </div></div>
+</div>
+</body>
+</html>

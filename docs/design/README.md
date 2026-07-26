@@ -13,6 +13,8 @@
 - [mockups/onboarding.html](./mockups/onboarding.html) — **온보딩(M2) 3단계 시안**(색 스와치 인터랙션 동작). [스크린샷](./mockups/onboarding.png)
 - [handoff-m3.md](./handoff-m3.md) — **M3 개발 핸드오프 가이드**. 미니게임 장면·HUD, 쓰레기 스프라이트 계약, 5원 조이스틱 수치 명세, 청약·선별 컴포넌트.
 - [mockups/minigame-subscription.html](./mockups/minigame-subscription.html) — **지상 미니게임·발사체 청약·선별 결과(M3) 시안**. [스크린샷](./mockups/minigame-subscription.png)
+- [handoff-m4.md](./handoff-m4.md) — **M4 개발 핸드오프 가이드**. 카운트다운·중계 계기, 로켓 에셋·이펙트, 우주 지도 Canvas 명세(음영·궤적), 초대·아케이드 진입.
+- [mockups/launch-space-map.html](./mockups/launch-space-map.html) — **발사 카운트다운·중계·우주 지도(M4) 시안**. [스크린샷](./mockups/launch-space-map.png)
 
 ## 에셋을 repo로 관리하는 규칙
 
