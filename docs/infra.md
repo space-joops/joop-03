@@ -76,6 +76,29 @@ npx supabase link --project-ref gclewzipfpkmxjikqmav   # 이미 링크되어 있
 |---|---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | 프로젝트 URL | 클라이언트 공개 |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | anon key | 클라이언트 공개 (RLS로 보호) |
-| `SUPABASE_SERVICE_ROLE_KEY` | 관리자 키, RLS 우회 | **서버 전용, 절대 클라이언트 노출 금지** |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service_role 키, RLS 우회 | **서버 전용, 절대 클라이언트 노출 금지** |
+| `ADMIN_PASSWORD` | 관리자 콘솔(`/admin`) 로그인 비밀번호 | **서버 전용** |
+| `ADMIN_SESSION_SECRET` | 관리자 세션 쿠키 HMAC 서명 키 | **서버 전용** |
+| `ADMIN_SESSION_TTL_SECONDS` | (선택) 관리자 세션 수명. 기본 43200(12시간) | 서버 전용 |
 
-로컬 `.env.local`(gitignore됨)과 Vercel 프로젝트의 Production/Preview/Development 세 환경 모두에 등록되어 있습니다.
+로컬 `.env.local`(gitignore됨)과 Vercel 프로젝트의 Production/Preview/Development 세 환경 모두에 등록되어 있어야 합니다.
+
+### 관리자 콘솔 환경변수 (M8)
+
+`/admin`은 게임의 익명 세션과 분리된 자체 인증을 씁니다. 두 값이 **하나라도 없거나 짧으면
+콘솔 전체가 잠깁니다**(로그인 실패 + 기존 세션도 거부). 의도된 fail-closed 동작입니다.
+
+- `ADMIN_PASSWORD` — 12자 이상. 온라인 무차별 대입에 대한 실질적 방어선이 이 값의 엔트로피이므로
+  사람이 외우는 문자열 대신 랜덤 값을 쓰세요.
+- `ADMIN_SESSION_SECRET` — 32자 이상. 이 값을 바꾸면 모든 관리자 세션이 즉시 무효화됩니다.
+  (비밀번호를 바꿔도 마찬가지입니다 — 서명 키가 두 값에서 함께 유도되기 때문입니다.)
+
+```bash
+# 생성
+node -e "console.log(require('crypto').randomBytes(18).toString('base64url'))"  # ADMIN_PASSWORD
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"        # ADMIN_SESSION_SECRET
+
+# Vercel 3환경 모두에 등록
+vercel env add ADMIN_PASSWORD production   # preview, development 도 동일하게
+vercel env add ADMIN_SESSION_SECRET production
+```

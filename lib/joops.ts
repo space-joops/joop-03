@@ -1,5 +1,7 @@
 import { cache } from "react";
 import { createServerClient } from "@/lib/supabase/server";
+import { getGameConfig } from "@/lib/game-config";
+import { CONFIG_SPEC_BY_KEY, coerceConfigNumber } from "@/lib/config-specs";
 import type { OrbitParams } from "@/lib/orbit";
 
 // /api/orbital 응답 = 첫 화면 스냅샷.
@@ -31,23 +33,24 @@ type JoopRow = {
   total_collected: number;
 };
 
-type ConfigRow = { key: string; value: unknown };
-
-const DEFAULT_TICK_SECONDS = 10;
-const DEFAULT_DEBRIS_TARGET = 5_000_000;
+/** config 폴백의 단일 진실은 lib/config-specs.ts 이므로 여기서 상수를 따로 두지 않는다. */
+function configNumber(config: Map<string, unknown>, key: string): number {
+  const spec = CONFIG_SPEC_BY_KEY.get(key)!;
+  return config.has(key) ? coerceConfigNumber(spec, config.get(key)) : spec.fallback;
+}
 
 /**
  * 궤도 스냅샷을 계산한다. 서버 컴포넌트(초기 SSR)와 /api/orbital 라우트가 공유한다.
  * `React.cache` 로 같은 요청 안에서는 한 번만 조회.
  *
- * ⚠️ serverTime = Date.now() 는 비결정 값이다. 라우트에서 `revalidate = 10` 으로
- *    이 스냅샷이 10초간 캐시(고정)되며, 그게 곧 "10초마다 새 스냅샷" 설계다
+ * ⚠️ serverTime = Date.now() 는 비결정 값이다. /api/orbital 이 이 스냅샷을
+ *    `tickSeconds` 동안 CDN 캐시로 고정하며, 그게 곧 "N초마다 새 스냅샷" 설계다
  *    (docs/architecture/adr/0005-ssr-orbital-api.md).
  */
 export const getOrbitalSnapshot = cache(async (): Promise<OrbitalSnapshot> => {
   const sb = createServerClient();
 
-  const [joopsRes, configRes] = await Promise.all([
+  const [joopsRes, config] = await Promise.all([
     sb
       .from("joop_03_joops")
       .select(
@@ -55,17 +58,13 @@ export const getOrbitalSnapshot = cache(async (): Promise<OrbitalSnapshot> => {
       )
       .eq("status", "orbit")
       .order("name"),
-    sb.from("joop_03_game_config").select("key,value"),
+    getGameConfig(),
   ]);
 
   if (joopsRes.error) throw joopsRes.error;
-  if (configRes.error) throw configRes.error;
 
-  const config = new Map(
-    ((configRes.data ?? []) as ConfigRow[]).map((r) => [r.key, r.value]),
-  );
-  const tickSeconds = Number(config.get("orbital_tick_seconds") ?? DEFAULT_TICK_SECONDS);
-  const target = Number(config.get("debris_target") ?? DEFAULT_DEBRIS_TARGET);
+  const tickSeconds = configNumber(config, "orbital_tick_seconds");
+  const target = configNumber(config, "debris_target");
 
   const rows = (joopsRes.data ?? []) as JoopRow[];
   const debris = rows.reduce((sum, j) => sum + Number(j.total_collected), 0);
