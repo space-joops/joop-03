@@ -1,0 +1,24 @@
+{
+  "common": {
+    "appName": "줍스"
+  },
+  "firstScreen": {
+    "title": "함께 지구 궤도를 청소합니다",
+    "totalCollected": "수거한 우주 쓰레기",
+    "percentCleaned": "청소 완료",
+    "pieces": "조각",
+    "ranking": "랭킹",
+    "weeklyChange": "주간",
+    "myRank": "나",
+    "inOrbit": "개의 줍스가 궤도에",
+    "cta": {
+      "startWithInvite": "초대코드로 시작하기"
+    },
+    "reducedMotion": "애니메이션이 정지되었습니다 (모션 최소화)."
+  },
+  "language": {
+    "label": "언어",
+    "en": "English",
+    "ko": "한국어"
+  }
+}
