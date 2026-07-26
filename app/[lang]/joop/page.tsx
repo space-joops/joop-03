@@ -68,26 +68,46 @@ export default async function JoopPage({ params }: PageProps<"/[lang]/joop">) {
         </div>
       </section>
 
-      {/* 액션 */}
+      {/* 액션 — 줍스 상태별 분기 */}
       <div className="mt-5 flex flex-col gap-3">
-        <Link
-          href={`/${lang}/joop/train`}
-          className="rounded-md py-3.5 text-center font-mono text-sm font-semibold uppercase tracking-widest"
-          style={{ background: "var(--color-primary)", color: "var(--color-bg)" }}
-        >
-          {j.train}
-        </Link>
-        <Link
-          href={`/${lang}/launch`}
-          className="rounded-md border py-3.5 text-center font-mono text-sm font-semibold uppercase tracking-widest text-[var(--color-fg)]"
-          style={{ borderColor: "var(--color-neutral-600)" }}
-        >
-          {j.launch}
-        </Link>
+        {mine.status === "orbit" ? (
+          <Link
+            href={`/${lang}/joop/map`}
+            className="rounded-md py-3.5 text-center font-mono text-sm font-semibold uppercase tracking-widest"
+            style={{ background: "var(--color-primary)", color: "var(--color-bg)" }}
+          >
+            {j.openMap}
+          </Link>
+        ) : mine.status === "queued" ? (
+          <Link
+            href={`/${lang}/joop/launch`}
+            className="rounded-md py-3.5 text-center font-mono text-sm font-semibold uppercase tracking-widest"
+            style={{ background: "var(--color-primary)", color: "var(--color-bg)" }}
+          >
+            {j.launchNow}
+          </Link>
+        ) : (
+          <>
+            <Link
+              href={`/${lang}/joop/train`}
+              className="rounded-md py-3.5 text-center font-mono text-sm font-semibold uppercase tracking-widest"
+              style={{ background: "var(--color-primary)", color: "var(--color-bg)" }}
+            >
+              {j.train}
+            </Link>
+            <Link
+              href={`/${lang}/launch`}
+              className="rounded-md border py-3.5 text-center font-mono text-sm font-semibold uppercase tracking-widest text-[var(--color-fg)]"
+              style={{ borderColor: "var(--color-neutral-600)" }}
+            >
+              {j.launch}
+            </Link>
+          </>
+        )}
       </div>
 
       <p className="mt-4 font-mono text-xs leading-relaxed text-[var(--color-muted)]">
-        {j.hint}
+        {mine.status === "orbit" ? j.hintOrbit : mine.status === "queued" ? j.hintQueued : j.hint}
       </p>
     </main>
   );

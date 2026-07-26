@@ -3,20 +3,21 @@ import Link from "next/link";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getMyJoop } from "@/lib/profile";
-import { getMinigameConfig } from "@/lib/game-config";
-import { GroundMinigame } from "@/components/ground-minigame";
+import { getSpaceConfig } from "@/lib/space";
+import { LaunchSequence } from "@/components/launch-sequence";
 
 export const dynamic = "force-dynamic";
 
-export default async function TrainPage({ params }: PageProps<"/[lang]/joop/train">) {
+export default async function LaunchSeqPage({ params }: PageProps<"/[lang]/joop/launch">) {
   const { lang } = await params;
   if (!isLocale(lang)) notFound();
 
   const mine = await getMyJoop();
   if (!mine) redirect(`/${lang}/onboarding`);
+  if (mine.status === "orbit") redirect(`/${lang}/joop/map`);
+  if (mine.status !== "queued") redirect(`/${lang}/joop`); // 발사 자격 없음
 
-  // force-dynamic 이라 화면에 들어올 때마다 최신 설정을 읽는다 = "게임 재시작 시 반영".
-  const [dict, minigameConfig] = await Promise.all([getDictionary(lang), getMinigameConfig()]);
+  const [dict, cfg] = await Promise.all([getDictionary(lang), getSpaceConfig()]);
 
   return (
     <main
@@ -28,11 +29,16 @@ export default async function TrainPage({ params }: PageProps<"/[lang]/joop/trai
           {dict.joop.back}
         </Link>
         <span className="font-mono text-xs uppercase tracking-widest text-[var(--color-muted)]">
-          {dict.minigame.title}
+          {dict.launch.launchTitle}
         </span>
       </header>
 
-      <GroundMinigame lang={lang} dict={dict} color={mine.color} config={minigameConfig} />
+      <LaunchSequence
+        lang={lang}
+        dict={dict}
+        color={mine.color}
+        countdownSeconds={cfg.launchCountdownSeconds}
+      />
     </main>
   );
 }

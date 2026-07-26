@@ -20,6 +20,8 @@ Supabase 연동을 위해 아래 환경변수가 로컬 `.env.local`(gitignore�
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY` — 서버 전용, 절대 클라이언트 코드나 커밋에 노출하지 마세요.
+- `ADMIN_PASSWORD` (12자 이상) · `ADMIN_SESSION_SECRET` (32자 이상) — 관리자 콘솔(`/admin`) 로그인용.
+  서버 전용이며, 없으면 콘솔이 잠깁니다. 생성 방법은 [docs/infra.md](docs/infra.md) 참고.
 
 ## 인프라
 
