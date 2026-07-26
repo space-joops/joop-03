@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
 
 // PWA 매니페스트 — 세로 고정 설치형 (docs/architecture/adr/0002-pwa-portrait.md).
-// 아이콘은 임시(icon.svg). 디자이너 에셋(192/512/maskable) 오면 교체 → docs/design/asset-inventory.md
+// 아이콘: scripts/generate-icons.mjs 로 마스터 SVG 에서 파생 → docs/design/asset-inventory.md
+// 색상: app/globals.css 의 --color-bg 와 일치(#05070f).
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "JOOPS — 함께 우주를 청소합니다",
@@ -10,8 +11,18 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/",
     display: "standalone",
     orientation: "portrait",
-    background_color: "#050810",
-    theme_color: "#050810",
-    icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml" }],
+    background_color: "#05070f",
+    theme_color: "#05070f",
+    icons: [
+      { src: "/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" },
+      { src: "/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+      { src: "/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+      {
+        src: "/icon-maskable-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "maskable",
+      },
+    ],
   };
 }

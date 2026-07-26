@@ -1,66 +1,91 @@
-# 디자인 토큰 초안 — 카세트퓨처리즘
+# 디자인 토큰 — 카세트퓨처리즘 (확정)
 
-> 디자이너와 개발이 공유하는 **공용 어휘**입니다. 아래는 방향을 잡기 위한 **초안**이며, 실제 값(HEX·px)은 디자이너가 확정합니다. 확정된 토큰은 이후 `app/globals.css`의 `@theme`(Tailwind v4)로 매핑되어 코드에서 그대로 쓰입니다.
-> 참고: 현재 `app/globals.css`는 `@import "tailwindcss"` + `@theme inline { … }` 방식(Tailwind v4, 설정 파일 없음)입니다.
+> 디자이너와 개발이 공유하는 **공용 어휘**입니다. 아래 값은 **확정본**이며 `app/globals.css`
+> 의 `:root` + `@theme inline`(Tailwind v4)에 그대로 반영되어 있습니다.
+> M1 컴포넌트는 `var(--color-*)` 이름을 참조하므로 **변수 이름은 고정**이고 값만 확정합니다.
+> 모든 텍스트/전경 조합은 WCAG **AA(≥4.5:1)** 대비를 통과하도록 선정했습니다(형광색 위 텍스트 주의).
 
-## 1. 컬러
+## 1. 컬러 (확정)
 
-**다크 기본.** 우주 배경 위 형광 모노크롬 + 절제된 네온.
+**다크 기본.** 딥스페이스 위 형광 모노크롬 + 절제된 네온.
 
-| 토큰(제안) | 역할 | 방향(초안) |
+| 토큰 | 역할 | HEX | 비고 |
+|---|---|---|---|
+| `--color-bg` | 기본 배경 | `#05070f` | 딥스페이스(거의 검정, 네이비 기미). 아이콘/매니페스트 배경도 동일 |
+| `--color-surface` | 패널·베젤 표면 / 지구 본체 | `#0f1826` | 배경보다 밝은 차콜 네이비 |
+| `--color-fg` | 기본 텍스트 | `#e4f2e9` | 형광 기미 오프화이트 (bg 대비 17.4:1) |
+| `--color-muted` | 보조 텍스트·비활성 | `#8a9e92` | 데새추레이트 그린그레이 (surface 대비 6.3:1) |
+| `--color-primary` | 형광 강조·계기·주요 수치·CTA | `#35e07a` | P1 phosphor 그린. CTA 배경(위 텍스트는 `--color-bg`, 11.6:1) |
+| `--color-secondary` | 보조 강조 | `#ffb23e` | P3 앰버 phosphor |
+| `--color-accent` | 절제된 네온 포인트 | `#38e0f0` | 시안. 소량 사용 |
+| `--color-danger` | 경고·게임오버·하락 | `#ff5c77` | 레드(핑크 기미로 다크 위 가독성 확보) |
+| `--color-success` | 상승·성공 | `#7ce64b` | 라임 — primary 그린과 **색상(hue)으로 구분** |
+| `--color-grid` | 지구본/궤도 그리드 라인 | `#1e5a46` | 저채도 그린. 라인/비활성 세그먼트에 |
+
+**뉴트럴 스케일** (패널·구분선·비활성): `--color-neutral-050 … -900`
+`#eef4f0 · #cdd8d2 · #9fb0a7 · #71847b · #4c5c54 · #33413b · #232e29 · #17201c · #0f1620 · #080c14`
+
+**CRT 글로우** (형광 요소 외곽; `box-shadow`/`text-shadow` 로 사용):
+`--glow-primary: 0 0 8px rgba(53,224,122,.55)` · `--glow-secondary` · `--glow-accent` · `--glow-danger`
+
+> **대비 원칙**: 텍스트는 `--color-bg`/`--color-surface` 위 `--color-fg`/`--color-muted` 로.
+> 형광색(primary/secondary/accent)은 **강조·라인·계기**에 쓰고, 그 **위에 텍스트를 올릴 때는
+> 어두운 `--color-bg` 를 전경색**으로 사용한다(예: CTA 버튼).
+
+## 2. 타이포그래피 (확정)
+
+| 토큰 | 역할 | 값 |
 |---|---|---|
-| `--color-bg` | 기본 배경 | 딥스페이스 블랙/네이비 (거의 검정) |
-| `--color-surface` | 패널·베젤 표면 | 배경보다 약간 밝은 차콜 |
-| `--color-fg` | 기본 텍스트 | 오프화이트/연회색 |
-| `--color-primary` | 형광 강조(계기·주요 수치) | **형광 그린** |
-| `--color-secondary` | 보조 강조 | **앰버/오렌지** |
-| `--color-accent` | 절제된 네온 포인트 | 시안/마젠타 소량 |
-| `--color-danger` | 경고·게임오버·하락 | 레드 |
-| `--color-success` | 상승·성공 | 그린 계열(primary와 구분) |
-| `--color-muted` | 보조 텍스트·비활성 | 중간 회색 |
-| `--color-grid` | 지구본/궤도 그리드 라인 | 저채도 그린/앰버 |
-| `--glow-*` | CRT 글로우(형광 요소 외곽) | 각 형광색의 블러 발광 |
+| `--font-display` | 계기·수치·헤드라인 | Geist Mono 스택 (모노 = 세븐세그먼트 대체) |
+| `--font-body` / `--font-sans` | 본문·라벨(다국어) | Geist Sans 스택 |
+| `--font-mono` | 좌표·수치 | Geist Mono 스택 |
 
-- 뉴트럴 스케일 `--color-neutral-050 … -900` 제안(패널·구분선·비활성).
-- 대비: 형광색 위 텍스트는 대비가 낮아지기 쉬움 → 텍스트는 배경 대비로, 형광은 강조/라인에.
+- 외부 폰트 파일 미도입(라이선스). display 는 로드된 **Geist Mono** 로 대체(숫자·라틴에 모노
+  질감). 본문은 다국어 지원 **Geist Sans**(CJK/키릴은 시스템 폴백).
+- `--font-sans`/`--font-mono` 는 `@theme inline` 에서 Tailwind `font-sans`/`font-mono` 유틸로 노출.
 
-## 2. 타이포그래피
+**스케일**(px / rem):
 
-| 토큰 | 역할 | 방향 |
+| 토큰 | 크기 | 용도 |
 |---|---|---|
-| `--font-display` | 계기·수치·헤드라인 | 세븐세그먼트/도트/모노 느낌(카세트퓨처리즘 핵심) |
-| `--font-body` | 본문·라벨 | 가독성 좋은 산세리프 |
-| `--font-mono` | 코드·좌표·수치 | 모노스페이스 |
+| `--text-display-lg` | 40px (2.5rem) | 대형 수치 |
+| `--text-display-md` | 24px (1.5rem) | 청소량 등 계기 수치 |
+| `--text-title` | 18px (1.125rem) | 로고/타이틀 |
+| `--text-body` | 14px (0.875rem) | 본문·라벨 |
+| `--text-caption` | 12px (0.75rem) | 캡션 |
+| `--text-micro` | 10px (0.625rem) | 마이크로 라벨 |
 
-- **다국어 주의**: 10개 언어(라틴/CJK/키릴). display 폰트가 특정 언어 글리프를 다 못 담을 수 있으니, **본문은 다국어 지원 폰트**로, display 폰트는 숫자·라틴 위주로 쓰거나 언어별 폴백 지정. subset 용량 관리(→ [ADR-0001](../architecture/adr/0001-i18n.md)).
-- 스케일(초안): `display-lg / display-md / title / body / caption / mono` — 실제 px/lineHeight는 디자이너 확정.
+`--leading-tight: 1.1` · `--leading-normal: 1.45` · `--tracking-wide: .1em` · `--tracking-widest: .2em`(계기판 라벨)
 
-## 3. 간격 · 그리드 · 반경
+## 3. 간격 · 그리드 · 반경 (확정)
 
-- **8pt 기반** 간격 스케일: `--space-1(4) … --space-8(32)` 등.
-- 세로 모바일 콘텐츠 **최대 폭 + 좌우 여백**, 상/하 **safe area** 패딩 토큰.
-- 반경(`--radius-*`): 카세트퓨처리즘은 각진 편 → 작은 반경 + 두꺼운 베젤 대비.
+**8pt 기반 간격**: `--space-1:4 · -2:8 · -3:12 · -4:16 · -5:24 · -6:32 · -8:48` (px)
+**콘텐츠 최대 폭**: `--content-max: 28rem`(448px) — 세로 모바일 1열, 좌우 여백. safe area 는
+컴포넌트에서 `env(safe-area-inset-*)` 로 처리(상단 헤더 / 하단 CTA).
+
+**반경**(각진 편 + 두꺼운 베젤 대비): `--radius-sm:2px · -md:4px · -lg:8px · -pill:999px`
 
 ## 4. 컴포넌트 스타일 방향
 
-| 컴포넌트 | 방향 |
-|---|---|
-| 버튼 | 물리 버튼 느낌(입체 베젤·눌림 상태). 주요 CTA는 형광. |
-| 토글/스위치 | 아날로그 토글 스위치 은유 |
-| 게이지/미터 | 청소량 등 계기판 스타일(세그먼트 바·바늘) |
-| 패널/카드 | 두꺼운 베젤 + 표면 질감, 코너 나사·라벨 디테일(선택) |
-| 스캔라인 오버레이 | CRT 느낌의 미세 스캔라인(절제, 성능·가독성 해치지 않게) |
-| 랭킹 리스트 | 모노 수치 정렬, 등락 화살표(success/danger 색) |
-| 스파크라인 | 주간 등락 미니 차트(형광 라인) |
+| 컴포넌트 | 방향 | 토큰 매핑 |
+|---|---|---|
+| CTA 버튼 | 형광 배경 + 다크 전경(물리 버튼) | bg `--color-primary`, text `--color-bg` |
+| 게이지/미터 | 세그먼트 바(24칸), 채움=형광+글로우, 빈칸=surface | `--color-primary` + `--glow-primary` / `--color-surface` |
+| 패널/카드·랭킹 아이템 | 두꺼운 베젤 표면 | bg `--color-surface`, text `--color-fg`/`--color-muted` |
+| 등락 화살표 | 상승/하락 색 구분 | ▲ `--color-success` / ▼ `--color-danger` |
+| 스파크라인 | 형광 라인 | stroke `--color-primary` |
+| 지구본/궤도(Canvas) | 저채도 그리드 + surface 지구 | line `--color-grid`, fill `--color-surface` |
+| 줍스 마커(Canvas) | 발광 점 | 데이터별 색 + `shadowBlur`(글로우) |
 
 ## 5. 모션
 
-- CRT 플리커·스캔라인·부팅 시퀀스 등 **절제해서** 사용(과하면 피로·성능 저하).
-- 모든 지속 애니메이션은 **`prefers-reduced-motion` 시 정지/최소화** 대안 필수.
-- 게임 영역(Canvas)의 실시간 모션과 UI 모션을 구분.
+- CRT 플리커·스캔라인·부팅 시퀀스는 **절제** 사용.
+- 모든 지속 애니메이션은 **`prefers-reduced-motion: reduce`** 시 정지/최소화(궤도 Canvas 는
+  이미 reduced-motion 시 1회 정지 렌더).
 
-## 6. 기술 매핑 메모(개발용)
+## 6. 기술 매핑 (개발용)
 
-- 확정 토큰 → `app/globals.css`의 `:root` 변수 + `@theme inline`에 색/폰트 매핑 → Tailwind 유틸리티로 사용.
-- 라이트/다크는 `prefers-color-scheme` + (필요 시) `data-theme` 토글로. 지금은 **다크가 기본**.
-- Canvas 2D 렌더러도 동일 토큰 값을 참조(중복 하드코딩 금지) → [ADR-0003](../architecture/adr/0003-rendering-canvas2d.md).
+- 확정 토큰 → `app/globals.css` `:root` 변수 + `@theme inline` 색/폰트 매핑 → Tailwind 유틸.
+- Canvas 2D 렌더러는 `getComputedStyle` 로 동일 토큰(`--color-grid`, `--color-surface`)을 읽어
+  하드코딩 중복을 피한다(→ [ADR-0003](../architecture/adr/0003-rendering-canvas2d.md)).
+- 라이트/다크는 `prefers-color-scheme` + `data-theme` 토글 대비. **현재 다크가 기본.**
