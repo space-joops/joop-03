@@ -11,6 +11,8 @@
 - [handoff-m2.md](./handoff-m2.md) — **M2 개발 핸드오프 가이드**. 온보딩 플로우·컴포넌트 스펙, 줍스 캐릭터 스프라이트시트 계약(meta JSON), i18n 키 초안.
 - [mockups/first-screen.html](./mockups/first-screen.html) — **첫 화면 완성 시안**(393×852, Canvas 레퍼런스 구현 포함). [스크린샷](./mockups/first-screen.png)
 - [mockups/onboarding.html](./mockups/onboarding.html) — **온보딩(M2) 3단계 시안**(색 스와치 인터랙션 동작). [스크린샷](./mockups/onboarding.png)
+- [handoff-m3.md](./handoff-m3.md) — **M3 개발 핸드오프 가이드**. 미니게임 장면·HUD, 쓰레기 스프라이트 계약, 5원 조이스틱 수치 명세, 청약·선별 컴포넌트.
+- [mockups/minigame-subscription.html](./mockups/minigame-subscription.html) — **지상 미니게임·발사체 청약·선별 결과(M3) 시안**. [스크린샷](./mockups/minigame-subscription.png)
 
 ## 에셋을 repo로 관리하는 규칙
 

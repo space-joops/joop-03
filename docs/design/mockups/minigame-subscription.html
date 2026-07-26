@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>줍스 — M3 시안 · 지상 미니게임 + 발사체 청약</title>
+<!--
+  M3 시안: [1] 지상 미니게임(FR-3.1/3.2) · [2] 발사체 청약(FR-4.1) · [3] 선별 결과(FR-4.3).
+  - 393×852 프레임 3개. 토큰은 design-tokens.md v1.0, 공통 컴포넌트는 M1/M2 핸드오프와 동일.
+  - 미니게임 장면·조이스틱은 handoff-m3.md 수치 명세의 시각 레퍼런스(게임플레이는 Canvas 구현).
+  - 캐릭터·쓰레기는 public/game/ 시트와 동일 지오메트리(인라인 SVG).
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Doto:wght@700;900&family=VT323&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --color-bg:#05080a; --color-surface:#0d1412; --color-surface-raised:#141c19;
+    --color-fg:#d8e6d4; --color-primary:#39ff14; --color-primary-dim:#1d7a10;
+    --color-secondary:#ffb000; --color-accent:#2de2e6; --color-danger:#ff4545;
+    --color-success:#00e08f; --color-muted:#7d8f7f;
+    --color-grid:rgba(57,255,20,.22); --color-neutral-700:#2a332c; --color-neutral-800:#141c19;
+    --glow-primary:0 0 6px rgba(57,255,20,.55),0 0 18px rgba(57,255,20,.25);
+    --glow-text:0 0 4px rgba(57,255,20,.45);
+    --font-display:"Doto","VT323",monospace;
+    --font-body:system-ui,"Apple SD Gothic Neo","Noto Sans KR","Noto Sans",sans-serif;
+    --font-mono:ui-monospace,"SFMono-Regular","Cascadia Mono","Noto Sans Mono",monospace;
+    --page-pad-x:20px; --safe-top:12px; --safe-bottom:12px;
+    --radius-xs:2px; --radius-sm:4px; --radius-md:8px;
+    --bezel-highlight:rgba(255,255,255,.06); --bezel-shadow:rgba(0,0,0,.6);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#1a1d1f;color:var(--color-fg);font-family:var(--font-body);font-size:15px;line-height:22px;padding:24px}
+  h1{font:600 15px/22px var(--font-body);color:#9aa;margin-bottom:16px}
+  .sheet{display:flex;gap:24px;align-items:flex-start;overflow-x:auto;padding-bottom:16px}
+  .col{flex:none}
+  .col>p{font-size:12px;line-height:16px;color:#889;margin-bottom:8px;max-width:393px}
+  .device{width:393px;height:852px;overflow:hidden;position:relative;background:var(--color-bg);outline:1px solid #333;border-radius:24px;display:flex;flex-direction:column}
+  .scanlines::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:5;background:repeating-linear-gradient(0deg,rgba(57,255,20,.05) 0 1px,transparent 1px 3px)}
+
+  .topbar{display:flex;align-items:center;gap:6px;height:calc(56px + var(--safe-top));padding:var(--safe-top) 8px 0;flex:none}
+  .icon-btn{width:44px;height:44px;display:grid;place-items:center;background:none;border:none;color:var(--color-muted);cursor:pointer}
+  .topbar h2{font:600 17px/24px var(--font-body)}
+
+  .panel{background:var(--color-surface);border:2px solid var(--color-neutral-700);border-radius:var(--radius-md);
+    box-shadow:inset 0 1px 0 var(--bezel-highlight),inset 0 -2px 6px var(--bezel-shadow);padding:14px 16px}
+  .panel-label{font-size:12px;line-height:16px;letter-spacing:.08em;color:var(--color-secondary);text-transform:uppercase}
+  .cta{width:100%;min-height:56px;cursor:pointer;font:600 17px/24px var(--font-body);letter-spacing:.02em;
+    color:#05080a;background:var(--color-primary);border:2px solid #63ff47;border-radius:var(--radius-sm);
+    box-shadow:inset 0 2px 0 rgba(255,255,255,.35),inset 0 -3px 0 rgba(0,0,0,.35),0 0 6px rgba(57,255,20,.55),0 0 18px rgba(57,255,20,.25)}
+  .btn-sm{min-height:44px;padding:0 18px;cursor:pointer;font:600 15px/22px var(--font-body);
+    color:#05080a;background:var(--color-primary);border:2px solid #63ff47;border-radius:var(--radius-sm);
+    box-shadow:inset 0 2px 0 rgba(255,255,255,.35),inset 0 -2px 0 rgba(0,0,0,.35),0 0 6px rgba(57,255,20,.4)}
+  .btn-sm[disabled]{background:var(--color-neutral-800);border-color:var(--color-neutral-700);color:var(--color-muted);box-shadow:none;cursor:default}
+
+  /* ── ① 미니게임 ── */
+  .hud{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;pointer-events:none;padding:var(--safe-top) 12px calc(var(--safe-bottom) + 8px)}
+  .hud-row{display:flex;align-items:center;gap:10px}
+  .lv-badge{font-family:var(--font-display);font-weight:700;font-size:20px;color:var(--color-secondary);letter-spacing:.02em}
+  .xp{display:flex;gap:2px;height:8px;flex:1;max-width:120px}
+  .xp i{flex:1;border-radius:2px;background:color-mix(in srgb,var(--color-primary-dim) 35%,transparent)}
+  .xp i.on{background:var(--color-primary);box-shadow:var(--glow-primary)}
+  .score{margin-left:auto;text-align:right}
+  .score b{font-family:var(--font-display);font-weight:700;font-size:24px;color:var(--color-fg)}
+  .score span{display:block;font-size:11px;line-height:14px;color:var(--color-muted)}
+  .fuel{display:flex;align-items:center;gap:8px;margin-top:8px}
+  .fuel .lab{font-size:11px;line-height:14px;color:var(--color-muted);letter-spacing:.06em}
+  .fuel .bar{display:flex;gap:2px;height:8px;flex:1}
+  .fuel .bar i{flex:1;border-radius:2px;background:rgba(122,85,0,.35)}
+  .fuel .bar i.on{background:var(--color-secondary);box-shadow:0 0 6px rgba(255,176,0,.45)}
+  .goal{margin-top:auto;pointer-events:none;display:flex;justify-content:center}
+  .goal span{background:rgba(13,20,18,.85);border:1px solid var(--color-neutral-700);border-radius:999px;
+    padding:6px 14px;font-size:12px;line-height:16px;color:var(--color-muted)}
+  .goal b{color:var(--color-secondary);font-weight:600}
+  .scene{position:absolute;inset:0;overflow:hidden}
+  .pop{position:absolute;font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--color-primary);text-shadow:var(--glow-text)}
+
+  /* ── ②③ 청약 ── */
+  .page{flex:1;display:flex;flex-direction:column;gap:12px;padding:8px var(--page-pad-x) 0;min-height:0;overflow:hidden}
+  .banner-ok{border-color:rgba(0,224,143,.5)}
+  .banner-ok .panel-label{color:var(--color-success)}
+  .card-title{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+  .card-title b{font-family:var(--font-mono);font-size:17px}
+  .card-sub{color:var(--color-muted);font-size:12px;line-height:16px;margin-top:2px}
+  .card-row{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+  .seats{font-family:var(--font-mono);font-size:13px;color:var(--color-muted)}
+  .chip{font-size:11px;line-height:14px;padding:3px 8px;border-radius:999px;border:1.5px solid;letter-spacing:.04em}
+  .chip.open{color:var(--color-secondary);border-color:var(--color-secondary)}
+  .chip.closed{color:var(--color-muted);border-color:var(--color-neutral-700)}
+  .chip.wait{color:var(--color-accent);border-color:var(--color-accent)}
+  .chip.ok{color:var(--color-success);border-color:var(--color-success)}
+  .mycard{border-color:rgba(45,226,230,.45)}
+  .okcard{border-color:rgba(0,224,143,.55);box-shadow:inset 0 1px 0 var(--bezel-highlight),0 0 14px rgba(0,224,143,.18)}
+  .result-hero{display:flex;flex-direction:column;align-items:center;gap:4px;margin:8px 0 4px}
+  /* 한글 헤드라인은 body 폰트(디스플레이 폰트는 숫자·라틴 전용 — 토큰 규칙) */
+  .result-hero .big{font:800 30px/38px var(--font-body);letter-spacing:.01em;color:var(--color-primary);text-shadow:var(--glow-text)}
+  .result-hero .sub{color:var(--color-muted)}
+  .dday{font-family:var(--font-display);font-weight:700;font-size:24px;color:var(--color-secondary)}
+  .cta-wrap{margin-top:auto;padding:12px 0 calc(var(--safe-bottom) + 12px)}
+  .note{font-size:12px;line-height:16px;color:var(--color-muted)}
+  @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<h1>줍스 M3 시안 — ① 지상 미니게임 → ② 발사체 청약 → ③ 선별 결과</h1>
+<div class="sheet">
+
+  <!-- ①==================== 지상 미니게임 ====================-->
+  <div class="col"><p>① 지상 미니게임 — FR-3.1(조작 학습) / FR-3.2(발사 자격). 장면·조이스틱 수치는 handoff-m3.md §3</p>
+  <div class="device">
+    <div class="scene">
+      <!-- 하늘·별 -->
+      <svg width="393" height="852" viewBox="0 0 393 852" style="position:absolute;inset:0">
+        <g fill="#d8e6d4">
+          <circle cx="40" cy="90" r="1.5" opacity=".4"/><circle cx="130" cy="150" r="2" opacity=".5"/>
+          <circle cx="300" cy="110" r="1.5" opacity=".35"/><circle cx="350" cy="220" r="2" opacity=".45"/>
+          <circle cx="70" cy="260" r="1.5" opacity=".3"/><circle cx="220" cy="180" r="1.5" opacity=".35"/>
+          <circle cx="180" cy="80" r="1.2" opacity=".3"/><circle cx="330" cy="330" r="1.5" opacity=".3"/>
+        </g>
+        <!-- 지평선 + 원근 그리드(지상 y=560) -->
+        <g stroke="rgba(57,255,20,.22)" fill="none">
+          <path d="M0 560 H393" stroke-width="1.5" stroke="rgba(57,255,20,.4)"/>
+          <path d="M0 596 H393 M0 640 H393 M0 696 H393 M0 764 H393 M0 844 H393" stroke-width="1"/>
+          <path d="M196 560 L196 852 M96 560 L-80 852 M296 560 L472 852 M146 560 L28 852 M246 560 L364 852 M46 560 L-190 852 M346 560 L580 852" stroke-width="1"/>
+        </g>
+        <!-- 발사장 실루엣(우측) -->
+        <g fill="#141c19" stroke="#2a332c" stroke-width="2">
+          <rect x="308" y="430" width="16" height="130"/>
+          <rect x="296" y="446" width="12" height="8"/><rect x="296" y="478" width="12" height="8"/><rect x="296" y="510" width="12" height="8"/>
+          <rect x="336" y="500" width="34" height="60" rx="3"/>
+          <rect x="330" y="552" width="46" height="10"/>
+        </g>
+        <circle cx="316" cy="426" r="3" fill="#ff4545" opacity=".8"/>
+        <!-- 쓰레기(debris-sheet 지오메트리, 크기 클래스 S/M/L) -->
+        <g transform="translate(52 200) scale(1.1)"><g transform="rotate(-18 32 32)">
+          <rect x="20" y="14" width="24" height="36" rx="4" fill="#aebfab" stroke="#5c6b5e" stroke-width="2"/>
+          <ellipse cx="32" cy="15.5" rx="11" ry="4" fill="#8ba08c" stroke="#5c6b5e" stroke-width="1.5"/>
+          <rect x="20" y="26" width="24" height="10" fill="#ffb000" opacity=".85"/>
+        </g></g>
+        <g transform="translate(280 260) scale(.85)"><g transform="rotate(24 32 32)">
+          <path d="M24 14 L40 14 L44 21 L40 28 L24 28 L20 21 Z" fill="#8ba08c" stroke="#5c6b5e" stroke-width="2"/>
+          <rect x="27" y="28" width="10" height="24" fill="#aebfab" stroke="#5c6b5e" stroke-width="2"/>
+          <path d="M27 33h10M27 38h10M27 43h10M27 48h10" stroke="#5c6b5e" stroke-width="1.5"/>
+        </g></g>
+        <g transform="translate(90 400) scale(.6)"><g transform="rotate(-10 32 32)">
+          <path d="M32 12 L48 21 L48 41 L32 50 L16 41 L16 21 Z" fill="#8ba08c" stroke="#5c6b5e" stroke-width="2"/>
+          <circle cx="32" cy="31" r="8" fill="#05080a" stroke="#414d43" stroke-width="2"/>
+        </g></g>
+        <g transform="translate(238 420) scale(1.15)"><g transform="rotate(12 32 32)">
+          <path d="M14 18 L52 14 L54 44 L34 50 L18 46 Z" fill="#0e2f38" stroke="#5c6b5e" stroke-width="2"/>
+          <path d="M23 16.2 L26 47.5 M35 15 L40 48.6 M46 14.6 L49 45.7 M15 27 L53 24 M16.5 37 L53.6 35" stroke="#2de2e6" stroke-width="1.2" opacity=".5"/>
+          <path d="M52 14 L54 44 L34 50" fill="none" stroke="#8ba08c" stroke-width="2.5"/>
+        </g></g>
+        <g transform="translate(150 490) scale(.6)"><g transform="rotate(8 32 32)">
+          <path d="M16 20 L48 16 L50 42 L40 46 L18 44 Z" fill="#14401f" stroke="#5c6b5e" stroke-width="2"/>
+          <path d="M22 24 h10 v6 h8 M24 38 h14 v-6 M40 22 v8" fill="none" stroke="#39ff14" stroke-width="1.4" opacity=".6"/>
+          <circle cx="20" cy="40" r="1.8" fill="#ffd25e"/><circle cx="45" cy="20" r="1.8" fill="#ffd25e"/>
+        </g></g>
+        <!-- 줍스(move 상태, 우상향 이동) -->
+        <g transform="translate(140 285) scale(.95)">
+          <g transform="translate(64 64) rotate(-6) translate(-64 -64)">
+            <path d="M64 24 V13" stroke="#8ba08c" stroke-width="3"/>
+            <circle cx="64" cy="11" r="3.2" fill="#39ff14"/>
+            <g fill="#c8d2c4" stroke="#5c6b5e" stroke-width="2">
+              <rect x="22" y="46" width="12" height="18" rx="6" transform="rotate(-14 28 50)"/>
+              <rect x="94" y="46" width="12" height="18" rx="6" transform="rotate(14 100 50)"/>
+            </g>
+            <rect x="34" y="24" width="60" height="54" rx="10" fill="#c8d2c4" stroke="#5c6b5e" stroke-width="2.5"/>
+            <rect x="42" y="32" width="44" height="32" rx="4" fill="#071a0d" stroke="#414d43" stroke-width="2"/>
+            <rect x="50" y="40" width="7" height="10" rx="1.5" fill="#39ff14"/>
+            <rect x="71" y="40" width="7" height="10" rx="1.5" fill="#39ff14"/>
+            <rect x="56" y="55" width="16" height="3" rx="1.5" fill="#39ff14" opacity=".9"/>
+            <circle cx="46" cy="71" r="2.2" fill="#39ff14"/><circle cx="53" cy="71" r="2.2" fill="#ffb000" opacity=".85"/>
+            <path d="M46 78 H82 L78 88 H50 Z" fill="#414d43"/>
+            <rect x="55" y="88" width="18" height="5" rx="2" fill="#2a332c"/>
+            <path d="M56 92 Q64 116 72 92 Z" fill="#39ff14" opacity=".85"/>
+            <path d="M59 92 Q64 106 69 92 Z" fill="#f2f7f0" opacity=".8"/>
+          </g>
+        </g>
+        <!-- 조이스틱(5원: 링 4 + 노브 1, 반투명 · 분사 3단계 활성) -->
+        <g transform="translate(100 700)">
+          <circle r="60" fill="rgba(216,230,212,.04)" stroke="rgba(57,255,20,.22)" stroke-width="1.5"/>
+          <circle r="46" fill="rgba(216,230,212,.04)" stroke="rgba(57,255,20,.5)" stroke-width="1.5"/>
+          <circle r="32" fill="rgba(216,230,212,.04)" stroke="rgba(57,255,20,.22)" stroke-width="1.5"/>
+          <circle r="18" fill="rgba(216,230,212,.04)" stroke="rgba(57,255,20,.22)" stroke-width="1.5"/>
+          <path d="M0 0 L31 -31" stroke="rgba(57,255,20,.5)" stroke-width="1.5"/>
+          <circle cx="31" cy="-31" r="14" fill="rgba(57,255,20,.25)" stroke="#39ff14" stroke-width="2"/>
+        </g>
+      </svg>
+      <span class="pop" style="left:208px;top:452px">+5</span>
+    </div>
+    <div class="hud">
+      <div class="hud-row">
+        <button class="icon-btn" style="pointer-events:auto" aria-label="일시정지">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+        </button>
+        <span class="lv-badge">LV.3</span>
+        <div class="xp"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i></div>
+        <div class="score"><b>128</b><span>수거</span></div>
+      </div>
+      <div class="fuel">
+        <span class="lab">분사가스</span>
+        <div class="bar"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+      <div class="goal"><span><b>LV.5</b> 도달 시 발사 자격 획득 · 드래그로 분사 방향과 세기 조절</span></div>
+    </div>
+  </div></div>
+
+  <!-- ②==================== 발사체 청약 ====================-->
+  <div class="col"><p>② 발사체 청약 — FR-4.1 (자격 배너 + 실 발사체 리스트)</p>
+  <div class="device scanlines">
+    <header class="topbar">
+      <button class="icon-btn" aria-label="뒤로">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square"><path d="M15 4 L7 12 L15 20"/></svg>
+      </button>
+      <h2>발사체 청약</h2>
+    </header>
+    <div class="page">
+      <section class="panel banner-ok">
+        <span class="panel-label">Launch Ready</span>
+        <div style="font:600 17px/24px var(--font-body);margin-top:2px">발사 자격 획득 — LV.5 달성</div>
+        <p class="note">원하는 발사체에 청약하세요. 탑승 대상은 운영진이 선별합니다.</p>
+      </section>
+
+      <section class="panel mycard">
+        <div class="card-title"><b>누리 KSLV-II</b><span class="chip wait">선별 대기</span></div>
+        <div class="card-sub">나로우주센터 · 2026-08-14 10:00 KST</div>
+        <div class="card-row"><span class="seats">정원 100 · 신청 1,240</span><span class="note">내 청약</span></div>
+      </section>
+
+      <section class="panel">
+        <div class="card-title"><b>Falcon 9</b><span class="chip open">모집 중</span></div>
+        <div class="card-sub">케이프커내버럴 SLC-40 · 2026-08-21 09:30 EDT</div>
+        <div class="card-row"><span class="seats">정원 120 · 신청 2,810</span><button class="btn-sm">청약하기</button></div>
+      </section>
+
+      <section class="panel">
+        <div class="card-title"><b>H3-24L</b><span class="chip open">모집 중</span></div>
+        <div class="card-sub">다네가시마 우주센터 · 2026-09-02 11:00 JST</div>
+        <div class="card-row"><span class="seats">정원 80 · 신청 640</span><button class="btn-sm">청약하기</button></div>
+      </section>
+
+      <section class="panel">
+        <div class="card-title"><b>Ariane 6</b><span class="chip closed">마감</span></div>
+        <div class="card-sub">기아나 쿠루 ELA-4 · 2026-08-05 06:00 GFT</div>
+        <div class="card-row"><span class="seats">정원 90 · 신청 3,020</span><button class="btn-sm" disabled>마감</button></div>
+      </section>
+
+      <p class="note" style="margin-top:auto;padding:0 0 calc(var(--safe-bottom) + 12px);text-align:center">청약은 1건만 유지됩니다. 다른 발사체에 청약하면 기존 청약은 취소돼요.</p>
+    </div>
+  </div></div>
+
+  <!-- ③==================== 선별 결과 ====================-->
+  <div class="col"><p>③ 선별 결과 — FR-4.3 (확정/미선정 상태)</p>
+  <div class="device scanlines">
+    <header class="topbar">
+      <span style="width:44px"></span>
+      <h2 style="margin:0 auto">선별 결과</h2>
+      <span style="width:44px"></span>
+    </header>
+    <div class="page">
+      <div class="result-hero">
+        <svg width="140" height="140" viewBox="0 0 128 128" aria-label="내 줍스">
+          <g>
+            <path d="M64 24 V13" stroke="#8ba08c" stroke-width="3"/>
+            <circle cx="64" cy="11" r="3.2" fill="#39ff14"/>
+            <g fill="#c8d2c4" stroke="#5c6b5e" stroke-width="2">
+              <rect x="22" y="46" width="12" height="18" rx="6" transform="rotate(6 28 50)"/>
+              <rect x="94" y="46" width="12" height="18" rx="6" transform="rotate(-6 100 50)"/>
+            </g>
+            <rect x="34" y="24" width="60" height="54" rx="10" fill="#c8d2c4" stroke="#5c6b5e" stroke-width="2.5"/>
+            <rect x="42" y="32" width="44" height="32" rx="4" fill="#071a0d" stroke="#414d43" stroke-width="2"/>
+            <rect x="50" y="40" width="7" height="10" rx="1.5" fill="#39ff14"/>
+            <rect x="71" y="40" width="7" height="10" rx="1.5" fill="#39ff14"/>
+            <rect x="58" y="53" width="12" height="7" rx="2" fill="#39ff14"/>
+            <circle cx="46" cy="71" r="2.2" fill="#39ff14"/><circle cx="53" cy="71" r="2.2" fill="#ffb000" opacity=".85"/>
+            <path d="M46 78 H82 L78 88 H50 Z" fill="#414d43"/>
+            <rect x="55" y="88" width="18" height="5" rx="2" fill="#2a332c"/>
+          </g>
+        </svg>
+        <div class="big">탑승 확정!</div>
+        <p class="sub">ORBITA의 좌석이 확정됐어요</p>
+      </div>
+
+      <section class="panel okcard">
+        <div class="card-title"><b>누리 KSLV-II</b><span class="chip ok">탑승 확정</span></div>
+        <div class="card-sub">나로우주센터 LC-2 · 2026-08-14 10:00 KST</div>
+        <div class="card-row"><span class="seats">좌석 41/100 · ORBITA</span><span class="dday">D-18</span></div>
+      </section>
+
+      <section class="panel">
+        <span class="panel-label" style="color:var(--color-muted)">미선정이라면</span>
+        <p class="note" style="margin-top:4px">이번 발사에 선정되지 않으면 청약은 자동으로 다음 모집으로 이월돼요. 알림으로 결과를 알려드립니다.</p>
+      </section>
+
+      <div class="cta-wrap"><button class="cta">발사 준비하기</button></div>
+    </div>
+  </div></div>
+</div>
+</body>
+</html>
