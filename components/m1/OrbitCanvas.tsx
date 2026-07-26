@@ -3,15 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import { calculatePosition, generateMockSnapshot, OrbitalSnapshot } from "@/lib/orbit";
 
-export default function OrbitCanvas() {
+export default function OrbitCanvas({ snapshot }: { snapshot: OrbitalSnapshot | null }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [snapshot, setSnapshot] = useState<OrbitalSnapshot | null>(null);
-
-  // Fetch or generate snapshot on mount
-  useEffect(() => {
-    // In a real app, this would be a fetch to /api/orbital
-    setSnapshot(generateMockSnapshot());
-  }, []);
 
   const imgRef = useRef<HTMLImageElement | null>(null);
 
@@ -67,8 +60,12 @@ export default function OrbitCanvas() {
       }
 
       // --- Draw Joops ---
+      // Support prefers-reduced-motion
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      
       const currentTime = Date.now();
-      const elapsedTimeMs = currentTime - snapshot.serverTime;
+      // If reduced motion is true, lock the time to the snapshot time to freeze animation
+      const elapsedTimeMs = prefersReducedMotion ? 0 : currentTime - snapshot.serverTime;
 
       // Sort by Z to draw distant ones first
       const positions = snapshot.joops.map(joop => {
@@ -102,13 +99,15 @@ export default function OrbitCanvas() {
       });
       ctx.globalAlpha = 1.0; // Reset alpha
 
-      animationFrameId = requestAnimationFrame(render);
+      if (!prefersReducedMotion) {
+        animationFrameId = requestAnimationFrame(render);
+      }
     };
 
     render();
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
     };
   }, [snapshot]);
 

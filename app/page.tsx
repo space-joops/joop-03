@@ -1,10 +1,28 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import TopBar from "@/components/m1/TopBar";
 import OrbitCanvas from "@/components/m1/OrbitCanvas";
 import ProgressGauge from "@/components/m1/ProgressGauge";
 import RankingList from "@/components/m1/RankingList";
 import CTA from "@/components/m1/CTA";
+import { generateMockSnapshot, OrbitalSnapshot } from "@/lib/orbit";
 
 export default function Home() {
+  const [snapshot, setSnapshot] = useState<OrbitalSnapshot | null>(null);
+
+  useEffect(() => {
+    // Initial fetch (mocking SSR/initial load)
+    setSnapshot(generateMockSnapshot());
+
+    // 10-second polling (mocking client-side fetch from /api/orbital)
+    const interval = setInterval(() => {
+      setSnapshot(generateMockSnapshot());
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground max-w-md mx-auto relative shadow-2xl shadow-primary/5">
       {/* Scanline overlay is handled by body background in globals.css, but we can add an extra inner shadow for the CRT bezel feel */}
@@ -13,8 +31,11 @@ export default function Home() {
       <TopBar />
       
       <main className="flex-1 flex flex-col overflow-y-auto pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] scrollbar-hide">
-        <OrbitCanvas />
-        <ProgressGauge percent={62} total={1284000} />
+        <OrbitCanvas snapshot={snapshot} />
+        <ProgressGauge 
+          percent={snapshot?.totals.percent || 0} 
+          total={snapshot?.totals.debris || 0} 
+        />
         <RankingList />
         <CTA />
       </main>

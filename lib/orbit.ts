@@ -55,30 +55,41 @@ export function calculatePosition(orbit: OrbitParams, elapsedTimeMs: number, sca
   return { x, y, z };
 }
 
+let cachedJoops: JoopData[] | null = null;
+const MOCK_START_TIME = Date.now();
+
 /**
  * Helper to generate mock snapshot data for M1 testing.
  */
 export function generateMockSnapshot(): OrbitalSnapshot {
-  const colors = ["#39ff14", "#ffb000", "#00ffff", "#ff3333", "#00ff66"];
-  const joops: JoopData[] = Array.from({ length: 100 }).map((_, idx) => ({
-    id: `joop-${idx}`,
-    name: `Joop-${idx}`,
-    color: colors[Math.floor(Math.random() * colors.length)],
-    orbit: {
-      radius: 1.1 + Math.random() * 0.8, // 1.1x to 1.9x Earth radius
-      inclination: Math.random() * 180,
-      raan: Math.random() * 360,
-      phase0: Math.random() * Math.PI * 2,
-      // Orbital speed varies by radius (Kepler's third law approx)
-      angularVelocity: (Math.random() > 0.5 ? 1 : -1) * (0.0005 + Math.random() * 0.001) / Math.pow(1.5, 1.5), 
-    },
-    collected: Math.floor(Math.random() * 50000),
-  }));
+  if (!cachedJoops) {
+    const colors = ["#39ff14", "#ffb000", "#00ffff", "#ff3333", "#00ff66"];
+    cachedJoops = Array.from({ length: 100 }).map((_, idx) => ({
+      id: `joop-${idx}`,
+      name: `Joop-${idx}`,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      orbit: {
+        radius: 1.1 + Math.random() * 0.8, // 1.1x to 1.9x Earth radius
+        inclination: Math.random() * 180,
+        raan: Math.random() * 360,
+        phase0: Math.random() * Math.PI * 2,
+        // Orbital speed varies by radius (Kepler's third law approx)
+        angularVelocity: (Math.random() > 0.5 ? 1 : -1) * (0.0005 + Math.random() * 0.001) / Math.pow(1.5, 1.5), 
+      },
+      collected: Math.floor(Math.random() * 50000),
+    }));
+  }
+
+  const now = Date.now();
+  const elapsedSecs = (now - MOCK_START_TIME) / 1000;
+  // Simulate debris collection (e.g. 5 pieces per second)
+  const currentDebris = 1284000 + Math.floor(elapsedSecs * 5);
+  const currentPercent = 62.0 + (elapsedSecs * 0.001);
 
   return {
-    serverTime: Date.now(),
+    serverTime: now,
     tickSeconds: 10,
-    totals: { debris: 1284000, percent: 62.0 },
-    joops,
+    totals: { debris: currentDebris, percent: parseFloat(currentPercent.toFixed(2)) },
+    joops: cachedJoops,
   };
 }
