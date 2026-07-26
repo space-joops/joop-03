@@ -2,6 +2,7 @@
 
 > 필요한 모든 디자인 에셋 목록입니다. 우선순위(**M1**=첫 화면 착수용 / **후속**), 포맷, 사이즈/변형, repo 경로를 정리합니다.
 > 배치·네이밍·포맷 규칙은 [에셋 관리 규칙](./README.md)을 따릅니다. UI 요소 근거는 [첫 화면 스펙](../product/screens/01-first-screen.md).
+> **납품 상태(2026-07-26)**: ✅ = repo 반영 완료. 상세 사용법은 [핸드오프 가이드 §7](./handoff-m1.md). 마스터 원본은 `public/design-src/`.
 
 ## 범례
 
@@ -12,31 +13,31 @@
 
 ## A. 브랜드 · PWA (1순위)
 
-| 에셋 | 우선 | 포맷 | 사이즈/변형 | repo 경로(산출물) |
-|---|---|---|---|---|
-| 로고(워드마크 가로) | M1 | SVG | 단색/형광 2종 | `public/brand/logo-wordmark.svg` |
-| 심볼(줍스 마크) | M1 | SVG | 정사각 | `public/brand/logo-symbol.svg` |
-| 파비콘 | M1 | ICO/PNG | 32, 16 | `app/favicon.ico` |
-| 앱 아이콘 | M1 | PNG | **192**, **512** | `public/icon-192.png`, `public/icon-512.png` |
-| 앱 아이콘(maskable) | M1 | PNG | **512**(안전영역 준수) | `public/icon-maskable-512.png` |
-| apple-touch 아이콘 | M1 | PNG | **180** | `app/apple-icon.png` |
-| 스플래시(스타트업) | M1 | PNG | 주요 비율 세트 | `public/brand/splash-*.png` |
+| 에셋 | 우선 | 포맷 | 사이즈/변형 | repo 경로(산출물) | 상태 |
+|---|---|---|---|---|---|
+| 로고(워드마크 가로) | M1 | SVG | 단색/형광 2종 → **2파일**: 단색(currentColor)은 `logo-wordmark.svg`, 형광+글로우는 `logo-wordmark-glow.svg` | `public/brand/logo-wordmark.svg` · `logo-wordmark-glow.svg` | ✅ |
+| 심볼(줍스 마크) | M1 | SVG | 정사각(64), currentColor | `public/brand/logo-symbol.svg` | ✅ |
+| 파비콘 | M1 | ICO/PNG | 32, 16 | `app/favicon.ico` | ✅ |
+| 앱 아이콘 | M1 | PNG | **192**, **512** (+ `app/icon.png` 512) | `public/icon-192.png`, `public/icon-512.png` | ✅ |
+| 앱 아이콘(maskable) | M1 | PNG | **512**(안전영역=중앙 원 r40% 준수) | `public/icon-maskable-512.png` | ✅ |
+| apple-touch 아이콘 | M1 | PNG | **180** | `app/apple-icon.png` | ✅ |
+| 스플래시(스타트업) | M1 | PNG | iOS 세로 5종: 1179×2556 · 1206×2622 · 1290×2796 · 1320×2868 · 1170×2532 (Android는 매니페스트로 자동) | `public/brand/splash-*.png` | ✅ |
 
 ## B. 첫 화면(M1) UI
 
-| 에셋 | 우선 | 포맷 | Canvas | 비고 / repo 경로 |
-|---|---|---|---|---|
-| 상단 바 배경/베젤 | M1 | SVG/CSS | | 토큰으로 구현 가능하면 에셋 불필요 |
-| 언어 선택 아이콘(🌐) | M1 | SVG | | `public/ui/icon-language.svg` |
-| 지구본 + 경위도 그리드 | M1 | 수치 명세 | ✅ | 색·선두께·반경 비율 명세(스프라이트 아님) |
-| 궤도 링 | M1 | 수치 명세 | ✅ | 링 두께·투명도 |
-| 줍스 마커(점) | M1 | SVG/PNG | ✅ | **색 변형** 다수(줍스 색). 작은 발광 점 + anchor 중심 |
-| 청소량 게이지 | M1 | SVG/CSS | | 세그먼트 계기 스타일, 값 가변 |
-| 랭킹 리스트 아이템 | M1 | CSS | | 등락 화살표 아이콘 필요 |
-| 등락 화살표(▲▼) | M1 | SVG | | `public/ui/arrow-up.svg`, `arrow-down.svg`(success/danger 색) |
-| 주간 등락 스파크라인 | M1 | 수치 명세 | ✅ | 형광 라인, 데이터 가변 |
-| "초대코드로 시작" CTA | M1 | SVG/CSS | | 물리 버튼 스타일(형광 강조) |
-| 로딩/스켈레톤·빈 상태 | M1 | CSS | | reduced-motion 대안 |
+| 에셋 | 우선 | 포맷 | Canvas | 비고 / repo 경로 | 상태 |
+|---|---|---|---|---|---|
+| 상단 바 배경/베젤 | M1 | SVG/CSS | | 토큰만으로 구현(에셋 불필요) → [핸드오프 §5-1](./handoff-m1.md) | ✅ |
+| 언어 선택 아이콘(🌐) | M1 | SVG | | `public/ui/icon-language.svg` | ✅ |
+| 지구본 + 경위도 그리드 | M1 | 수치 명세 | ✅ | [핸드오프 §4](./handoff-m1.md) + 시안 레퍼런스 구현 | ✅ |
+| 궤도 링 | M1 | 수치 명세 | ✅ | [핸드오프 §4](./handoff-m1.md) | ✅ |
+| 줍스 마커(점) | M1 | 수치 명세 | ✅ | 색은 API `joops[].color`(권장 6색 팔레트), r2.5 + 글로우, anchor 중심 → [핸드오프 §4](./handoff-m1.md) | ✅ |
+| 청소량 게이지 | M1 | SVG/CSS | | 세그먼트 30칸 스펙 → [핸드오프 §5-3](./handoff-m1.md) | ✅ |
+| 랭킹 리스트 아이템 | M1 | CSS | | [핸드오프 §5-4](./handoff-m1.md) | ✅ |
+| 등락 화살표(▲▼) | M1 | SVG | | `public/ui/arrow-up.svg`, `arrow-down.svg`(success/danger 색) | ✅ |
+| 주간 등락 스파크라인 | M1 | 수치 명세 | ✅ | 44×16 · 1.5px → [핸드오프 §5-4](./handoff-m1.md) | ✅ |
+| "초대코드로 시작" CTA | M1 | SVG/CSS | | 물리 버튼 스펙 → [핸드오프 §5-5](./handoff-m1.md) | ✅ |
+| 로딩/스켈레톤·빈 상태 | M1 | CSS | | [핸드오프 §5-7](./handoff-m1.md), reduced-motion 대안 포함 | ✅ |
 
 > 지구본·궤도·줍스 마커·스파크라인은 코드가 Canvas로 그리므로, "이미지 파일"보다 **색·비율·선 두께 명세**가 핵심입니다. 줍스 마커만 색 변형 스프라이트로 뽑아둘 수 있습니다.
 
@@ -57,11 +58,11 @@
 
 ## D. 공통 UI (전 화면, 후속 포함)
 
-| 에셋 | 우선 | 포맷 | 비고 |
-|---|---|---|---|
-| 아이콘 세트(설정·뒤로·닫기·공유·알림 등) | M1~후속 | SVG | 일관된 라인/그리드 |
-| 토스트·모달·다이얼로그 스타일 | 후속 | CSS/SVG | 베젤 패널 |
-| 탭바/내비게이션 | 후속 | SVG/CSS | 화면 확장 시 |
+| 에셋 | 우선 | 포맷 | 비고 | 상태 |
+|---|---|---|---|---|
+| 아이콘 세트(설정·뒤로·닫기·공유·알림 등) | M1~후속 | SVG | 24 그리드 통일. `public/ui/icon-settings.svg` · `icon-close.svg` · `icon-back.svg` · `icon-share.svg` 선반영 | ✅(4종) |
+| 토스트·모달·다이얼로그 스타일 | 후속 | CSS/SVG | 베젤 패널 | |
+| 탭바/내비게이션 | 후속 | SVG/CSS | 화면 확장 시 | |
 
 ---
 

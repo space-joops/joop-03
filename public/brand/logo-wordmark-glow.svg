@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -4 148 48">
+  <!-- JOOPS 워드마크 · 형광(#39ff14) + CRT 글로우 + 소등 세그먼트 고스트. 웹 전용(래스터 파이프라인 입력 금지: 필터 포함) -->
+  <defs>
+    <path id="ga" d="M3 2 5 0 15 0 17 2 15 4 5 4Z"/>
+    <path id="gb" d="M18 3 20 5 20 15 18 17 16 15 16 5Z"/>
+    <path id="gc" d="M18 19 20 21 20 31 18 33 16 31 16 21Z"/>
+    <path id="gd" d="M3 34 5 32 15 32 17 34 15 36 5 36Z"/>
+    <path id="ge" d="M2 19 4 21 4 31 2 33 0 31 0 21Z"/>
+    <path id="gf" d="M2 3 4 5 4 15 2 17 0 15 0 5Z"/>
+    <path id="gg" d="M3 18 5 16 15 16 17 18 15 20 5 20Z"/>
+    <g id="glyph-j"><use href="#gb"/><use href="#gc"/><use href="#gd"/><use href="#ge"/></g>
+    <g id="glyph-o"><use href="#ga"/><use href="#gb"/><use href="#gc"/><use href="#gd"/><use href="#ge"/><use href="#gf"/></g>
+    <g id="glyph-p"><use href="#ga"/><use href="#gb"/><use href="#ge"/><use href="#gf"/><use href="#gg"/></g>
+    <g id="glyph-s"><use href="#ga"/><use href="#gc"/><use href="#gd"/><use href="#gf"/><use href="#gg"/></g>
+    <g id="glyph-all"><use href="#ga"/><use href="#gb"/><use href="#gc"/><use href="#gd"/><use href="#ge"/><use href="#gf"/><use href="#gg"/></g>
+    <g id="word-lit">
+      <use href="#glyph-j"/>
+      <use href="#glyph-o" transform="translate(28 0)"/>
+      <use href="#glyph-o" transform="translate(56 0)"/>
+      <use href="#glyph-p" transform="translate(84 0)"/>
+      <use href="#glyph-s" transform="translate(112 0)"/>
+    </g>
+    <filter id="crt-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="1.6"/>
+    </filter>
+  </defs>
+  <g transform="translate(4 2) skewX(-6)">
+    <!-- 소등 세그먼트 고스트(디스플레이 잔상) -->
+    <g fill="#39ff14" opacity="0.1">
+      <use href="#glyph-all"/>
+      <use href="#glyph-all" transform="translate(28 0)"/>
+      <use href="#glyph-all" transform="translate(56 0)"/>
+      <use href="#glyph-all" transform="translate(84 0)"/>
+      <use href="#glyph-all" transform="translate(112 0)"/>
+    </g>
+    <!-- 글로우 레이어 -->
+    <use href="#word-lit" fill="#39ff14" opacity="0.7" filter="url(#crt-glow)"/>
+    <!-- 점등 세그먼트 -->
+    <use href="#word-lit" fill="#39ff14"/>
+  </g>
+</svg>

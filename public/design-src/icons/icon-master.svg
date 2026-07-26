@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- 앱 아이콘 마스터(1024) → icon-512 / icon-192 / apple-icon-180 / app-icon 원본.
+       규칙: 텍스트·필터(feGaussianBlur) 금지(librsvg 래스터 호환), 글로우는 radialGradient 헤일로로.
+       구성: 딥스페이스 배경 + CRT 베젤 + 지구 경위도 그리드 + 앰버 궤도 + 형광 그린 줍스 점 -->
+  <defs>
+    <radialGradient id="dot-glow">
+      <stop offset="0%" stop-color="#39ff14" stop-opacity="0.55"/>
+      <stop offset="40%" stop-color="#39ff14" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#39ff14" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="scanline" patternUnits="userSpaceOnUse" width="8" height="8">
+      <rect width="8" height="3" fill="#39ff14" opacity="0.025"/>
+    </pattern>
+  </defs>
+
+  <!-- 배경 -->
+  <rect width="1024" height="1024" fill="#05080a"/>
+
+  <!-- 별(장식) -->
+  <g fill="#d8e6d4">
+    <circle cx="150" cy="180" r="3" opacity="0.5"/>
+    <circle cx="870" cy="150" r="2.5" opacity="0.4"/>
+    <circle cx="180" cy="850" r="2" opacity="0.35"/>
+    <circle cx="840" cy="760" r="3" opacity="0.45"/>
+    <circle cx="300" cy="120" r="2" opacity="0.3"/>
+    <circle cx="120" cy="520" r="2.5" opacity="0.35"/>
+    <circle cx="900" cy="480" r="2" opacity="0.3"/>
+    <circle cx="700" cy="880" r="2" opacity="0.35"/>
+  </g>
+
+  <!-- 스캔라인(미세) -->
+  <rect x="60" y="60" width="904" height="904" fill="url(#scanline)"/>
+
+  <!-- CRT 베젤 -->
+  <rect x="40" y="40" width="944" height="944" rx="88" fill="none" stroke="#2a332c" stroke-width="14"/>
+  <rect x="58" y="58" width="908" height="908" rx="76" fill="none" stroke="#ffffff" stroke-opacity="0.05" stroke-width="4"/>
+
+  <!-- 지구 -->
+  <circle cx="512" cy="512" r="190" fill="#071a0d" stroke="#39ff14" stroke-width="20"/>
+  <g fill="none" stroke="#39ff14">
+    <ellipse cx="512" cy="512" rx="78" ry="190" stroke-width="9" stroke-opacity="0.55"/>
+    <path d="M322 512h380" stroke-width="9" stroke-opacity="0.55"/>
+    <path d="M343.6 424h336.8M343.6 600h336.8" stroke-width="8" stroke-opacity="0.35"/>
+  </g>
+
+  <!-- 궤도 링 (-24°, 앰버) -->
+  <ellipse cx="512" cy="512" rx="330" ry="120" fill="none" stroke="#ffb000" stroke-width="15" stroke-opacity="0.95" transform="rotate(-24 512 512)"/>
+
+  <!-- 줍스 점 (궤도 위 t=35° 지점, anchor 중심) -->
+  <circle cx="731" cy="339" r="85" fill="url(#dot-glow)"/>
+  <circle cx="731" cy="339" r="26" fill="#39ff14"/>
+  <circle cx="731" cy="339" r="10" fill="#d6ffcc"/>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor">
+  <!-- 줍스 심볼: 지구(경위도 그리드) + 궤도 링 + 줍스(발광 점). 정사각 64 그리드 · currentColor 단색 -->
+  <!-- 지구 -->
+  <circle cx="32" cy="32" r="16" stroke-width="3"/>
+  <ellipse cx="32" cy="32" rx="6.5" ry="16" stroke-width="1.5" opacity="0.55"/>
+  <path d="M16 32h32" stroke-width="1.5" opacity="0.55"/>
+  <path d="M17.9 24.5h28.2M17.9 39.5h28.2" stroke-width="1.5" opacity="0.35"/>
+  <!-- 궤도 링 (-24°) -->
+  <ellipse cx="32" cy="32" rx="28.5" ry="10.5" stroke-width="2" opacity="0.9" transform="rotate(-24 32 32)"/>
+  <!-- 줍스 점 (궤도 위, anchor는 점 중심) -->
+  <circle cx="50.8" cy="17" r="6" fill="currentColor" stroke="none" opacity="0.25"/>
+  <circle cx="50.8" cy="17" r="3" fill="currentColor" stroke="none"/>
+</svg>

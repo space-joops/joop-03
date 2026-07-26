@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <!-- 파비콘 전용 플랫 마스터(16 그리드) → 16/32 PNG → favicon.ico.
+       16px에서 읽히도록 요소 2개(행성 링 + 줍스 점)만. 그리드 정수/0.5 스냅. -->
+  <rect width="16" height="16" fill="#05080a"/>
+  <circle cx="8" cy="9" r="4.5" fill="#071a0d" stroke="#39ff14" stroke-width="1.5"/>
+  <circle cx="13" cy="3.5" r="2" fill="#39ff14"/>
+</svg>
