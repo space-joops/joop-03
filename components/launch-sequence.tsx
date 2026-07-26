@@ -79,8 +79,11 @@ export function LaunchSequence({
     }));
 
     let raf = 0;
-    let progress = reduce ? 1 : 0;
     let lastStage = "";
+    // 진행률은 프레임 수가 아니라 실제 경과 시간 기준 → 백그라운드 탭에서 rAF 가
+    // throttle 돼도 활성화 시 정확히 따라잡는다.
+    const startTs = performance.now();
+    const DURATION = 2500; // 발사 애니메이션 길이(ms)
     const styles = getComputedStyle(document.documentElement);
     const amber = styles.getPropertyValue("--color-secondary").trim() || "#ffb23e";
     const muted = styles.getPropertyValue("--color-muted").trim() || "#8a9e92";
@@ -92,7 +95,8 @@ export function LaunchSequence({
       }
     };
 
-    const draw = () => {
+    const draw = (ts: number) => {
+      const progress = reduce ? 1 : Math.min(1, (ts - startTs) / DURATION);
       ctx.clearRect(0, 0, W, H);
       // 별
       ctx.fillStyle = muted;
@@ -160,31 +164,34 @@ export function LaunchSequence({
         setPhase("saving");
         return;
       }
-      progress = Math.min(1, progress + (reduce ? 1 : 0.008));
       raf = requestAnimationFrame(draw);
     };
     raf = requestAnimationFrame(draw);
 
-    return () => cancelAnimationFrame(raf);
+    // 하드 상한: rAF 가 아예 안 돌아도(탭 백그라운드 등) 결국 다음 단계로.
+    const hardStop = setTimeout(() => setPhase("saving"), DURATION + 3000);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(hardStop);
+    };
   }, [phase, color, t.ignition, t.ascent, t.separation, t.orbitInsertion]);
 
-  // 궤도 진입 저장
+  // 궤도 진입 저장 — 한 번만 이동하고, 액션이 지연/실패해도 반드시 화면을 넘긴다.
   useEffect(() => {
     if (phase !== "saving") return;
-    let cancelled = false;
-    completeLaunch().then((res) => {
-      if (cancelled) return;
-      if (res.ok) {
-        setPhase("done");
-        router.push(`/${lang}/joop/map`);
-      } else {
-        // 실패 시 대시보드로
-        router.push(`/${lang}/joop`);
-      }
-    });
-    return () => {
-      cancelled = true;
+    let navigated = false;
+    const go = (path: string) => {
+      if (navigated) return;
+      navigated = true;
+      router.push(path);
     };
+    completeLaunch()
+      .then((res) => go(res.ok ? `/${lang}/joop/map` : `/${lang}/joop`))
+      .catch(() => go(`/${lang}/joop/map`));
+    // 안전장치: 액션이 응답하지 않아도 결국 우주 지도로(궤도 진입은 서버에서 처리됨).
+    const fallback = setTimeout(() => go(`/${lang}/joop/map`), 6000);
+    return () => clearTimeout(fallback);
   }, [phase, lang, router]);
 
   return (
