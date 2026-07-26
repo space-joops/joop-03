@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- 아이템: 자석(수거 반경 증가). 32 그리드 · 고유색 -->
+  <path d="M8 4 V16 a8 8 0 0 0 16 0 V4 H18 V16 a2 2 0 0 1 -4 0 V4 Z" fill="#ff4545" stroke="#5c6b5e" stroke-width="2"/>
+  <rect x="8" y="4" width="6" height="6" fill="#aebfab" stroke="#5c6b5e" stroke-width="2"/>
+  <rect x="18" y="4" width="6" height="6" fill="#aebfab" stroke="#5c6b5e" stroke-width="2"/>
+</svg>
