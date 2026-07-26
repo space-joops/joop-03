@@ -34,6 +34,12 @@ space-joops 계정에는 이미 Supabase 프로젝트가 두 개(`jd-02`, `jd-04
 
 에이전트 작업 환경은 non-TTY라 `supabase login`의 브라우저 자동 로그인 플로우가 동작하지 않았습니다. 대신 [Supabase 대시보드 → Access Tokens](https://supabase.com/dashboard/account/tokens)에서 토큰을 발급받아 `supabase login --token <token>`으로 로그인했습니다. 로컬 개발 환경(TTY)에서는 그냥 `supabase login`으로 브라우저 로그인이 될 거예요.
 
+### 화면에 버전을 표시하기로 했어요
+
+배포마다 `package.json`의 `version`이 달라지고, 이 값이 실제 제품 화면(우측 하단 작은 뱃지, `app/version-badge.tsx`)에 노출되도록 만들었습니다. 목적은 장애대응·고객 응대입니다 — 고객이 문제를 제보할 때 화면의 버전을 같이 알려주면, 정확히 어떤 배포에서 발생한 이슈인지 바로 특정할 수 있습니다.
+
+배포하는 사람은 `vercel deploy --prod` 실행 전에 `npm version patch --no-git-tag-version`(또는 minor/major)으로 버전을 올려야 합니다. `--no-git-tag-version`을 쓰는 이유는 이 팀이 PR 기반으로 작업하기 때문에, `npm version`이 기본으로 만드는 git commit/tag를 건너뛰고 PR 안에서 일반 커밋으로 함께 리뷰하기 위해서입니다. 자세한 절차는 [docs/infra.md](../infra.md#배포-전-버전을-올려주세요-장애대응--고객-응대용)를 참고하세요.
+
 ## 배운 점 / 다음에 참고할 것
 
 - 새 프로젝트를 Vercel에 연결하기 전에 "private + 조직 소유 리포 + Hobby 플랜"이면 자동배포가 안 된다는 걸 미리 체크리스트에 넣어두면 좋겠습니다.

@@ -32,6 +32,20 @@ vercel deploy --prod
 1. Vercel 팀을 Pro 플랜으로 업그레이드
 2. GitHub 리포지토리를 Public으로 전환
 
+### 배포 전 버전을 올려주세요 (장애대응 / 고객 응대용)
+
+배포마다 `package.json`의 `version`이 달라야 합니다. 이 값은 화면 우측 하단의 작은 뱃지(`app/version-badge.tsx`, `app/layout.tsx`에 포함되어 모든 페이지에 노출)로 표시됩니다. 고객이 문의할 때 화면에 보이는 버전을 알려주면, 정확히 어떤 배포에서 발생한 문제인지 바로 특정할 수 있어 장애대응과 고객 응대가 빨라집니다.
+
+배포 전 체크리스트:
+
+```bash
+npm version patch --no-git-tag-version   # 또는 minor / major — git commit·tag는 만들지 않음(PR 워크플로우와 충돌 방지)
+```
+
+1. 위 명령으로 `package.json`/`package-lock.json`의 버전을 올린다
+2. 변경사항을 커밋해 PR에 포함하고 머지한다
+3. `vercel deploy --prod`로 배포한다 → 화면의 버전 뱃지가 갱신된다
+
 ## Supabase
 
 - 프로젝트: `jd-04` (ref: `gclewzipfpkmxjikqmav`, 리전: `ap-northeast-2`)
