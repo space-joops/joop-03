@@ -54,16 +54,16 @@
 | 위성 스프라이트 | 후속 | PNG/WebP(+시트) | ✅ | `public/game/satellite.png`(512×256), 원근은 코드 스케일 0.15~2.4 → [핸드오프 M5 §2](./handoff-m5.md) | ✅ |
 | 5원 반투명 조이스틱 | 후속 | SVG/PNG | ✅ | 원 5개(링 4 + 노브), 반투명, 분사 단계 표시 — 파일 대신 **수치 명세**로 납품 → [핸드오프 M3 §3](./handoff-m3.md) | ✅(명세) |
 | 분사가스/이펙트 | 후속 | PNG(+시트) | ✅ | 동적 파티클이라 파일 대신 **코드 명세**(원 감쇠 수열) → [핸드오프 M5 §3](./handoff-m5.md) | ✅(명세) |
-| 인벤토리·아이템 아이콘 | 후속 | SVG | | 합성/업그레이드(자석·체력·꾸미기) | |
+| 인벤토리·아이템 아이콘 | 후속 | SVG | | 5종(자석·배터리·분사가스·도색·렌치) 32 그리드 고유색. `public/ui/item-*.svg` → [핸드오프 M6 §1](./handoff-m6.md) | ✅ |
 | 발사체(로켓) | 후속 | SVG | | 카운트다운·중계 화면용 64×160, anchor [32,152]. `public/game/rocket.svg`, 화염·연기는 이펙트 명세 → [핸드오프 M4 §2](./handoff-m4.md) | ✅ |
 
 ## D. 공통 UI (전 화면, 후속 포함)
 
 | 에셋 | 우선 | 포맷 | 비고 | 상태 |
 |---|---|---|---|---|
-| 아이콘 세트(설정·뒤로·닫기·공유·알림 등) | M1~후속 | SVG | 24 그리드 통일. `public/ui/icon-settings.svg` · `icon-close.svg` · `icon-back.svg` · `icon-share.svg` 선반영 | ✅(4종) |
-| 토스트·모달·다이얼로그 스타일 | 후속 | CSS/SVG | 베젤 패널 | |
-| 탭바/내비게이션 | 후속 | SVG/CSS | 화면 확장 시 | |
+| 아이콘 세트(설정·뒤로·닫기·공유·알림 등) | M1~후속 | SVG | 24 그리드 통일. `public/ui/icon-settings.svg` · `icon-close.svg` · `icon-back.svg` · `icon-share.svg` + M6에서 `icon-map.svg` · `icon-inventory.svg` · `icon-ranking.svg` 추가 | ✅(7종) |
+| 토스트·모달·다이얼로그 스타일 | 후속 | CSS/SVG | 베젤 패널 + 코너 나사, 자동 소멸·용도 규칙 → [핸드오프 M6 §4](./handoff-m6.md) | ✅ |
+| 탭바/내비게이션 | 후속 | SVG/CSS | 4탭(지도·인벤토리·랭킹·설정), 아이콘 `icon-{map,inventory,ranking}.svg` 추가, 노출 규칙 포함 → [핸드오프 M6 §4-3](./handoff-m6.md) | ✅ |
 
 ---
 

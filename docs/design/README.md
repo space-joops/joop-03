@@ -17,6 +17,8 @@
 - [mockups/launch-space-map.html](./mockups/launch-space-map.html) — **발사 카운트다운·중계·우주 지도(M4) 시안**. [스크린샷](./mockups/launch-space-map.png)
 - [handoff-m5.md](./handoff-m5.md) — **M5 개발 핸드오프 가이드**. 천체 배경·패럴럭스·구역 전환, 위성 원근, 분사 파티클, 아케이드 HUD·게임오버.
 - [mockups/arcade.html](./mockups/arcade.html) — **아케이드 모드(M5) 시안**(실제 배경 에셋 참조). [스크린샷](./mockups/arcade.png)
+- [handoff-m6.md](./handoff-m6.md) — **M6 개발 핸드오프 가이드**. 인벤토리·합성 화면, 아이템 아이콘, 공통 UI(토스트·모달·탭바) 규칙.
+- [mockups/inventory-common-ui.html](./mockups/inventory-common-ui.html) — **인벤토리·합성·공통 UI(M6) 시안**. [스크린샷](./mockups/inventory-common-ui.png)
 
 ## 에셋을 repo로 관리하는 규칙
 
