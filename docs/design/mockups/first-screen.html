@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>줍스 — 첫 화면(M1) 시안 · 카세트퓨처리즘</title>
+<!--
+  줍스 첫 화면(궤도 대시보드) 완성 시안.
+  - 기준 프레임 393×852, 360 폭까지 대응. 모든 값은 docs/design/design-tokens.md v1.0.
+  - Canvas 영역은 handoff-m1.md §4의 수치 명세를 그대로 구현한 레퍼런스(줍스 100개, rAF).
+  - prefers-reduced-motion: reduce 시 애니메이션 정지(정지 스냅샷).
+  - 폰트는 Google Fonts(Doto·VT323) — 오프라인이면 monospace로 폴백(의도된 동작).
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Doto:wght@700;900&family=VT323&display=swap" rel="stylesheet">
+<style>
+  /* ── 디자인 토큰 v1.0 (design-tokens.md) ─────────────────────── */
+  :root {
+    --color-bg: #05080a;
+    --color-surface: #0d1412;
+    --color-surface-raised: #141c19;
+    --color-fg: #d8e6d4;
+    --color-primary: #39ff14;
+    --color-primary-dim: #1d7a10;
+    --color-secondary: #ffb000;
+    --color-secondary-dim: #7a5500;
+    --color-accent: #2de2e6;
+    --color-accent-magenta: #ff2e97;
+    --color-danger: #ff4545;
+    --color-success: #00e08f;
+    --color-muted: #7d8f7f;
+    --color-grid: rgba(57, 255, 20, .22);
+    --color-neutral-700: #2a332c;
+    --color-neutral-800: #141c19;
+
+    --glow-primary: 0 0 6px rgba(57,255,20,.55), 0 0 18px rgba(57,255,20,.25);
+    --glow-text: 0 0 4px rgba(57,255,20,.45);
+
+    --font-display: "Doto", "VT323", monospace;
+    --font-body: system-ui, "Apple SD Gothic Neo", "Noto Sans KR", "Noto Sans", sans-serif;
+    --font-mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", "Noto Sans Mono", monospace;
+
+    --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+    --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 64px;
+    --page-pad-x: 20px;
+    --safe-top: max(env(safe-area-inset-top), 12px);
+    --safe-bottom: max(env(safe-area-inset-bottom), 12px);
+    --radius-xs: 2px; --radius-sm: 4px; --radius-md: 8px;
+    --bezel-border: 2px;
+    --bezel-highlight: rgba(255,255,255,.06);
+    --bezel-shadow: rgba(0,0,0,.6);
+    --motion-fast: 120ms; --motion-base: 200ms;
+    --ease-console: cubic-bezier(.2,.8,.2,1);
+  }
+  @media (max-width: 370px) { :root { --page-pad-x: 16px; } }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { background: #1a1d1f; }
+  body {
+    font-family: var(--font-body);
+    color: var(--color-fg);
+    font-size: 15px; line-height: 22px;
+    display: flex; justify-content: center; padding: 24px 0;
+  }
+  /* 시안 프레임(브라우저 데스크톱 미리보기용 껍데기 — 실제 앱에는 없음) */
+  .device {
+    width: 393px; height: 852px; overflow: hidden; position: relative;
+    background: var(--color-bg);
+    outline: 1px solid #333; border-radius: 24px;
+    display: flex; flex-direction: column;
+  }
+  @media (max-width: 430px) {
+    body { padding: 0; }
+    .device { width: 100vw; height: 100dvh; border-radius: 0; outline: none; }
+  }
+
+  /* ── CRT 스캔라인 오버레이(불투명도 ≤0.06, Canvas 영역 제외) ── */
+  .scanlines::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 5;
+    background: repeating-linear-gradient(0deg, rgba(57,255,20,.05) 0 1px, transparent 1px 3px);
+  }
+
+  /* ── 상단 바 ── */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    height: calc(56px + var(--safe-top));
+    padding: var(--safe-top) var(--page-pad-x) 0;
+    flex: none;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; color: var(--color-primary); }
+  .brand svg { display: block; }
+  .brand .wordmark { filter: drop-shadow(0 0 4px rgba(57,255,20,.45)); }
+  .lang-btn {
+    width: 44px; height: 44px; display: grid; place-items: center;
+    background: none; border: none; color: var(--color-muted); cursor: pointer;
+  }
+  .lang-btn:active { color: var(--color-primary); }
+
+  /* ── Canvas(궤도 지구본): 가변 높이 — 남는 세로 공간을 흡수(최소 240px) ── */
+  .orbit-wrap { position: relative; flex: 1 1 auto; min-height: 240px; }
+  canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  /* ── 패널 공통(두꺼운 베젤) ── */
+  .panel {
+    background: var(--color-surface);
+    border: var(--bezel-border) solid var(--color-neutral-700);
+    border-radius: var(--radius-md);
+    box-shadow: inset 0 1px 0 var(--bezel-highlight), inset 0 -2px 6px var(--bezel-shadow);
+    margin: 0 var(--page-pad-x) var(--space-3);
+    padding: 14px var(--space-4);
+    position: relative;
+    flex: none;
+  }
+  .panel-label {
+    font-size: 12px; line-height: 16px; letter-spacing: .08em;
+    color: var(--color-secondary); text-transform: uppercase;
+  }
+
+  /* ── 청소량 게이지 ── */
+  .gauge-row { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; }
+  .gauge-pct {
+    font-family: var(--font-display); font-weight: 900;
+    font-size: 40px; line-height: 44px; letter-spacing: .02em;
+    color: var(--color-primary); text-shadow: var(--glow-text);
+  }
+  .gauge-pct small { font-size: 20px; }
+  .gauge-bar { display: flex; gap: 3px; height: 14px; margin-bottom: var(--space-2); }
+  .gauge-bar i {
+    flex: 1; border-radius: var(--radius-xs);
+    background: color-mix(in srgb, var(--color-primary-dim) 35%, transparent);
+  }
+  .gauge-bar i.on { background: var(--color-primary); box-shadow: var(--glow-primary); }
+  .gauge-bar i.part { background: var(--color-primary); opacity: .5; }
+  .gauge-count { display: flex; align-items: baseline; gap: var(--space-2); }
+  .gauge-count b {
+    font-family: var(--font-display); font-weight: 700; font-size: 28px; line-height: 32px;
+    letter-spacing: .02em; color: var(--color-fg);
+  }
+  .gauge-count span { color: var(--color-muted); font-size: 12px; }
+
+  /* ── 랭킹 ── */
+  .rank-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: var(--space-2); }
+  .rank-head .panel-label { color: var(--color-secondary); }
+  .rank-head .sub { font-size: 12px; color: var(--color-muted); }
+  .rank-list { list-style: none; display: flex; flex-direction: column; }
+  .rank-row {
+    display: grid; grid-template-columns: 28px 1fr 44px 48px 64px;
+    align-items: center; gap: var(--space-2);
+    min-height: 36px; border-top: 1px solid var(--color-neutral-800);
+  }
+  .rank-row:first-child { border-top: 0; }
+  .rank-no {
+    font-family: var(--font-display); font-weight: 700; font-size: 20px; line-height: 24px;
+    color: var(--color-muted); letter-spacing: .02em;
+  }
+  .rank-row.top .rank-no { color: var(--color-secondary); }
+  .rank-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .rank-spark svg { display: block; }
+  .rank-delta { display: inline-flex; align-items: center; gap: 3px; justify-content: flex-end;
+    font-family: var(--font-mono); font-size: 13px; }
+  .rank-delta.up { color: var(--color-success); }
+  .rank-delta.down { color: var(--color-danger); }
+  .rank-delta.same { color: var(--color-muted); }
+  .rank-val { text-align: right; font-family: var(--font-mono); font-size: 13px; color: var(--color-muted); }
+  .rank-me {
+    margin-top: var(--space-2); padding-top: var(--space-2);
+    border-top: 1px dashed var(--color-neutral-700);
+    display: flex; justify-content: space-between; align-items: center;
+    color: var(--color-accent); font-size: 15px;
+  }
+
+  /* ── CTA(물리 버튼) ── */
+  .cta-wrap { margin-top: auto; padding: var(--space-3) var(--page-pad-x) calc(var(--safe-bottom) + var(--space-3)); }
+  .cta {
+    width: 100%; min-height: 56px; cursor: pointer;
+    font: 600 17px/24px var(--font-body); letter-spacing: .02em;
+    color: #05080a; background: var(--color-primary);
+    border: var(--bezel-border) solid #63ff47;
+    border-radius: var(--radius-sm);
+    box-shadow: inset 0 2px 0 rgba(255,255,255,.35), inset 0 -3px 0 rgba(0,0,0,.35),
+                0 0 6px rgba(57,255,20,.55), 0 0 18px rgba(57,255,20,.25);
+    transition: transform var(--motion-fast) var(--ease-console), box-shadow var(--motion-fast) var(--ease-console);
+  }
+  .cta:active {
+    transform: translateY(1px);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.2), inset 0 -1px 0 rgba(0,0,0,.35),
+                0 0 4px rgba(57,255,20,.4);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="device scanlines">
+
+  <!-- 상단 바: 심볼 + 워드마크 + 언어 선택 -->
+  <header class="topbar">
+    <div class="brand">
+      <!-- public/brand/logo-symbol.svg (28px, currentColor) -->
+      <svg width="28" height="28" viewBox="0 0 64 64" fill="none" stroke="currentColor">
+        <circle cx="32" cy="32" r="16" stroke-width="3"/>
+        <ellipse cx="32" cy="32" rx="6.5" ry="16" stroke-width="1.5" opacity=".55"/>
+        <path d="M16 32h32" stroke-width="1.5" opacity=".55"/>
+        <ellipse cx="32" cy="32" rx="28.5" ry="10.5" stroke-width="2" opacity=".9" transform="rotate(-24 32 32)"/>
+        <circle cx="50.8" cy="17" r="3" fill="currentColor" stroke="none"/>
+      </svg>
+      <!-- public/brand/logo-wordmark.svg (높이 18px, currentColor + drop-shadow 글로우) -->
+      <svg class="wordmark" width="63" height="18" viewBox="0 0 140 40">
+        <defs>
+          <path id="sa" d="M3 2 5 0 15 0 17 2 15 4 5 4Z"/><path id="sb" d="M18 3 20 5 20 15 18 17 16 15 16 5Z"/>
+          <path id="sc" d="M18 19 20 21 20 31 18 33 16 31 16 21Z"/><path id="sd" d="M3 34 5 32 15 32 17 34 15 36 5 36Z"/>
+          <path id="se" d="M2 19 4 21 4 31 2 33 0 31 0 21Z"/><path id="sf" d="M2 3 4 5 4 15 2 17 0 15 0 5Z"/>
+          <path id="sg" d="M3 18 5 16 15 16 17 18 15 20 5 20Z"/>
+        </defs>
+        <g fill="currentColor" transform="translate(4 2) skewX(-6)">
+          <g><use href="#sb"/><use href="#sc"/><use href="#sd"/><use href="#se"/></g>
+          <g transform="translate(28 0)"><use href="#sa"/><use href="#sb"/><use href="#sc"/><use href="#sd"/><use href="#se"/><use href="#sf"/></g>
+          <g transform="translate(56 0)"><use href="#sa"/><use href="#sb"/><use href="#sc"/><use href="#sd"/><use href="#se"/><use href="#sf"/></g>
+          <g transform="translate(84 0)"><use href="#sa"/><use href="#sb"/><use href="#se"/><use href="#sf"/><use href="#sg"/></g>
+          <g transform="translate(112 0)"><use href="#sa"/><use href="#sc"/><use href="#sd"/><use href="#sf"/><use href="#sg"/></g>
+        </g>
+      </svg>
+    </div>
+    <button class="lang-btn" aria-label="언어 선택">
+      <!-- public/ui/icon-language.svg (22px) -->
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
+        <circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4.2" ry="9"/><path d="M3.8 8.5h16.4M3.8 15.5h16.4"/>
+      </svg>
+    </button>
+  </header>
+
+  <!-- Canvas: 지구 + 경위도 그리드 + 궤도 링 + 줍스 100개 (handoff-m1.md §4 수치 그대로) -->
+  <div class="orbit-wrap"><canvas id="orbit" aria-label="지구 궤도를 도는 줍스 100기"></canvas></div>
+
+  <!-- 누적 청소 게이지 -->
+  <section class="panel">
+    <div class="gauge-row">
+      <span class="panel-label">누적 청소</span>
+      <span class="gauge-pct">62<small>%</small></span>
+    </div>
+    <div class="gauge-bar" id="gauge" role="img" aria-label="청소율 62%"></div>
+    <div class="gauge-count"><b>1,284,000</b><span>조각 수거</span></div>
+  </section>
+
+  <!-- 랭킹 -->
+  <section class="panel">
+    <div class="rank-head">
+      <span class="panel-label">랭킹</span>
+      <span class="sub">주간 등락</span>
+    </div>
+    <ol class="rank-list" id="ranks"></ol>
+    <div class="rank-me"><span>나: 37위</span>
+      <span class="rank-delta up">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5 L20 17 H4 Z"/></svg>5
+      </span>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-wrap">
+    <button class="cta">초대코드로 시작하기</button>
+  </div>
+</div>
+
+<script>
+/* ── 게이지: 세그먼트 30칸, 62% → 18칸 점등 + 1칸 부분 점등 ── */
+(() => {
+  const g = document.getElementById('gauge'), pct = .62, segs = 30;
+  const full = Math.floor(pct * segs), part = pct * segs - full >= .3;
+  for (let i = 0; i < segs; i++) {
+    const el = document.createElement('i');
+    if (i < full) el.className = 'on'; else if (i === full && part) el.className = 'part';
+    g.appendChild(el);
+  }
+})();
+
+/* ── 랭킹 5행 + 스파크라인(44×16, 1.5px primary) ── */
+(() => {
+  const rows = [
+    { no: 1, name: 'Orbita',  d: +2, val: '20,400', spark: [3,5,4,7,9,8,11] },
+    { no: 2, name: 'Dusty',   d: -1, val: '19,850', spark: [8,9,7,8,6,7,6] },
+    { no: 3, name: 'Kessler', d: +4, val: '18,200', spark: [2,3,5,4,8,10,12] },
+    { no: 4, name: 'Спутник', d:  0, val: '17,930', spark: [6,6,7,6,7,7,7] },
+    { no: 5, name: 'Müllmann',d: -2, val: '17,100', spark: [10,9,9,7,8,6,5] },
+  ];
+  const arrowUp = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5 L20 17 H4 Z"/></svg>';
+  const arrowDn = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 19 L4 7 H20 Z"/></svg>';
+  document.getElementById('ranks').innerHTML = rows.map(r => {
+    const pts = r.spark.map((v, i) => `${(i * 44 / 6).toFixed(1)},${(15 - v).toFixed(1)}`).join(' ');
+    const delta = r.d > 0 ? `<span class="rank-delta up">${arrowUp}${r.d}</span>`
+      : r.d < 0 ? `<span class="rank-delta down">${arrowDn}${-r.d}</span>`
+      : `<span class="rank-delta same">–</span>`;
+    return `<li class="rank-row${r.no === 1 ? ' top' : ''}">
+      <span class="rank-no">${r.no}</span>
+      <span class="rank-name">${r.name}</span>
+      <span class="rank-spark"><svg width="44" height="16" viewBox="0 0 44 16">
+        <polyline points="${pts}" fill="none" stroke="#39ff14" stroke-width="1.5" opacity=".85"/>
+      </svg></span>
+      ${delta}
+      <span class="rank-val">${r.val}</span>
+    </li>`;
+  }).join('');
+})();
+
+/* ── Canvas 궤도: handoff-m1.md §4 수치 명세의 레퍼런스 구현 ── */
+(() => {
+  const cv = document.getElementById('orbit'), ctx = cv.getContext('2d');
+  const CSS = getComputedStyle(document.documentElement);
+  const T = n => CSS.getPropertyValue(n).trim();          // 토큰 재사용(중복 하드코딩 금지)
+  const COLORS = [T('--color-primary'), T('--color-secondary'), T('--color-accent'), T('--color-accent-magenta'), '#a0ff70', '#ffd25e'];
+  const RINGS = [
+    { k: 1.32, tilt: -24, squash: .34 },
+    { k: 1.55, tilt: -10, squash: .30 },
+    { k: 1.80, tilt:  12, squash: .26 },
+  ];
+  // 줍스 100기: 링 배분 40/33/27, 결정적 의사난수(seed) — 스냅샷 재현 가능
+  let seed = 20260726;
+  const rnd = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
+  const JOOPS = Array.from({ length: 100 }, (_, i) => ({
+    ring: i < 40 ? 0 : i < 73 ? 1 : 2,
+    phase: rnd() * Math.PI * 2,
+    speed: (.05 + rnd() * .07) * (rnd() < .5 ? 1 : -1),   // rad/s
+    color: COLORS[Math.floor(rnd() * COLORS.length)],
+  }));
+
+  let W, H, R, CX, CY;
+  function layout() {
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    const wrap = cv.parentElement;
+    W = wrap.clientWidth; H = wrap.clientHeight;
+    cv.width = W * dpr; cv.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    R = Math.min(W, H) * .34; CX = W / 2; CY = H / 2;
+  }
+
+  function drawEarth() {
+    ctx.lineWidth = 2; ctx.strokeStyle = T('--color-primary');
+    ctx.beginPath(); ctx.arc(CX, CY, R, 0, 7); ctx.stroke();
+    ctx.strokeStyle = T('--color-grid'); ctx.lineWidth = 1;
+    for (const f of [.41, .82]) {                          // 자오선 2개(타원 rx = R×f)
+      ctx.beginPath(); ctx.ellipse(CX, CY, R * f, R, 0, 0, 7); ctx.stroke();
+    }
+    for (const dy of [0, -.46, .46]) {                     // 적도 + 위도 ±46%
+      const y = CY + R * dy, half = Math.sqrt(1 - dy * dy) * R;
+      ctx.beginPath(); ctx.moveTo(CX - half, y); ctx.lineTo(CX + half, y); ctx.stroke();
+    }
+  }
+
+  function ringPoint(ring, a) {
+    const rx = R * ring.k, ry = rx * ring.squash, t = ring.tilt * Math.PI / 180;
+    const x = Math.cos(a) * rx, y = Math.sin(a) * ry;
+    return [CX + x * Math.cos(t) - y * Math.sin(t), CY + x * Math.sin(t) + y * Math.cos(t)];
+  }
+
+  function draw(now) {
+    ctx.clearRect(0, 0, W, H);
+    drawEarth();
+    ctx.lineWidth = 1;
+    for (const ring of RINGS) {                            // 궤도 링(그리드 색, 1px)
+      ctx.strokeStyle = T('--color-grid');
+      ctx.beginPath();
+      ctx.ellipse(CX, CY, R * ring.k, R * ring.k * ring.squash, ring.tilt * Math.PI / 180, 0, 7);
+      ctx.stroke();
+    }
+    for (const j of JOOPS) {                               // 줍스: r2.5 + 글로우(shadowBlur 6)
+      const [x, y] = ringPoint(RINGS[j.ring], j.phase + now * j.speed);
+      ctx.shadowBlur = 6; ctx.shadowColor = j.color; ctx.fillStyle = j.color;
+      ctx.beginPath(); ctx.arc(x, y, 2.5, 0, 7); ctx.fill();
+    }
+    ctx.shadowBlur = 0;
+  }
+
+  layout(); addEventListener('resize', layout);
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced) { draw(0); }                                // 정지 스냅샷 폴백
+  else {
+    const t0 = performance.now();
+    (function loop(ts) { draw((ts - t0) / 1000); requestAnimationFrame(loop); })(t0);
+  }
+})();
+</script>
+</body>
+</html>

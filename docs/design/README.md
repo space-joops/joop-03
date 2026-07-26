@@ -5,8 +5,10 @@
 ## 문서
 
 - [design-brief.md](./design-brief.md) — **디자인 요청 브리프**. 무엇을, 왜, 어떤 제약으로 만들지. 디자이너가 가장 먼저 읽는 문서.
-- [design-tokens.md](./design-tokens.md) — **디자인 토큰 초안**(카세트퓨처리즘). 색·타이포·간격·컴포넌트·모션의 공용 어휘.
-- [asset-inventory.md](./asset-inventory.md) — **에셋 인벤토리**. 필요한 모든 에셋을 우선순위·포맷·사이즈·경로로 정리한 목록.
+- [design-tokens.md](./design-tokens.md) — **디자인 토큰 v1.0(확정)**. 카세트퓨처리즘 색·타이포·간격·컴포넌트·모션의 실제 값.
+- [asset-inventory.md](./asset-inventory.md) — **에셋 인벤토리**. 필요한 모든 에셋을 우선순위·포맷·사이즈·경로로 정리한 목록(납품 상태 포함).
+- [handoff-m1.md](./handoff-m1.md) — **M1 개발 핸드오프 가이드**. 토큰 CSS 스니펫, PWA 스니펫, 화면 해부도, Canvas 수치 명세, 컴포넌트 스펙.
+- [mockups/first-screen.html](./mockups/first-screen.html) — **첫 화면 완성 시안**(393×852, Canvas 레퍼런스 구현 포함). [스크린샷](./mockups/first-screen.png)
 
 ## 에셋을 repo로 관리하는 규칙
 
