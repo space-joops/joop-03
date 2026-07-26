@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Cassette Futurism Joop Character -->
+  <style>
+    .line {
+      fill: none;
+      stroke: #39ff14; /* primary */
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .solid {
+      fill: #39ff14;
+    }
+    .panel {
+      fill: #18181b;
+      stroke: #39ff14;
+      stroke-width: 2;
+    }
+  </style>
+  
+  <!-- Main Body (Boxy retro robot) -->
+  <rect x="16" y="20" width="32" height="28" rx="4" class="panel"/>
+  
+  <!-- CRT Screen/Eye -->
+  <rect x="22" y="26" width="20" height="12" rx="2" class="line"/>
+  <circle cx="32" cy="32" r="3" class="solid"/>
+  
+  <!-- Antenna -->
+  <line x1="32" y1="20" x2="32" y2="8" class="line"/>
+  <circle cx="32" cy="6" r="3" class="solid"/>
+  
+  <!-- Arms (Claws for picking up debris) -->
+  <path d="M16 34 L8 38 L8 44" class="line"/>
+  <path d="M5 44 L11 44" class="line"/>
+  
+  <path d="M48 34 L56 38 L56 44" class="line"/>
+  <path d="M53 44 L59 44" class="line"/>
+  
+  <!-- Thruster base -->
+  <polygon points="24,48 40,48 36,54 28,54" class="line"/>
+</svg>
