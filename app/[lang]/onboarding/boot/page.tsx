@@ -2,13 +2,15 @@ import { notFound, redirect } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { createSessionClient } from "@/lib/supabase/session";
+import { deviceNameFor } from "@/lib/joop-device-name";
 import { OnboardingShell } from "@/components/onboarding-shell";
-import { SetupForm } from "@/components/setup-form";
+import { BootSequence } from "@/components/boot-sequence";
 
 export const dynamic = "force-dynamic";
 
-// ③ 이름·색 설정 (FR-2.3) — 시안: docs/design/mockups/onboarding.html
-export default async function SetupPage({ params }: PageProps<"/[lang]/onboarding/setup">) {
+// ② 분양 연출 (FR-2.2) — 보급 카트리지 부팅. 시안: docs/design/mockups/onboarding.html
+// 연출 화면이라 뒤로가기를 두지 않는다(핸드오프 §1).
+export default async function BootPage({ params }: PageProps<"/[lang]/onboarding/boot">) {
   const { lang } = await params;
   if (!isLocale(lang)) notFound();
 
@@ -24,12 +26,11 @@ export default async function SetupPage({ params }: PageProps<"/[lang]/onboardin
 
   return (
     <OnboardingShell
-      title={t.setup.title}
-      step={3}
-      stepLabel={t.stepIndicator.replace("{n}", "3")}
-      back={{ href: `/${lang}/onboarding/boot`, label: t.a11y.back }}
+      title={t.boot.title}
+      step={2}
+      stepLabel={t.stepIndicator.replace("{n}", "2")}
     >
-      <SetupForm lang={lang} dict={dict} />
+      <BootSequence lang={lang} dict={dict} deviceName={deviceNameFor(user.id)} />
     </OnboardingShell>
   );
 }

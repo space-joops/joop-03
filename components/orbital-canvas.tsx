@@ -22,8 +22,8 @@ export function OrbitalCanvas({ snapshot }: { snapshot: OrbitalSnapshot }) {
 
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const styles = getComputedStyle(document.documentElement);
-    const gridColor = styles.getPropertyValue("--color-grid").trim() || "#1f6f4a";
-    const earthColor = styles.getPropertyValue("--color-surface").trim() || "#0b1a2a";
+    const gridColor = styles.getPropertyValue("--color-grid").trim() || "rgba(57,255,20,0.22)";
+    const earthColor = styles.getPropertyValue("--color-surface").trim() || "#0d1412";
 
     let raf = 0;
     let running = true;
@@ -55,8 +55,9 @@ export function OrbitalCanvas({ snapshot }: { snapshot: OrbitalSnapshot }) {
       ctx.beginPath();
       ctx.arc(cx, cy, scale, 0, Math.PI * 2);
       ctx.fill();
+      // --color-grid 가 alpha 를 내장(rgba)하므로 globalAlpha 를 겹치지 않는다.
+      // 겹치면 실효 알파가 곱해져 그리드가 사실상 사라진다.
       ctx.strokeStyle = gridColor;
-      ctx.globalAlpha = 0.55;
       ctx.stroke();
       for (let k = 1; k <= 3; k++) {
         ctx.beginPath();
@@ -66,7 +67,6 @@ export function OrbitalCanvas({ snapshot }: { snapshot: OrbitalSnapshot }) {
         ctx.ellipse(cx, cy, scale * (k / 4), scale, 0, 0, Math.PI * 2);
         ctx.stroke();
       }
-      ctx.globalAlpha = 1;
 
       // 줍스 (Unix 초 기준, t0=0 → 스냅샷 갱신과 무관하게 위상 연속)
       const t = Date.now() / 1000;

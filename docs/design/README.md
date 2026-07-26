@@ -5,8 +5,11 @@
 ## 문서
 
 - [design-brief.md](./design-brief.md) — **디자인 요청 브리프**. 무엇을, 왜, 어떤 제약으로 만들지. 디자이너가 가장 먼저 읽는 문서.
-- [design-tokens.md](./design-tokens.md) — **디자인 토큰 초안**(카세트퓨처리즘). 색·타이포·간격·컴포넌트·모션의 공용 어휘.
+- [design-tokens.md](./design-tokens.md) — **디자인 토큰 v1.0(확정)**. 색·타이포·간격·컴포넌트·모션의 공용 어휘. 코드 반영본은 `app/globals.css`.
+- [handoff-m1.md](./handoff-m1.md) — **M1 개발 핸드오프**. 첫 화면 컴포넌트 스펙(CTA·패널·게이지)과 토큰 적용 예시.
+- [handoff-m2.md](./handoff-m2.md) — **M2 개발 핸드오프**. 온보딩 플로우·컴포넌트 스펙·줍스 캐릭터 스프라이트 계약.
 - [asset-inventory.md](./asset-inventory.md) — **에셋 인벤토리**. 필요한 모든 에셋을 우선순위·포맷·사이즈·경로로 정리한 목록.
+- `mockups/` — 화면 시안. [onboarding.png](./mockups/onboarding.png)(디자이너 시안 3단계) · [onboarding.html](./mockups/onboarding.html)(스와치가 동작하는 인터랙션 레퍼런스) · [onboarding-applied.png](./mockups/onboarding-applied.png)(**구현 적용 결과** — 시안과 비교용, `/[lang]/onboarding/preview`에서 캡처).
 
 ## 에셋을 repo로 관리하는 규칙
 

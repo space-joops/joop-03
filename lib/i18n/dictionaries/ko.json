@@ -24,33 +24,66 @@
     "openMyJoop": "내 줍스: {name}"
   },
   "onboarding": {
-    "title": "줍스를 분양받으세요",
-    "subtitle": "초대 코드를 입력해 줍스를 분양받거나, 이메일을 남겨 초대 코드를 받으세요.",
-    "inviteLabel": "초대 코드",
-    "invitePlaceholder": "JOOP-XXXX-XX",
-    "redeem": "줍스 분양받기",
-    "or": "또는",
-    "waitlistLabel": "이메일",
-    "waitlistPlaceholder": "you@example.com",
-    "join": "알림 신청",
-    "joined": "등록됐어요! 곧 초대 코드를 보내드릴게요.",
-    "back": "뒤로",
+    "invite": {
+      "pageTitle": "줍스 분양받기",
+      "eyebrow": "Invite Code",
+      "title": "초대코드를 입력하세요",
+      "lead": "줍스는 초대받은 시민에게만 분양됩니다.",
+      "label": "초대코드",
+      "placeholder": "JOOP-ALPHA-01",
+      "cta": "코드 확인",
+      "footnote": "이미 분양받았다면 로그인 시 자동으로 내 줍스와 연결됩니다."
+    },
+    "waitlist": {
+      "label": "초대코드가 없나요? 이메일을 남기면 차례가 오면 보내드려요.",
+      "placeholder": "you@example.com",
+      "cta": "대기 등록",
+      "done": "등록됐어요. 차례가 오면 메일로 알려드릴게요."
+    },
+    "boot": {
+      "title": "보급 카트리지 도착",
+      "status": "부팅 중…",
+      "ready": "부팅 완료",
+      "lead": "당신의 줍스가 깨어나고 있어요",
+      "cta": "만나기",
+      "logOrbitProtocol": "궤도 프로토콜 로드",
+      "logCollectModule": "수거 모듈 점검",
+      "logCitizenRegistry": "시민 등록 대기…",
+      "logOk": "OK"
+    },
+    "setup": {
+      "title": "내 줍스 설정",
+      "nameLabel": "이름 — 우주에서 하나뿐이어야 해요",
+      "namePlaceholder": "내 줍스 이름",
+      "nameOk": "사용 가능한 이름이에요",
+      "nameTaken": "이미 사용 중인 이름이에요.",
+      "nameLen": "2~20자로 입력하세요",
+      "colorLabel": "색 — 궤도에서 내 줍스를 알아보는 표식",
+      "colorErr": "색상을 선택하세요",
+      "cta": "분양 완료"
+    },
+    "stepIndicator": "STEP {n}/3",
+    "divider": "또는",
+    "a11y": {
+      "back": "뒤로",
+      "bootingJoop": "부팅 중인 줍스",
+      "joopPreview": "내 줍스 미리보기",
+      "colorGroup": "줍스 색 선택"
+    },
+    "colors": {
+      "green": "그린",
+      "amber": "앰버",
+      "cyan": "시안",
+      "magenta": "마젠타",
+      "lime": "라임",
+      "gold": "골드"
+    },
     "errors": {
       "empty": "코드를 입력하세요",
       "invalid": "유효하지 않거나 이미 사용된 코드예요",
       "email": "올바른 이메일을 입력하세요",
       "session": "세션 생성에 실패했어요",
       "waitlist": "문제가 발생했어요"
-    },
-    "setup": {
-      "title": "줍스 설정",
-      "nameLabel": "이름 (유니크)",
-      "namePlaceholder": "내 줍스 이름",
-      "colorLabel": "색상",
-      "complete": "완료",
-      "nameTaken": "이미 쓰이는 이름이에요",
-      "nameLen": "2~20자로 입력하세요",
-      "colorErr": "색상을 선택하세요"
     }
   },
   "joop": {

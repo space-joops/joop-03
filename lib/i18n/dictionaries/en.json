@@ -24,33 +24,66 @@
     "openMyJoop": "Your joop: {name}"
   },
   "onboarding": {
-    "title": "Adopt your joop",
-    "subtitle": "Enter an invite code to receive your joop, or leave your email for one.",
-    "inviteLabel": "Invite code",
-    "invitePlaceholder": "JOOP-XXXX-XX",
-    "redeem": "Adopt my joop",
-    "or": "or",
-    "waitlistLabel": "Email",
-    "waitlistPlaceholder": "you@example.com",
-    "join": "Notify me",
-    "joined": "You're on the list! We'll send an invite code soon.",
-    "back": "Back",
+    "invite": {
+      "pageTitle": "Get your joop",
+      "eyebrow": "Invite Code",
+      "title": "Enter your invite code",
+      "lead": "Joops are only given to invited citizens.",
+      "label": "Invite code",
+      "placeholder": "JOOP-ALPHA-01",
+      "cta": "Verify code",
+      "footnote": "Already have a joop? Signing in reconnects you automatically."
+    },
+    "waitlist": {
+      "label": "No invite code? Leave your email and we'll send one when it's your turn.",
+      "placeholder": "you@example.com",
+      "cta": "Join waitlist",
+      "done": "You're on the list. We'll email you when it's your turn."
+    },
+    "boot": {
+      "title": "Supply cartridge arrived",
+      "status": "Booting…",
+      "ready": "Boot complete",
+      "lead": "Your joop is waking up",
+      "cta": "Meet your joop",
+      "logOrbitProtocol": "Loading orbital protocol",
+      "logCollectModule": "Checking collection module",
+      "logCitizenRegistry": "Awaiting citizen registration…",
+      "logOk": "OK"
+    },
+    "setup": {
+      "title": "Set up my joop",
+      "nameLabel": "Name — must be one of a kind in space",
+      "namePlaceholder": "Name your joop",
+      "nameOk": "That name is available",
+      "nameTaken": "That name is already taken.",
+      "nameLen": "Use 2–20 characters",
+      "colorLabel": "Color — how you'll spot your joop in orbit",
+      "colorErr": "Pick a color",
+      "cta": "Complete adoption"
+    },
+    "stepIndicator": "STEP {n}/3",
+    "divider": "or",
+    "a11y": {
+      "back": "Back",
+      "bootingJoop": "Joop booting up",
+      "joopPreview": "My joop preview",
+      "colorGroup": "Choose your joop's color"
+    },
+    "colors": {
+      "green": "Green",
+      "amber": "Amber",
+      "cyan": "Cyan",
+      "magenta": "Magenta",
+      "lime": "Lime",
+      "gold": "Gold"
+    },
     "errors": {
       "empty": "Enter a code",
       "invalid": "Invalid or used code",
       "email": "Enter a valid email",
       "session": "Could not start a session",
       "waitlist": "Something went wrong"
-    },
-    "setup": {
-      "title": "Set up your joop",
-      "nameLabel": "Name (unique)",
-      "namePlaceholder": "Name your joop",
-      "colorLabel": "Color",
-      "complete": "Done",
-      "nameTaken": "That name is taken",
-      "nameLen": "Use 2–20 characters",
-      "colorErr": "Pick a color"
     }
   },
   "joop": {

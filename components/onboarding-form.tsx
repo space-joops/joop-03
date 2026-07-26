@@ -1,7 +1,6 @@
 "use client";
 
 import { useActionState } from "react";
-import Link from "next/link";
 import {
   redeemInvite,
   joinWaitlist,
@@ -9,7 +8,10 @@ import {
 } from "@/app/[lang]/onboarding/actions";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
+import { ConsoleField } from "@/components/console-field";
+import { PrimaryButton, SecondaryButton } from "@/components/console-button";
 
+// ① 초대코드 입력 + 이메일 대기 등록 — docs/design/handoff-m2.md §3-2~3-4
 export function OnboardingForm({ lang, dict }: { lang: Locale; dict: Dictionary }) {
   const t = dict.onboarding;
   const errors = t.errors as Record<string, string>;
@@ -25,82 +27,60 @@ export function OnboardingForm({ lang, dict }: { lang: Locale; dict: Dictionary 
 
   const inviteErr = inviteState?.error;
   const waitErr = waitState?.error;
-
-  const fieldClass =
-    "w-full rounded-md border px-3 py-2.5 font-mono text-sm text-[var(--color-fg)] outline-none";
-  const fieldStyle = {
-    background: "var(--color-surface)",
-    borderColor: "var(--color-neutral-600)",
-  };
-  const btnStyle = { background: "var(--color-primary)", color: "var(--color-bg)" };
+  // 대기 등록 성공은 서버 액션이 error 채널로 "joined" 를 돌려주는 기존 계약을 그대로 쓴다.
+  const joined = waitErr === "joined";
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* 초대 코드 */}
-      <form action={inviteAction} className="flex flex-col gap-2">
-        <label className="font-mono text-xs uppercase tracking-widest text-[var(--color-muted)]">
-          {t.inviteLabel}
-        </label>
-        <input
+    <div className="flex min-h-0 flex-1 flex-col">
+      <form action={inviteAction}>
+        <ConsoleField
+          id="invite-code"
           name="code"
-          placeholder={t.invitePlaceholder}
+          label={t.invite.label}
+          placeholder={t.invite.placeholder}
           autoComplete="off"
           autoCapitalize="characters"
-          className={fieldClass}
-          style={fieldStyle}
+          display
+          invalid={Boolean(inviteErr)}
+          helper={inviteErr ? errors[inviteErr] : undefined}
+          helperTone="err"
         />
-        {inviteErr && (
-          <p className="font-mono text-xs text-[var(--color-danger)]">{errors[inviteErr]}</p>
-        )}
-        <button
-          type="submit"
-          disabled={invitePending}
-          className="mt-1 rounded-md py-3 font-mono text-sm font-semibold uppercase tracking-widest disabled:opacity-60"
-          style={btnStyle}
-        >
-          {t.redeem}
-        </button>
+        <div className="mt-4">
+          <PrimaryButton type="submit" disabled={invitePending}>
+            {t.invite.cta}
+          </PrimaryButton>
+        </div>
       </form>
 
-      <div className="text-center font-mono text-xs uppercase tracking-widest text-[var(--color-muted)]">
-        {t.or}
+      <div className="my-5 flex items-center gap-3 text-xs text-[var(--color-muted)]">
+        <span className="h-px flex-1" style={{ background: "var(--color-neutral-700)" }} />
+        {t.divider}
+        <span className="h-px flex-1" style={{ background: "var(--color-neutral-700)" }} />
       </div>
 
-      {/* 이메일 대기리스트 */}
-      <form action={waitAction} className="flex flex-col gap-2">
-        <label className="font-mono text-xs uppercase tracking-widest text-[var(--color-muted)]">
-          {t.waitlistLabel}
-        </label>
-        <input
+      <form action={waitAction}>
+        <ConsoleField
+          id="waitlist-email"
           name="email"
           type="email"
-          placeholder={t.waitlistPlaceholder}
-          className={fieldClass}
-          style={fieldStyle}
+          inputMode="email"
+          label={t.waitlist.label}
+          placeholder={t.waitlist.placeholder}
+          autoComplete="email"
+          invalid={Boolean(waitErr) && !joined}
+          helper={joined ? t.waitlist.done : waitErr ? errors[waitErr] : undefined}
+          helperTone={joined ? "ok" : "err"}
+          trailing={
+            <SecondaryButton type="submit" disabled={waitPending} className="h-[52px] flex-none">
+              {t.waitlist.cta}
+            </SecondaryButton>
+          }
         />
-        {waitErr === "joined" ? (
-          <p className="font-mono text-xs text-[var(--color-primary)]">{t.joined}</p>
-        ) : (
-          waitErr && (
-            <p className="font-mono text-xs text-[var(--color-danger)]">{errors[waitErr]}</p>
-          )
-        )}
-        <button
-          type="submit"
-          disabled={waitPending}
-          className="mt-1 rounded-md border py-3 font-mono text-sm font-semibold uppercase tracking-widest text-[var(--color-fg)] disabled:opacity-60"
-          style={{ borderColor: "var(--color-neutral-600)" }}
-        >
-          {t.join}
-        </button>
       </form>
 
-      <Link
-        href={`/${lang}`}
-        className="text-center font-mono text-xs text-[var(--color-muted)] underline"
-      >
-        {t.back}
-      </Link>
+      <p className="mt-auto pt-3 pb-[calc(var(--safe-bottom)+12px)] text-center text-xs leading-4 text-[var(--color-muted)]">
+        {t.invite.footnote}
+      </p>
     </div>
   );
 }

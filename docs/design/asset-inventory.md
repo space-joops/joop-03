@@ -20,7 +20,7 @@
 | 앱 아이콘 | M1 | PNG | **192**, **512** | `public/icon-192.png`, `public/icon-512.png` |
 | 앱 아이콘(maskable) | M1 | PNG | **512**(안전영역 준수) | `public/icon-maskable-512.png` |
 | apple-touch 아이콘 | M1 | PNG | **180** | `app/apple-icon.png` |
-| 스플래시(스타트업) | M1 | PNG | 주요 비율 세트 | `public/brand/splash-*.png` |
+| 스플래시(스타트업) | M1 | PNG | iOS 5종(1170×2532 · 1179×2556 · 1206×2622 · 1290×2796 · 1320×2868) | ✅ **제작·연결됨**: `public/brand/splash-*.png`, 마스터 `public/design-src/brand/splash-template.svg`. `app/[lang]/layout.tsx` 의 `appleWebApp.startupImage` 에 기기별 media 쿼리로 1:1 연결([handoff-m1.md](./handoff-m1.md) §3-2). Android 는 매니페스트 아이콘+`background_color` 로 자동 생성하므로 파일 불필요 |
 
 ## B. 첫 화면(M1) UI
 
@@ -46,7 +46,8 @@
 
 | 에셋 | 우선 | 포맷 | Canvas | 상태 / 경로 |
 |---|---|---|---|---|
-| 줍스 캐릭터 | 후속 | SVG(시안) → PNG/WebP(+시트) | ✅ | ✅ **제작됨**: `public/game/joop-{green,amber,cyan}.svg` — 정면 대기 포즈, 몸통색 currentColor 3변형. (이동·수거 프레임은 후속) |
+| 줍스 캐릭터 (A안 · 크림 CRT) | 후속 | PNG 시트 + 메타 | ✅ | ✅ **제작됨**: `public/game/joop-sheet-{green,amber,cyan,magenta,lime,gold}.png`(768×128, 128px×6프레임) + `joop-sheet.meta.json`(anchor·fps·색 매핑 **단일 출처**), 마스터 `public/design-src/game/joop-character-master.svg`. 상태 3종(대기·이동·수거) × 색 6종. **온보딩 화면이 이 지오메트리를 인라인 SVG(`components/joop-character.tsx`)로 사용** |
+| 줍스 캐릭터 (B안 · 다크 네이비) | 후속 | SVG(시안) | ✅ | ⚠️ **A안과 중복**: `public/game/joop-{green,amber,cyan}.svg` — 정면 대기 포즈 3색, 상태 프레임 없음. 현재 코드 미참조. **디자이너가 A/B 중 하나를 확정하고 나머지를 폐기해야 함** |
 | 우주 쓰레기 스프라이트 세트 | 후속 | SVG(시안) → PNG/WebP(+시트) | ✅ | ✅ **제작됨**: `public/game/debris-*.svg` — 위성파편·볼트·캔·회로판·패널·안테나 6종 |
 | 배경 천체 — 지구 | 후속 | SVG(시안) → WebP | ✅ | ✅ **제작됨**: `public/game/celestial-earth.svg` — 경위도 그리드 + 형광 대륙 + 터미네이터 |
 | 배경 천체 — 달 | 후속 | SVG(시안) → WebP | ✅ | ✅ **제작됨**: `public/game/celestial-moon.svg` — 크레이터/마리아 |

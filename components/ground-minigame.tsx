@@ -41,9 +41,9 @@ export function GroundMinigame({
     if (!ctx) return;
 
     const styles = getComputedStyle(document.documentElement);
-    const gridColor = styles.getPropertyValue("--color-grid").trim() || "#1e5a46";
-    const amber = styles.getPropertyValue("--color-secondary").trim() || "#ffb23e";
-    const fgColor = styles.getPropertyValue("--color-fg").trim() || "#e4f2e9";
+    const gridColor = styles.getPropertyValue("--color-grid").trim() || "rgba(57,255,20,0.22)";
+    const amber = styles.getPropertyValue("--color-secondary").trim() || "#ffb000";
+    const fgColor = styles.getPropertyValue("--color-fg").trim() || "#d8e6d4";
 
     let raf = 0;
     let running = true;
@@ -168,8 +168,8 @@ export function GroundMinigame({
       // 렌더
       ctx.clearRect(0, 0, W, H);
       // 배경 그리드
+      // --color-grid 는 alpha 내장(rgba) — globalAlpha 를 겹치면 그리드가 사라진다.
       ctx.strokeStyle = gridColor;
-      ctx.globalAlpha = 0.18;
       ctx.lineWidth = 1;
       const gs = u * 0.12;
       for (let gx = 0; gx < W; gx += gs) {
@@ -184,7 +184,6 @@ export function GroundMinigame({
         ctx.lineTo(W, gy);
         ctx.stroke();
       }
-      ctx.globalAlpha = 1;
 
       // 쓰레기
       for (const d of debris) {
