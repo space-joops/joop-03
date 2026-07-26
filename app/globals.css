@@ -94,3 +94,60 @@ body {
   color: var(--color-fg);
   font-family: var(--font-body);
 }
+
+/* ============================================================
+ * CRT 유틸리티 — 이슈 #5 컨셉 (그린+앰버 투톤 단말기)
+ * ============================================================ */
+
+/* 코너 브래킷 [ ] 프레임 — 네 모서리만 그리는 섹션 프레임.
+ * 색은 사용처에서 --bracket-color 로 오버라이드 (기본 --color-grid). */
+.crt-brackets {
+  position: relative;
+}
+.crt-brackets::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  --b: 14px; /* 브래킷 팔 길이 */
+  --bw: 1px; /* 선 두께 */
+  --bc: var(--bracket-color, var(--color-grid));
+  background:
+    linear-gradient(var(--bc), var(--bc)) left top / var(--b) var(--bw) no-repeat,
+    linear-gradient(var(--bc), var(--bc)) left top / var(--bw) var(--b) no-repeat,
+    linear-gradient(var(--bc), var(--bc)) right top / var(--b) var(--bw) no-repeat,
+    linear-gradient(var(--bc), var(--bc)) right top / var(--bw) var(--b) no-repeat,
+    linear-gradient(var(--bc), var(--bc)) left bottom / var(--b) var(--bw) no-repeat,
+    linear-gradient(var(--bc), var(--bc)) left bottom / var(--bw) var(--b) no-repeat,
+    linear-gradient(var(--bc), var(--bc)) right bottom / var(--b) var(--bw) no-repeat,
+    linear-gradient(var(--bc), var(--bc)) right bottom / var(--bw) var(--b) no-repeat;
+}
+
+/* CRT 스캔라인 오버레이 — body(게임 트리)에 부여. 정적 패턴이라 reduced-motion 무관.
+ * 농도는 --scanline-alpha 토큰으로 조정(대비 저하 주의). */
+.crt-scanlines::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 40; /* VersionBadge(z-50) 아래 */
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 2px,
+    rgba(0, 0, 0, var(--scanline-alpha, 0.14)) 2px 3px
+  );
+}
+
+/* 앰버 보더 패널 — 섹션 제목/랭킹 등 앰버 위계 프레임 (45% 감쇠로 과다 방지) */
+.panel-amber {
+  border: 1px solid color-mix(in srgb, var(--color-secondary) 45%, transparent);
+  border-radius: var(--radius-md);
+}
+
+/* 스피드라인(≡ 날개) — 워드마크 좌우 장식. color 는 부모 currentColor. */
+.speedlines {
+  flex: 1;
+  height: 9px;
+  background: repeating-linear-gradient(to bottom, currentColor 0 1px, transparent 1px 4px);
+  opacity: 0.7;
+}
