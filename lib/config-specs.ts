@@ -10,7 +10,7 @@
 // ⚠️ xp 오버플로 방어: max_debris_per_run(≤5000) × xp_per_debris(≤1000) = 500만 이므로
 //    한 판 최대 XP 가 int4 안에 넉넉히 들어온다. 두 키의 max 는 함께 조정해야 한다.
 
-export type ConfigGroup = "orbital" | "minigame" | "launch";
+export type ConfigGroup = "orbital" | "minigame" | "space" | "launch";
 
 export type ConfigSpec = {
   key: string;
@@ -32,6 +32,7 @@ export type ConfigSpec = {
 export const CONFIG_GROUP_LABELS: Record<ConfigGroup, string> = {
   orbital: "궤도 · 첫 화면",
   minigame: "미니게임 물리",
+  space: "우주 지도 · 자동 수거",
   launch: "발사",
 };
 
@@ -132,6 +133,45 @@ export const CONFIG_SPECS: readonly ConfigSpec[] = [
     step: 1,
     fallback: 300,
     warn: "올릴수록 클라이언트 조작 여지가 커집니다. 연료를 크게 늘렸을 때만 함께 올리세요.",
+  },
+  {
+    key: "idle_collect_rate",
+    label: "자동 수거 속도",
+    description:
+      "궤도의 줍스가 음영 지역에서 자동으로 줍는 시간당 조각 수입니다(FR-6.1). 방치형 진행 속도를 좌우합니다.",
+    group: "space",
+    type: "int",
+    min: 0,
+    max: 100_000,
+    step: 10,
+    unit: "조각/시간",
+    fallback: 120,
+  },
+  {
+    key: "idle_collect_cap_hours",
+    label: "자동 수거 정산 상한",
+    description:
+      "한 번 정산할 때 반영할 최대 경과 시간. 오래 접속하지 않아도 이 시간까지만 쌓입니다.",
+    group: "space",
+    type: "int",
+    min: 1,
+    max: 168,
+    step: 1,
+    unit: "시간",
+    fallback: 12,
+  },
+  {
+    key: "launch_countdown_seconds",
+    label: "발사 카운트다운",
+    description: "탑승 확정 후 발사 시퀀스 카운트다운 길이입니다(FR-5.1).",
+    group: "launch",
+    type: "int",
+    min: 3,
+    max: 60,
+    step: 1,
+    unit: "초",
+    fallback: 8,
+    restartRequired: true,
   },
   {
     key: "launch_required_level",

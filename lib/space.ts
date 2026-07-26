@@ -1,20 +1,24 @@
 import { cache } from "react";
 import { createSessionClient } from "@/lib/supabase/session";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getGameConfig } from "@/lib/game-config";
+import { CONFIG_SPEC_BY_KEY, coerceConfigNumber } from "@/lib/config-specs";
 import { positionAt, type OrbitParams } from "@/lib/orbit";
 
 const EARTH_RADIUS_KM = 6371;
 
 // 운영 파라미터(숫자) 읽기 — 공개 config.
+// 폴백 기본값은 lib/config-specs.ts 의 spec.fallback 이 단일 진실이다(관리자 콘솔이 쓰는 값과 동일).
 export const getSpaceConfig = cache(async () => {
-  const sb = await createSessionClient();
-  const { data } = await sb.from("joop_03_game_config").select("key,value");
-  const map = new Map(((data ?? []) as { key: string; value: unknown }[]).map((r) => [r.key, r.value]));
-  const num = (k: string, d: number) => Number(map.get(k) ?? d);
+  const config = await getGameConfig();
+  const num = (key: string) => {
+    const spec = CONFIG_SPEC_BY_KEY.get(key)!;
+    return config.has(key) ? coerceConfigNumber(spec, config.get(key)) : spec.fallback;
+  };
   return {
-    idleCollectRate: num("idle_collect_rate", 120), // 시간당 조각
-    idleCollectCapHours: num("idle_collect_cap_hours", 12),
-    launchCountdownSeconds: num("launch_countdown_seconds", 8),
+    idleCollectRate: num("idle_collect_rate"), // 시간당 조각
+    idleCollectCapHours: num("idle_collect_cap_hours"),
+    launchCountdownSeconds: num("launch_countdown_seconds"),
   };
 });
 

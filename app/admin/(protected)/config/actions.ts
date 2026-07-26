@@ -50,8 +50,11 @@ export async function updateGameConfig(
 
   revalidatePath("/admin/config");
   revalidatePath("/admin/launch");
-  revalidatePath("/[lang]/joop/train", "page");
   revalidatePath("/api/orbital");
+  // 설정을 읽는 게임 화면들 — 미니게임 물리, 발사 카운트다운, 자동 수거 속도.
+  revalidatePath("/[lang]/joop/train", "page");
+  revalidatePath("/[lang]/joop/launch", "page");
+  revalidatePath("/[lang]/joop/map", "page");
 
   return { ok: true, updated: rows.map((r) => r.key) };
 }
