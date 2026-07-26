@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 740 220" width="740" height="220" role="img" aria-label="JOOPS">
+  <title>JOOPS 워드마크 (형광 그린 · CRT 글로우)</title>
+  <!-- Phosphor variant: fixed primary green (#35e07a) with a soft CRT glow.
+       Use on deep-space dark surfaces only. -->
+  <defs>
+    <filter id="crt-glow" x="-20%" y="-40%" width="140%" height="180%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="9" result="b"/>
+      <feFlood flood-color="#35e07a" flood-opacity="0.55" result="c"/>
+      <feComposite in="c" in2="b" operator="in" result="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#crt-glow)" fill="none" stroke="#35e07a" stroke-width="26" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 66 53 L 136 53"/>
+    <path d="M 118 53 L 118 128 Q 118 167 79 167 Q 44 167 44 138"/>
+    <ellipse cx="228" cy="110" rx="48" ry="57"/>
+    <ellipse cx="368" cy="110" rx="48" ry="57"/>
+    <path d="M 460 167 L 460 53 L 520 53 Q 556 53 556 88 Q 556 122 520 122 L 460 122"/>
+    <path d="M 690 80 Q 690 53 646 53 Q 604 53 604 86 Q 604 108 648 110 Q 692 112 692 138 Q 692 167 646 167 Q 604 167 604 140"/>
+  </g>
+</svg>

@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="JOOPS maskable app icon">
+  <title>JOOPS — maskable 앱 아이콘 (안전영역 중앙 80% 준수)</title>
+  <defs>
+    <radialGradient id="space-m" cx="50%" cy="42%" r="90%">
+      <stop offset="0%" stop-color="#0c1626"/>
+      <stop offset="55%" stop-color="#070c16"/>
+      <stop offset="100%" stop-color="#04060d"/>
+    </radialGradient>
+  </defs>
+
+  <!-- full-bleed background (launcher applies its own mask shape) -->
+  <rect width="512" height="512" fill="url(#space-m)"/>
+
+  <!-- faint starfield (decorative; safe to crop) -->
+  <g fill="#e4f2e9">
+    <circle cx="86" cy="120" r="2.6" opacity="0.45"/>
+    <circle cx="440" cy="380" r="2.2" opacity="0.4"/>
+    <circle cx="120" cy="430" r="2" opacity="0.32"/>
+    <circle cx="430" cy="96" r="1.7" opacity="0.4"/>
+  </g>
+
+  <!-- MARK scaled to 0.8 about center → max radius ≈ 144px < safe circle (205px) -->
+  <g transform="translate(256 256) scale(0.8) translate(-256 -256)">
+    <!-- orbit ring (tilted) with layered glow -->
+    <g transform="rotate(-20 256 262)">
+      <ellipse cx="256" cy="262" rx="180" ry="94" fill="none" stroke="#35e07a" stroke-width="22" opacity="0.10"/>
+      <ellipse cx="256" cy="262" rx="180" ry="94" fill="none" stroke="#1e5a46" stroke-width="7" opacity="0.85"/>
+      <path d="M 436 262 A 180 94 0 0 1 76 262" fill="none" stroke="#35e07a" stroke-width="7" opacity="0.95" stroke-linecap="round"/>
+    </g>
+
+    <g transform="rotate(18 402 150)">
+      <rect x="388" y="136" width="26" height="26" rx="6" fill="#ffb23e" opacity="0.2"/>
+      <rect x="391" y="139" width="20" height="20" rx="5" fill="#ffb23e"/>
+      <rect x="397" y="145" width="8" height="8" rx="2" fill="#3a2a0c" opacity="0.5"/>
+    </g>
+    <rect x="104" y="356" width="16" height="16" rx="4" fill="#1e5a46" transform="rotate(-14 112 364)"/>
+
+    <line x1="256" y1="180" x2="256" y2="142" stroke="#35e07a" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="256" cy="132" r="20" fill="#ffb23e" opacity="0.18"/>
+    <circle cx="256" cy="132" r="11" fill="#ffb23e"/>
+    <circle cx="256" cy="132" r="4" fill="#ffe6b0"/>
+
+    <rect x="150" y="178" width="212" height="196" rx="46" fill="#16202e" stroke="#26374a" stroke-width="4"/>
+    <path d="M 178 190 Q 256 176 334 190" fill="none" stroke="#33475c" stroke-width="4" stroke-linecap="round" opacity="0.85"/>
+    <circle cx="150" cy="276" r="12" fill="#0e1622" stroke="#2a3646" stroke-width="4"/>
+    <circle cx="362" cy="276" r="12" fill="#0e1622" stroke="#2a3646" stroke-width="4"/>
+
+    <rect x="172" y="200" width="168" height="128" rx="26" fill="#0a1018"/>
+    <rect x="172" y="200" width="168" height="128" rx="26" fill="none" stroke="#1e5a46" stroke-width="2" opacity="0.6"/>
+
+    <rect x="192" y="230" width="52" height="44" rx="14" fill="#35e07a" opacity="0.22"/>
+    <rect x="268" y="230" width="52" height="44" rx="14" fill="#35e07a" opacity="0.22"/>
+    <rect x="198" y="236" width="40" height="32" rx="10" fill="#35e07a"/>
+    <rect x="274" y="236" width="40" height="32" rx="10" fill="#35e07a"/>
+    <rect x="204" y="240" width="14" height="9" rx="4.5" fill="#c7ffdd" opacity="0.9"/>
+    <rect x="280" y="240" width="14" height="9" rx="4.5" fill="#c7ffdd" opacity="0.9"/>
+    <rect x="192" y="250" width="128" height="3" fill="#0a1018" opacity="0.5"/>
+
+    <g fill="#35e07a">
+      <rect x="206" y="298" width="16" height="8" rx="2"/>
+      <rect x="228" y="298" width="16" height="8" rx="2"/>
+    </g>
+    <g fill="#1e5a46">
+      <rect x="250" y="298" width="16" height="8" rx="2"/>
+      <rect x="272" y="298" width="16" height="8" rx="2"/>
+      <rect x="294" y="298" width="16" height="8" rx="2"/>
+    </g>
+  </g>
+</svg>
