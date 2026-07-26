@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <!-- Cassette Futurism Symbol (Joop robot) -->
+  <style>
+    .line {
+      fill: none;
+      stroke: #39ff14;
+      stroke-width: 6;
+      stroke-linecap: square;
+      stroke-linejoin: miter;
+    }
+    .solid {
+      fill: #39ff14;
+    }
+  </style>
+  
+  <!-- Outer target/radar circle -->
+  <circle cx="50" cy="50" r="42" class="line" stroke-dasharray="20 10" opacity="0.8"/>
+  
+  <!-- Robot Body -->
+  <rect x="35" y="35" width="30" height="30" class="line"/>
+  
+  <!-- Robot Eye -->
+  <circle cx="50" cy="50" r="6" class="solid"/>
+  
+  <!-- Antenna -->
+  <line x1="50" y1="35" x2="50" y2="15" class="line"/>
+  <circle cx="50" cy="15" r="3" class="solid"/>
+  
+  <!-- Side thrusters -->
+  <line x1="25" y1="50" x2="35" y2="50" class="line"/>
+  <line x1="65" y1="50" x2="75" y2="50" class="line"/>
+</svg>

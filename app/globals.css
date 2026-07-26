@@ -1,26 +1,68 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Cassette Futurism - Dark Theme (Default) */
+  --bg: #09090b; /* Deep space black/navy */
+  --surface: #18181b; /* Charcoal for panels */
+  --fg: #f4f4f5; /* Off-white text */
+  --primary: #39ff14; /* Fluorescent Green */
+  --secondary: #ffb000; /* Amber / Orange */
+  --accent: #00ffff; /* Cyan neon point */
+  --danger: #ff3333; /* Red for danger */
+  --success: #00ff66; /* Green for success */
+  --muted: #a1a1aa; /* Gray text */
+  --grid: #1a4d2e; /* Low saturation green for grid */
+  
+  /* Typography - Using system fonts as placeholders */
+  --font-display: "Courier New", Courier, monospace; /* Segment/Mono feel */
+  --font-body: system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-background: var(--bg);
+  --color-foreground: var(--fg);
+  --color-surface: var(--surface);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-danger: var(--danger);
+  --color-success: var(--success);
+  --color-muted: var(--muted);
+  --color-grid: var(--grid);
+  
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  /* Optional CRT Scanline effect on body */
+  background-image: linear-gradient(
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.25) 50%
+  );
+  background-size: 100% 4px;
+}
+
+/* Base specific overrides */
+* {
+  box-sizing: border-box;
+}
+
+/* Cassette Futurism Specific utilities */
+.crt-glow-primary {
+  text-shadow: 0 0 5px var(--primary), 0 0 10px var(--primary);
+}
+.crt-glow-secondary {
+  text-shadow: 0 0 5px var(--secondary), 0 0 10px var(--secondary);
+}
+
+.panel-bezel {
+  background-color: var(--surface);
+  border: 2px solid var(--muted);
+  box-shadow: inset 4px 4px 0px rgba(255,255,255,0.05), inset -4px -4px 0px rgba(0,0,0,0.5);
 }

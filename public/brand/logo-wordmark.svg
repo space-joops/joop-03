@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <!-- Cassette Futurism Wordmark -->
+  <style>
+    .text {
+      font-family: 'Courier New', monospace;
+      font-size: 48px;
+      font-weight: 900;
+      fill: #39ff14; /* Fluorescent Green */
+      letter-spacing: 4px;
+    }
+    .shadow {
+      fill: none;
+      stroke: #39ff14;
+      stroke-width: 1.5;
+      opacity: 0.5;
+      transform: translate(2px, 2px);
+    }
+  </style>
+  <text x="10" y="45" class="shadow">JOOPS</text>
+  <text x="10" y="45" class="text">JOOPS</text>
+  <!-- Decorative underlines representing orbits/speed -->
+  <line x1="12" y1="52" x2="160" y2="52" stroke="#39ff14" stroke-width="4"/>
+  <line x1="30" y1="58" x2="175" y2="58" stroke="#39ff14" stroke-width="2"/>
+</svg>
