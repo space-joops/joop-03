@@ -22,8 +22,8 @@ export function OrbitalCanvas({ snapshot }: { snapshot: OrbitalSnapshot }) {
 
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const styles = getComputedStyle(document.documentElement);
-    const gridColor = styles.getPropertyValue("--color-grid").trim() || "#1f6f4a";
-    const earthColor = styles.getPropertyValue("--color-surface").trim() || "#0b1a2a";
+    const gridColor = styles.getPropertyValue("--color-grid").trim() || "#1e5a46";
+    const earthColor = styles.getPropertyValue("--color-surface").trim() || "#0a1c10";
 
     let raf = 0;
     let running = true;

@@ -21,7 +21,7 @@ export function SpaceMap({ state }: { state: OrbitState }) {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const styles = getComputedStyle(document.documentElement);
     const gridColor = styles.getPropertyValue("--color-grid").trim() || "#1e5a46";
-    const earthColor = styles.getPropertyValue("--color-surface").trim() || "#0f1826";
+    const earthColor = styles.getPropertyValue("--color-surface").trim() || "#0a1c10";
 
     let raf = 0;
     let running = true;
