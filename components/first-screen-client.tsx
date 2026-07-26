@@ -79,7 +79,8 @@ export function FirstScreen({
 
       <div className="mt-auto px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-3">
         {myJoop ? (
-          <div
+          <a
+            href={`/${lang}/joop`}
             className="flex w-full items-center justify-center gap-2 rounded-md border py-3 font-mono text-sm"
             style={{ borderColor: "var(--color-neutral-600)", background: "var(--color-surface)" }}
           >
@@ -95,7 +96,7 @@ export function FirstScreen({
               · {myJoop.status === "orbit" ? dict.home.orbit : dict.home.ground} {dict.home.level}
               {myJoop.level}
             </span>
-          </div>
+          </a>
         ) : (
           <a
             href={`/${lang}/onboarding`}
