@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Debris: satellite fragment">
+  <title>우주 쓰레기 — 위성 파편 (찢긴 태양전지판)</title>
+  <!-- Transparent bg, dark-surface use. Tokens: surface #0f1826/#16202e, grid #1e5a46, primary #35e07a, amber #ffb23e. -->
+  <g transform="rotate(-14 32 32)">
+    <!-- solar panel body -->
+    <rect x="10" y="18" width="44" height="26" rx="2" fill="#0f1826" stroke="#26374a" stroke-width="1.5"/>
+    <!-- cells grid -->
+    <g stroke="#1e5a46" stroke-width="1">
+      <line x1="21" y1="18" x2="21" y2="44"/>
+      <line x1="32" y1="18" x2="32" y2="44"/>
+      <line x1="43" y1="18" x2="43" y2="44"/>
+      <line x1="10" y1="31" x2="54" y2="31"/>
+    </g>
+    <g fill="#35e07a" opacity="0.14">
+      <rect x="11" y="19" width="9" height="11"/>
+      <rect x="33" y="32" width="9" height="11"/>
+    </g>
+    <!-- torn edge (amber warning) -->
+    <path d="M 54 18 L 60 22 L 55 26 L 60 31 L 54 34 L 60 38 L 54 44" fill="none" stroke="#ffb23e" stroke-width="1.5" stroke-linejoin="round"/>
+    <!-- support strut -->
+    <line x1="10" y1="31" x2="2" y2="31" stroke="#26374a" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="10" cy="31" r="2.5" fill="#16202e" stroke="#26374a" stroke-width="1.5"/>
+  </g>
+</svg>

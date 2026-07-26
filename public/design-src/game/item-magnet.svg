@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" role="img" aria-label="Item: magnet">
+  <title>아이템 — 자석 (쓰레기 끌어당김)</title>
+  <!-- Transparent bg, dark-surface use. Tokens: muted #8a9e92, accent #38e0f0, primary #35e07a, amber #ffb23e. -->
+  <!-- field lines -->
+  <g fill="none" stroke="#35e07a" stroke-width="1.5" stroke-linecap="round" opacity="0.55">
+    <path d="M 15 16 Q 24 4 33 16"/>
+    <path d="M 12 20 Q 24 2 36 20"/>
+  </g>
+  <!-- horseshoe body -->
+  <path d="M 15 40 V 24 a 9 9 0 0 1 18 0 V 40" fill="none" stroke="#8a9e92" stroke-width="8"/>
+  <path d="M 15 40 V 24 a 9 9 0 0 1 18 0 V 40" fill="none" stroke="#c4d2c9" stroke-width="1.5" opacity="0.5"/>
+  <!-- pole tips -->
+  <rect x="11" y="36" width="8" height="6" rx="1" fill="#38e0f0"/>
+  <rect x="29" y="36" width="8" height="6" rx="1" fill="#ffb23e"/>
+</svg>

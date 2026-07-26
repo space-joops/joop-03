@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 120" width="180" height="120" role="img" aria-label="Satellite: probe (far)">
+  <title>위성 — 소형 탐사 프로브 (원경/소형, 원근 스케일용)</title>
+  <!-- Transparent bg, dark-surface use. Simpler far-scale variant. Scale up for near.
+       Tokens: surface #16202e, bezel #26374a, grid #1e5a46, primary #35e07a, amber #ffb23e. -->
+
+  <!-- solar wing booms -->
+  <line x1="74" y1="60" x2="44" y2="60" stroke="#26374a" stroke-width="3" stroke-linecap="round"/>
+  <line x1="106" y1="60" x2="136" y2="60" stroke="#26374a" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- solar wings -->
+  <g fill="#0f1826" stroke="#26374a" stroke-width="1.75">
+    <rect x="14" y="44" width="30" height="32" rx="2"/>
+    <rect x="136" y="44" width="30" height="32" rx="2"/>
+  </g>
+  <g stroke="#1e5a46" stroke-width="1" opacity="0.9">
+    <line x1="29" y1="44" x2="29" y2="76"/><line x1="14" y1="60" x2="44" y2="60"/>
+    <line x1="151" y1="44" x2="151" y2="76"/><line x1="136" y1="60" x2="166" y2="60"/>
+  </g>
+
+  <!-- cube bus -->
+  <rect x="74" y="42" width="32" height="36" rx="4" fill="#16202e" stroke="#26374a" stroke-width="2"/>
+  <rect x="80" y="48" width="20" height="14" rx="2" fill="#0a1018" stroke="#33475c" stroke-width="1"/>
+  <rect x="83" y="52" width="14" height="2.5" rx="1.25" fill="#35e07a" opacity="0.8"/>
+  <circle cx="90" cy="70" r="3" fill="#35e07a" opacity="0.5"/>
+
+  <!-- small dish -->
+  <g transform="translate(90 34) rotate(-14)">
+    <ellipse cx="0" cy="0" rx="12" ry="7" fill="#16202e" stroke="#26374a" stroke-width="1.5"/>
+    <line x1="0" y1="0" x2="5" y2="-9" stroke="#26374a" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="5" cy="-9" r="2" fill="#0a1018" stroke="#33475c" stroke-width="1"/>
+  </g>
+
+  <!-- amber beacon -->
+  <circle cx="100" cy="46" r="2.4" fill="#ffb23e"/>
+</svg>
