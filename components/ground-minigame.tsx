@@ -1,16 +1,37 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { applyThrust, DEFAULT_CONFIG, type MinigameConfig } from "@/lib/minigame";
+import {
+  ALL_ITEMS,
+  DEFAULT_CONFIG,
+  HAZARD_ITEMS,
+  SAFE_ITEMS,
+  bondFrom,
+  bondTier,
+  fallSpeedAt,
+  pickItem,
+  spawnIntervalAt,
+  type FallingItem,
+  type MinigameConfig,
+} from "@/lib/minigame";
 import { submitMinigameResult } from "@/app/[lang]/joop/actions";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
 
-type Phase = "playing" | "over" | "saving" | "saved";
+type Phase = "ready" | "playing" | "over" | "saving" | "saved";
 
-// 지상 미니게임: 관성(마찰0) 조작으로 우주 쓰레기를 먹는다.
-// 화면을 누른 방향으로 분사(추력), 놓으면 관성 유지. 연료 소진 시 종료.
+type Summary = {
+  caught: number;
+  missed: number;
+  hits: number;
+  bond: number;
+  reason: "time" | "broken";
+};
+
+// 지상 훈련: 줍스는 땅에 서서 좌우로만 움직인다.
+// 위에서 떨어지는 것들 중 "우주 쓰레기"는 받아내고, "작동 중인 위성"은 피한다(식별 훈련).
+// 조작 = 화면을 좌우로 끌기(모바일) / ← → 키(데스크톱).
 export function GroundMinigame({
   lang,
   dict,
@@ -20,40 +41,75 @@ export function GroundMinigame({
   lang: Locale;
   dict: Dictionary;
   color: string;
-  /** joop_03_game_config 에서 읽어 서버가 주입. 없으면 코드 기본값(EPIC 10 / FR-7.5). */
+  /** joop_03_game_config 에서 읽어 서버가 주입. 없으면 코드 기본값(EPIC 10 / FR-10.2). */
   config?: MinigameConfig;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const boxRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const [phase, setPhase] = useState<Phase>("playing");
-  const [score, setScore] = useState(0);
+  const [phase, setPhase] = useState<Phase>("ready");
+  const [assetsReady, setAssetsReady] = useState(false);
+  const [summary, setSummary] = useState<Summary | null>(null);
   const [result, setResult] = useState<{ xpGained: number; level: number } | null>(null);
-  const finalScoreRef = useRef(0);
+  const imagesRef = useRef<Map<string, HTMLImageElement>>(new Map());
+  const m = dict.minigame;
 
-  // 마운트 시점에 한 번 고정한다 → 진행 중인 판은 설정이 바뀌어도 흔들리지 않고,
-  // 다시 들어와야 반영된다. 요구사항의 "설정값은 게임 재시작 시 반영"(FR-7.5/10.2) 그대로다.
+  // 마운트 시점에 한 번 고정 → 진행 중인 판은 설정이 바뀌어도 흔들리지 않고, 다시 들어와야 반영된다
+  // ("설정값은 게임 재시작 시 반영" FR-10.2).
   const [cfg] = useState<MinigameConfig>(() => config ?? DEFAULT_CONFIG);
 
+  // 에셋(SVG) 선로딩 — 첫 물체가 떨어질 때 깜빡이지 않도록 시작 버튼을 이때까지 잠근다.
   useEffect(() => {
+    let cancelled = false;
+    const map = imagesRef.current;
+    let remaining = ALL_ITEMS.length;
+    const done = () => {
+      remaining -= 1;
+      if (remaining <= 0 && !cancelled) setAssetsReady(true);
+    };
+    for (const item of ALL_ITEMS) {
+      const img = new Image();
+      img.onload = done;
+      img.onerror = done; // 하나 실패해도 훈련은 시작할 수 있어야 한다(대체 도형으로 그린다)
+      img.src = item.asset;
+      map.set(item.id, img);
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (phase !== "playing") return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     const styles = getComputedStyle(document.documentElement);
-    const gridColor = styles.getPropertyValue("--color-grid").trim() || "#1e5a46";
-    const amber = styles.getPropertyValue("--color-secondary").trim() || "#ffb23e";
-    const fgColor = styles.getPropertyValue("--color-fg").trim() || "#e4f2e9";
+    const pick = (name: string, fallback: string) =>
+      styles.getPropertyValue(name).trim() || fallback;
+    const gridColor = pick("--color-grid", "#1e5a46");
+    const amber = pick("--color-secondary", "#ffb23e");
+    const fgColor = pick("--color-fg", "#e4f2e9");
+    const mutedColor = pick("--color-muted", "#7d8f99");
+    const dangerColor = pick("--color-danger", "#ff5c77");
+    const surface = pick("--color-surface", "#0f1826");
+    const bezel = "#26374a";
 
     let raf = 0;
     let running = true;
 
-    // 월드(픽셀) — devicePixelRatio 대응
+    // ── 월드 크기(CSS px) — devicePixelRatio 대응
+    // ⚠️ 크기는 **컨테이너**에서 잰다. canvas 자신을 재면 width/height 속성을 다시 쓰는 순간
+    //    고유 크기가 바뀌어 관측 → 확대 → 관측이 반복되는 되먹임(탭 크래시)이 생긴다.
     let W = 0;
     let H = 0;
     const resize = () => {
+      const box = boxRef.current;
+      if (!box) return;
       const dpr = window.devicePixelRatio || 1;
-      const rect = canvas.getBoundingClientRect();
+      const rect = box.getBoundingClientRect();
       W = rect.width;
       H = rect.height;
       canvas.width = Math.round(W * dpr);
@@ -61,124 +117,373 @@ export function GroundMinigame({
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     resize();
+    // 레이아웃이 확정되는 시점이 첫 프레임보다 늦을 수 있어 ResizeObserver 로 따라간다.
+    // (window resize 만 듣던 예전 코드는 한 번 잘못 잰 크기를 끝까지 들고 갔다.)
+    const observer = new ResizeObserver(resize);
+    if (boxRef.current) observer.observe(boxRef.current);
     window.addEventListener("resize", resize);
 
-    // 스케일 상수(화면 크기 비례)
     const unit = () => Math.min(W, H);
-    const player = { x: W / 2, y: H / 2, vx: 0, vy: 0, r: 0 };
-    player.r = unit() * 0.035;
-    const speedScale = () => unit() * 0.012; // maxSpeed → px/frame
+    const groundY = () => H * 0.87; // 땅의 윗면 — 줍스의 발이 여기 닿는다
 
-    type D = { x: number; y: number; vx: number; vy: number; r: number };
-    const debris: D[] = [];
-    const spawn = (): D => {
-      const r = unit() * (0.018 + Math.random() * 0.02);
-      return {
-        x: Math.random() * W,
-        y: Math.random() * H,
-        vx: (Math.random() - 0.5) * unit() * 0.002,
-        vy: (Math.random() - 0.5) * unit() * 0.002,
-        r,
-      };
+    // ── 줍스(플레이어)
+    const joop = { x: 0.5, vx: 0, joy: 0, hurt: 0, blink: 0 }; // x = 0~1 정규화
+    let targetX: number | null = null; // 포인터로 지정한 목표 위치(0~1)
+    let keyDir = 0; // -1 | 0 | 1
+
+    const joopSize = () => {
+      const u = unit();
+      return { w: u * 0.15, h: u * 0.19 };
     };
-    for (let i = 0; i < 7; i++) debris.push(spawn());
 
-    let fuel = cfg.fuel;
-    let localScore = 0;
+    // ── 떨어지는 물체
+    type Falling = {
+      item: FallingItem;
+      x: number;
+      y: number;
+      w: number;
+      h: number;
+      vy: number;
+      rot: number;
+      rotV: number;
+    };
+    const falling: Falling[] = [];
+    type Floater = { x: number; y: number; text: string; color: string; life: number };
+    const floaters: Floater[] = [];
 
-    // 입력 — 포인터 위치(누르는 동안 그 방향으로 추력)
-    let pointer: { x: number; y: number } | null = null;
-    const toLocal = (e: PointerEvent) => {
+    let elapsed = 0;
+    let spawnTimer = 1.1; // 시작 직후 1.1초는 여유 — 화면을 파악할 시간
+    let caught = 0;
+    let missed = 0;
+    let hits = 0;
+
+    const spawn = () => {
+      const item = pickItem(cfg, Math.random(), Math.random());
+      const img = imagesRef.current.get(item.id);
+      const u = unit();
+      const h = u * item.scale;
+      const ratio =
+        img && img.naturalWidth > 0 && img.naturalHeight > 0
+          ? img.naturalWidth / img.naturalHeight
+          : 1;
+      const w = h * ratio;
+      const half = w / 2;
+      const spanMin = Math.min(half + 6, W / 2);
+      const spanMax = Math.max(W - half - 6, W / 2);
+      // 위성은 크고 무겁게, 쓰레기는 가볍게 — 회전으로도 실루엣을 구분하게 한다.
+      const speed = fallSpeedAt(cfg, elapsed) * H * (item.hazard ? 0.88 : 1) * (0.9 + Math.random() * 0.25);
+      falling.push({
+        item,
+        x: spanMin + Math.random() * (spanMax - spanMin),
+        y: -h,
+        w,
+        h,
+        vy: speed,
+        rot: (Math.random() - 0.5) * 0.6,
+        rotV: item.hazard ? (Math.random() - 0.5) * 0.25 : (Math.random() - 0.5) * 1.6,
+      });
+    };
+
+    // ── 입력
+    const localX = (clientX: number) => {
       const rect = canvas.getBoundingClientRect();
-      return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+      return Math.max(0, Math.min(1, (clientX - rect.left) / Math.max(1, rect.width)));
     };
     const onDown = (e: PointerEvent) => {
-      pointer = toLocal(e);
+      targetX = localX(e.clientX);
       canvas.setPointerCapture(e.pointerId);
     };
     const onMove = (e: PointerEvent) => {
-      if (pointer) pointer = toLocal(e);
+      if (e.buttons > 0 || e.pointerType === "touch") targetX = localX(e.clientX);
     };
-    const onUp = () => {
-      pointer = null;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") keyDir = -1;
+      else if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") keyDir = 1;
+      else return;
+      targetX = null;
+      e.preventDefault();
+    };
+    const onKeyUp = (e: KeyboardEvent) => {
+      if (["ArrowLeft", "a", "A"].includes(e.key) && keyDir === -1) keyDir = 0;
+      if (["ArrowRight", "d", "D"].includes(e.key) && keyDir === 1) keyDir = 0;
     };
     canvas.addEventListener("pointerdown", onDown);
     canvas.addEventListener("pointermove", onMove);
-    canvas.addEventListener("pointerup", onUp);
-    canvas.addEventListener("pointercancel", onUp);
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keyup", onKeyUp);
 
-    const endGame = () => {
+    const endGame = (reason: Summary["reason"]) => {
       if (!running) return;
       running = false;
       cancelAnimationFrame(raf);
-      finalScoreRef.current = localScore;
-      setScore(localScore);
+      setSummary({ caught, missed, hits, bond: bondFrom(caught, hits), reason });
       setPhase("over");
     };
 
-    const draw = () => {
-      // 레이아웃 확정 전(크기 0)이면 이번 프레임 스킵
+    // ── 그리기 유틸
+    const roundRect = (x: number, y: number, w: number, h: number, r: number) => {
+      const rr = Math.min(r, w / 2, h / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + rr, y);
+      ctx.arcTo(x + w, y, x + w, y + h, rr);
+      ctx.arcTo(x + w, y + h, x, y + h, rr);
+      ctx.arcTo(x, y + h, x, y, rr);
+      ctx.arcTo(x, y, x + w, y, rr);
+      ctx.closePath();
+    };
+
+    // 줍스 — 카세트퓨처리즘 청소로봇. 눌린 색(color)이 액센트, 앰버 비콘은 브랜드 고정.
+    const drawJoop = (cx: number, feetY: number, w: number, h: number) => {
+      const shake = joop.hurt > 0 ? Math.sin(joop.hurt * 60) * w * 0.06 : 0;
+      const x = cx + shake;
+      const bodyH = h * 0.62;
+      const bodyW = w * 0.78;
+      const bodyY = feetY - h * 0.16 - bodyH;
+
+      // 접지 글로우
+      ctx.globalAlpha = 0.16;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.ellipse(x, feetY - 2, w * 0.5, h * 0.05, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      // 안테나 + 비콘
+      ctx.strokeStyle = color;
+      ctx.lineWidth = Math.max(2, w * 0.045);
+      ctx.beginPath();
+      ctx.moveTo(x, bodyY);
+      ctx.lineTo(x, bodyY - h * 0.13);
+      ctx.stroke();
+      ctx.fillStyle = amber;
+      ctx.globalAlpha = 0.85;
+      ctx.beginPath();
+      ctx.arc(x, bodyY - h * 0.15, Math.max(2.5, w * 0.055), 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      // 수거 바스켓(양팔) — 받아내는 부위임을 시각적으로 알린다
+      ctx.strokeStyle = color;
+      ctx.lineWidth = Math.max(2, w * 0.055);
+      ctx.globalAlpha = 0.9;
+      ctx.beginPath();
+      ctx.arc(x, bodyY + h * 0.02, bodyW * 0.62, Math.PI * 1.12, Math.PI * 1.88);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+
+      // 몸통
+      ctx.fillStyle = surface;
+      ctx.strokeStyle = joop.hurt > 0 ? dangerColor : bezel;
+      ctx.lineWidth = Math.max(1.5, w * 0.03);
+      roundRect(x - bodyW / 2, bodyY, bodyW, bodyH, w * 0.14);
+      ctx.fill();
+      ctx.stroke();
+
+      // 바이저
+      const vW = bodyW * 0.72;
+      const vH = bodyH * 0.38;
+      const vX = x - vW / 2;
+      const vY = bodyY + bodyH * 0.16;
+      ctx.fillStyle = "#0b1220";
+      roundRect(vX, vY, vW, vH, vH * 0.4);
+      ctx.fill();
+
+      // 눈 — 이동 방향으로 살짝 쏠리고, 받아내면 웃고, 부딪히면 찡그린다
+      const look = Math.max(-1, Math.min(1, joop.vx * 2.5)) * vW * 0.1;
+      const eyeR = vH * 0.22;
+      const eyeY = vY + vH / 2;
+      const eyeDx = vW * 0.22;
+      ctx.fillStyle = color;
+      ctx.strokeStyle = color;
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 8;
+      const blinking = joop.blink > 0 && joop.blink < 0.12;
+      for (const s of [-1, 1]) {
+        const ex = x + s * eyeDx + look;
+        if (joop.hurt > 0) {
+          // ×  눈
+          ctx.lineWidth = Math.max(1.5, eyeR * 0.5);
+          ctx.strokeStyle = dangerColor;
+          ctx.beginPath();
+          ctx.moveTo(ex - eyeR, eyeY - eyeR);
+          ctx.lineTo(ex + eyeR, eyeY + eyeR);
+          ctx.moveTo(ex + eyeR, eyeY - eyeR);
+          ctx.lineTo(ex - eyeR, eyeY + eyeR);
+          ctx.stroke();
+        } else if (joop.joy > 0) {
+          // ^ 눈
+          ctx.lineWidth = Math.max(1.5, eyeR * 0.55);
+          ctx.beginPath();
+          ctx.arc(ex, eyeY + eyeR * 0.5, eyeR, Math.PI * 1.15, Math.PI * 1.85);
+          ctx.stroke();
+        } else if (blinking) {
+          ctx.lineWidth = Math.max(1.5, eyeR * 0.5);
+          ctx.beginPath();
+          ctx.moveTo(ex - eyeR, eyeY);
+          ctx.lineTo(ex + eyeR, eyeY);
+          ctx.stroke();
+        } else {
+          ctx.beginPath();
+          ctx.arc(ex, eyeY, eyeR, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      ctx.shadowBlur = 0;
+
+      // 가슴 액센트 스트라이프
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.5;
+      ctx.fillRect(x - bodyW * 0.22, bodyY + bodyH * 0.68, bodyW * 0.44, bodyH * 0.08);
+      ctx.globalAlpha = 1;
+
+      // 무한궤도
+      const tH = h * 0.16;
+      const tY = feetY - tH;
+      ctx.fillStyle = "#16202e";
+      ctx.strokeStyle = bezel;
+      ctx.lineWidth = Math.max(1.5, w * 0.03);
+      roundRect(x - w / 2, tY, w, tH, tH * 0.45);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = bezel;
+      for (const s of [-1, 0, 1]) {
+        ctx.beginPath();
+        ctx.arc(x + s * w * 0.3, tY + tH / 2, tH * 0.22, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    };
+
+    const drawItem = (f: Falling) => {
+      const img = imagesRef.current.get(f.item.id);
+      ctx.save();
+      ctx.translate(f.x, f.y);
+      ctx.rotate(f.rot);
+      // 위험물은 붉은 기운, 쓰레기는 앰버 기운 — 실루엣만으로 판단하기 어려운 순간의 단서.
+      ctx.shadowColor = f.item.hazard ? dangerColor : amber;
+      ctx.shadowBlur = f.item.hazard ? 16 : 8;
+      if (img && img.complete && img.naturalWidth > 0) {
+        ctx.drawImage(img, -f.w / 2, -f.h / 2, f.w, f.h);
+      } else {
+        // 에셋 로딩 실패 폴백
+        ctx.fillStyle = f.item.hazard ? dangerColor : amber;
+        ctx.globalAlpha = 0.8;
+        ctx.fillRect(-f.w / 2, -f.h / 2, f.w, f.h);
+        ctx.globalAlpha = 1;
+      }
+      ctx.shadowBlur = 0;
+      ctx.restore();
+
+      // 작동 중인 위성 표시 — 깜빡이는 경고등
+      if (f.item.hazard) {
+        const blink = 0.35 + 0.65 * Math.abs(Math.sin(elapsed * 6));
+        ctx.globalAlpha = blink;
+        ctx.fillStyle = dangerColor;
+        ctx.beginPath();
+        ctx.arc(f.x, f.y - f.h * 0.5 - 6, Math.max(2, f.h * 0.06), 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+    };
+
+    // ── 루프
+    let last = performance.now();
+    const frame = (now: number) => {
+      const dt = Math.min(0.05, (now - last) / 1000); // 탭 복귀 시 점프 방지
+      last = now;
+
       if (W < 2 || H < 2) {
-        if (running) raf = requestAnimationFrame(draw);
+        if (running) raf = requestAnimationFrame(frame);
         return;
       }
       const u = unit();
-      player.r = u * 0.035; // 크기 확정/리사이즈 반영
-      // 물리
-      let dir: { x: number; y: number } | null = null;
-      let strength = 0;
-      if (pointer && fuel > 0) {
-        const dx = pointer.x - player.x;
-        const dy = pointer.y - player.y;
-        const d = Math.hypot(dx, dy);
-        if (d > 1) {
-          dir = { x: dx / d, y: dy / d };
-          strength = Math.min(1, d / (u * 0.4));
-          fuel = Math.max(0, fuel - 0.55 * strength);
-        }
+      const gY = groundY();
+      const size = joopSize();
+
+      elapsed += dt;
+      const remain = Math.max(0, cfg.duration - elapsed);
+
+      // ── 이동: 키 입력이 있으면 키 우선, 없으면 포인터 목표로 접근
+      const speedPx = cfg.moveSpeed * W * dt;
+      const prevX = joop.x;
+      if (keyDir !== 0) {
+        joop.x += (keyDir * speedPx) / W;
+      } else if (targetX !== null) {
+        const d = targetX - joop.x;
+        const step = speedPx / W;
+        joop.x += Math.abs(d) <= step ? d : Math.sign(d) * step;
       }
-      const maxPx = cfg.maxSpeed * speedScale();
-      const v = applyThrust(
-        { x: player.vx, y: player.vy },
-        dir,
-        strength,
-        { ...cfg, thrust: cfg.thrust * speedScale(), maxSpeed: maxPx },
-        fuel,
-      );
-      player.vx = v.x;
-      player.vy = v.y;
-      player.x += player.vx;
-      player.y += player.vy;
-      // 경계 반사
-      if (player.x < player.r) {
-        player.x = player.r;
-        player.vx = -player.vx * 0.6;
-      } else if (player.x > W - player.r) {
-        player.x = W - player.r;
-        player.vx = -player.vx * 0.6;
-      }
-      if (player.y < player.r) {
-        player.y = player.r;
-        player.vy = -player.vy * 0.6;
-      } else if (player.y > H - player.r) {
-        player.y = H - player.r;
-        player.vy = -player.vy * 0.6;
+      const marginX = size.w / 2 / W;
+      joop.x = Math.max(marginX, Math.min(1 - marginX, joop.x));
+      joop.vx = (joop.x - prevX) / Math.max(dt, 0.001);
+
+      joop.joy = Math.max(0, joop.joy - dt);
+      joop.hurt = Math.max(0, joop.hurt - dt);
+      joop.blink = joop.blink > 0 ? joop.blink - dt : Math.random() < dt * 0.35 ? 0.24 : 0;
+
+      // ── 생성
+      spawnTimer -= dt;
+      if (spawnTimer <= 0) {
+        spawn();
+        spawnTimer = spawnIntervalAt(cfg, elapsed);
       }
 
-      // 렌더
+      // ── 물체 이동 · 충돌
+      const jx = joop.x * W;
+      const boxL = jx - size.w * 0.46;
+      const boxR = jx + size.w * 0.46;
+      const boxT = gY - size.h;
+      const boxB = gY;
+
+      for (let i = falling.length - 1; i >= 0; i--) {
+        const f = falling[i];
+        f.y += f.vy * dt;
+        f.rot += f.rotV * dt;
+
+        // 원(물체) ↔ 사각형(줍스) 충돌
+        const r = Math.min(f.w, f.h) * 0.4;
+        const nx = Math.max(boxL, Math.min(f.x, boxR));
+        const ny = Math.max(boxT, Math.min(f.y, boxB));
+        if (Math.hypot(f.x - nx, f.y - ny) < r) {
+          if (f.item.hazard) {
+            hits += 1;
+            joop.hurt = 0.55;
+            joop.joy = 0;
+            floaters.push({ x: f.x, y: f.y, text: "!", color: dangerColor, life: 0.9 });
+          } else {
+            caught += 1;
+            joop.joy = 0.5;
+            floaters.push({ x: f.x, y: f.y, text: "+1", color: color, life: 0.9 });
+          }
+          falling.splice(i, 1);
+          if (hits >= cfg.lives) {
+            endGame("broken");
+            return;
+          }
+          continue;
+        }
+
+        // 땅에 닿음
+        if (f.y - r > gY) {
+          if (!f.item.hazard) missed += 1;
+          falling.splice(i, 1);
+        }
+      }
+
+      // ── 렌더
       ctx.clearRect(0, 0, W, H);
-      // 배경 그리드
+
+      // 배경 그리드(하늘 영역)
       ctx.strokeStyle = gridColor;
-      ctx.globalAlpha = 0.18;
+      ctx.globalAlpha = 0.14;
       ctx.lineWidth = 1;
-      const gs = u * 0.12;
+      const gs = u * 0.14;
       for (let gx = 0; gx < W; gx += gs) {
         ctx.beginPath();
         ctx.moveTo(gx, 0);
-        ctx.lineTo(gx, H);
+        ctx.lineTo(gx, gY);
         ctx.stroke();
       }
-      for (let gy = 0; gy < H; gy += gs) {
+      for (let gy = 0; gy < gY; gy += gs) {
         ctx.beginPath();
         ctx.moveTo(0, gy);
         ctx.lineTo(W, gy);
@@ -186,131 +491,302 @@ export function GroundMinigame({
       }
       ctx.globalAlpha = 1;
 
-      // 쓰레기
-      for (const d of debris) {
-        d.x += d.vx;
-        d.y += d.vy;
-        if (d.x < 0 || d.x > W) d.vx = -d.vx;
-        if (d.y < 0 || d.y > H) d.vy = -d.vy;
-        // 충돌 (점수는 Canvas HUD 로만 표시 — rAF 중 setState 금지)
-        if (Math.hypot(d.x - player.x, d.y - player.y) < d.r + player.r) {
-          localScore++;
-          Object.assign(d, spawn());
+      // 땅
+      ctx.fillStyle = surface;
+      ctx.fillRect(0, gY, W, H - gY);
+      ctx.strokeStyle = color;
+      ctx.globalAlpha = 0.55;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, gY);
+      ctx.lineTo(W, gY);
+      ctx.stroke();
+      ctx.globalAlpha = 0.25;
+      ctx.strokeStyle = gridColor;
+      ctx.lineWidth = 1;
+      for (let gx = (u * 0.07) / 2; gx < W; gx += u * 0.07) {
+        ctx.beginPath();
+        ctx.moveTo(gx, gY + 4);
+        ctx.lineTo(gx - u * 0.03, H);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+
+      for (const f of falling) drawItem(f);
+      drawJoop(jx, gY, size.w, size.h);
+
+      // 플로터(+1 / !)
+      for (let i = floaters.length - 1; i >= 0; i--) {
+        const fl = floaters[i];
+        fl.life -= dt;
+        fl.y -= dt * u * 0.35;
+        if (fl.life <= 0) {
+          floaters.splice(i, 1);
           continue;
         }
-        ctx.beginPath();
-        ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
-        ctx.fillStyle = amber;
-        ctx.globalAlpha = 0.85;
+        ctx.globalAlpha = Math.min(1, fl.life * 1.6);
+        ctx.fillStyle = fl.color;
+        ctx.font = `600 ${Math.round(u * 0.05)}px ui-monospace, monospace`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(fl.text, fl.x, fl.y);
+        ctx.globalAlpha = 1;
+      }
+      ctx.textAlign = "left";
+
+      // ── HUD
+      const pad = 12;
+      const fs = Math.max(11, Math.round(u * 0.038));
+      ctx.font = `${fs}px ui-monospace, monospace`;
+      ctx.textBaseline = "top";
+      ctx.fillStyle = fgColor;
+      ctx.fillText(`${m.score} ${caught}`, pad, pad);
+      ctx.textAlign = "right";
+      ctx.fillStyle = remain <= 10 ? amber : mutedColor;
+      ctx.fillText(`${m.time} ${Math.ceil(remain)}s`, W - pad, pad);
+      ctx.textAlign = "left";
+
+      // 유대 바
+      const bond = bondFrom(caught, hits);
+      const barY = pad + fs + 10;
+      const barW = W * 0.38;
+      ctx.fillStyle = mutedColor;
+      ctx.font = `${Math.max(9, Math.round(fs * 0.75))}px ui-monospace, monospace`;
+      ctx.fillText(m.bond, pad, barY - 1);
+      const labelW = ctx.measureText(m.bond).width + 6;
+      ctx.fillStyle = gridColor;
+      ctx.globalAlpha = 0.45;
+      ctx.fillRect(pad + labelW, barY + 1, barW, 6);
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = color;
+      ctx.fillRect(pad + labelW, barY + 1, barW * (bond / 100), 6);
+
+      // 내구도
+      const livesLeft = Math.max(0, cfg.lives - hits);
+      const box = Math.max(6, u * 0.022);
+      for (let i = 0; i < cfg.lives; i++) {
+        const bx = W - pad - (i + 1) * (box + 5);
+        ctx.fillStyle = i < livesLeft ? color : gridColor;
+        ctx.globalAlpha = i < livesLeft ? 1 : 0.45;
+        roundRect(bx, barY, box, box, 2);
         ctx.fill();
         ctx.globalAlpha = 1;
       }
 
-      // 플레이어(줍스)
-      ctx.beginPath();
-      ctx.arc(player.x, player.y, player.r, 0, Math.PI * 2);
-      ctx.fillStyle = color;
-      ctx.shadowColor = color;
-      ctx.shadowBlur = 12;
-      ctx.fill();
-      ctx.shadowBlur = 0;
-      // 분사 방향 인디케이터
-      if (pointer && fuel > 0) {
-        ctx.strokeStyle = color;
-        ctx.globalAlpha = 0.4;
-        ctx.beginPath();
-        ctx.arc(pointer.x, pointer.y, u * 0.05, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.globalAlpha = 1;
-      }
-
-      // HUD
-      ctx.fillStyle = fgColor;
-      ctx.font = `${Math.round(u * 0.04)}px ui-monospace, monospace`;
-      ctx.textBaseline = "top";
-      ctx.fillText(`${dict.minigame.score}: ${localScore}`, 12, 12);
-      // 연료 바
-      const barW = W - 24;
-      ctx.fillStyle = gridColor;
-      ctx.globalAlpha = 0.4;
-      ctx.fillRect(12, H - 20, barW, 8);
-      ctx.globalAlpha = 1;
-      ctx.fillStyle = fuel > 25 ? color : amber;
-      ctx.fillRect(12, H - 20, barW * (fuel / cfg.fuel), 8);
-
-      if (fuel <= 0 && Math.hypot(player.vx, player.vy) < 0.2) {
-        endGame();
+      if (remain <= 0) {
+        endGame("time");
         return;
       }
-      if (running) raf = requestAnimationFrame(draw);
+      if (running) raf = requestAnimationFrame(frame);
     };
-    raf = requestAnimationFrame(draw);
+    raf = requestAnimationFrame(frame);
 
     return () => {
       running = false;
       cancelAnimationFrame(raf);
+      observer.disconnect();
       window.removeEventListener("resize", resize);
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keyup", onKeyUp);
       canvas.removeEventListener("pointerdown", onDown);
       canvas.removeEventListener("pointermove", onMove);
-      canvas.removeEventListener("pointerup", onUp);
-      canvas.removeEventListener("pointercancel", onUp);
     };
-    // cfg 는 useState 초기화로 고정된 참조라 여기 넣어도 게임 루프가 재시작되지 않는다.
-  }, [color, dict.minigame.score, cfg]);
+    // cfg 는 useState 초기화로 고정된 참조라 게임 루프를 재시작시키지 않는다.
+  }, [phase, cfg, color, m]);
 
-  const saveResult = async () => {
+  const saveResult = useCallback(async () => {
+    if (!summary) return;
     setPhase("saving");
-    const res = await submitMinigameResult(finalScoreRef.current);
+    const res = await submitMinigameResult(summary.caught);
     if (res.ok) {
       setResult({ xpGained: res.xpGained, level: res.level });
       setPhase("saved");
     } else {
       setPhase("over");
     }
+  }, [summary]);
+
+  const retry = () => {
+    setSummary(null);
+    setResult(null);
+    setPhase("ready");
   };
+
+  const overlayClass =
+    "absolute inset-0 flex flex-col items-center justify-center gap-4 bg-[color-mix(in_srgb,var(--color-bg)_88%,transparent)] px-6 text-center";
+  const buttonStyle = { background: "var(--color-primary)", color: "var(--color-bg)" } as const;
+  const buttonClass =
+    "rounded-md px-6 py-2.5 font-mono text-sm font-semibold uppercase tracking-widest disabled:opacity-60";
 
   return (
     <div className="relative flex flex-1 flex-col">
-      <p className="px-4 pb-2 text-center font-mono text-xs text-[var(--color-muted)]">
-        {dict.minigame.hint}
-      </p>
-      <div className="relative mx-4 flex-1 overflow-hidden rounded-md border" style={{ borderColor: "var(--color-neutral-600)" }}>
-        <canvas ref={canvasRef} className="block h-full w-full touch-none" />
+      <div
+        ref={boxRef}
+        className="relative mx-3 mb-1 flex-1 overflow-hidden rounded-md border"
+        style={{ borderColor: "var(--color-neutral-600)" }}
+      >
+        {/* absolute + inset-0 + 100% 크기로 컨테이너를 꽉 채운다. 예전처럼 흐름 배치 + h-full
+            만 주면 canvas 의 고유 종횡비가 이겨서 화면 위쪽 일부만 게임 화면이 되어 버렸다. */}
+        <canvas ref={canvasRef} className="absolute inset-0 block h-full w-full touch-none" />
 
-        {(phase === "over" || phase === "saving" || phase === "saved") && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-[color-mix(in_srgb,var(--color-bg)_82%,transparent)] px-6 text-center">
-            <h2 className="font-mono text-lg font-semibold text-[var(--color-primary)]">
-              {dict.minigame.gameOver}
+        {phase === "ready" && (
+          <div className={overlayClass}>
+            <h2 className="font-mono text-base font-semibold text-[var(--color-primary)]">
+              {m.briefTitle}
             </h2>
-            <p className="font-mono text-sm text-[var(--color-fg)]">
-              {dict.minigame.collected}: {score}
+            <p className="max-w-xs font-mono text-xs leading-relaxed text-[var(--color-fg)]">
+              {m.briefBody}
             </p>
+
+            <div className="flex w-full max-w-xs flex-col gap-3">
+              <ItemRow label={m.safeLabel} items={SAFE_ITEMS.slice(0, 4)} accent="var(--color-secondary)" />
+              <ItemRow label={m.hazardLabel} items={HAZARD_ITEMS} accent="var(--color-danger)" />
+            </div>
+
+            <p className="font-mono text-[11px] leading-relaxed text-[var(--color-muted)]">
+              {m.hint}
+              <br />
+              {m.rules
+                .replace("{lives}", String(cfg.lives))
+                .replace("{seconds}", String(cfg.duration))}
+            </p>
+
+            <button
+              onClick={() => setPhase("playing")}
+              disabled={!assetsReady}
+              className={buttonClass}
+              style={buttonStyle}
+            >
+              {assetsReady ? m.start : m.loading}
+            </button>
+          </div>
+        )}
+
+        {(phase === "over" || phase === "saving" || phase === "saved") && summary && (
+          <div className={overlayClass}>
+            <h2 className="font-mono text-lg font-semibold text-[var(--color-primary)]">
+              {m.gameOver}
+            </h2>
+            <p className="font-mono text-xs text-[var(--color-muted)]">
+              {summary.reason === "broken" ? m.reasonBroken : m.reasonTime}
+            </p>
+
+            <dl className="grid w-full max-w-xs grid-cols-3 gap-2 font-mono text-xs">
+              <Stat label={m.collected} value={summary.caught} tone="var(--color-primary)" />
+              <Stat label={m.missed} value={summary.missed} tone="var(--color-muted)" />
+              <Stat
+                label={m.hit}
+                value={summary.hits}
+                tone={summary.hits > 0 ? "var(--color-danger)" : "var(--color-muted)"}
+              />
+            </dl>
+
+            <div className="w-full max-w-xs">
+              <div className="flex items-baseline justify-between font-mono text-[11px] uppercase tracking-widest text-[var(--color-muted)]">
+                <span>{m.bond}</span>
+                <span className="text-[var(--color-fg)]">{m.bondTier[bondTier(summary.bond)]}</span>
+              </div>
+              <div
+                className="mt-1 h-2 w-full overflow-hidden rounded-full"
+                style={{ background: "var(--color-neutral-700)" }}
+              >
+                <div
+                  className="h-full rounded-full"
+                  style={{
+                    width: `${summary.bond}%`,
+                    background: "var(--color-primary)",
+                    boxShadow: "var(--glow-primary)",
+                  }}
+                />
+              </div>
+            </div>
+
             {phase === "saved" && result ? (
               <>
                 <p className="font-mono text-sm text-[var(--color-primary)]">
-                  +{result.xpGained} XP · {dict.minigame.nowLevel} {result.level}
+                  +{result.xpGained} XP · {m.nowLevel} {result.level}
                 </p>
-                <button
-                  onClick={() => router.push(`/${lang}/joop`)}
-                  className="rounded-md px-6 py-2.5 font-mono text-sm font-semibold uppercase tracking-widest"
-                  style={{ background: "var(--color-primary)", color: "var(--color-bg)" }}
-                >
-                  {dict.minigame.toDashboard}
-                </button>
+                <div className="flex gap-2">
+                  <button onClick={retry} className={`${buttonClass} border bg-transparent`} style={{ borderColor: "var(--color-neutral-600)", color: "var(--color-fg)" }}>
+                    {m.retry}
+                  </button>
+                  <button
+                    onClick={() => router.push(`/${lang}/joop`)}
+                    className={buttonClass}
+                    style={buttonStyle}
+                  >
+                    {m.toDashboard}
+                  </button>
+                </div>
               </>
             ) : (
-              <button
-                onClick={saveResult}
-                disabled={phase === "saving"}
-                className="rounded-md px-6 py-2.5 font-mono text-sm font-semibold uppercase tracking-widest disabled:opacity-60"
-                style={{ background: "var(--color-primary)", color: "var(--color-bg)" }}
-              >
-                {phase === "saving" ? dict.minigame.saving : dict.minigame.save}
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={retry}
+                  disabled={phase === "saving"}
+                  className={`${buttonClass} border bg-transparent`}
+                  style={{ borderColor: "var(--color-neutral-600)", color: "var(--color-fg)" }}
+                >
+                  {m.retry}
+                </button>
+                <button
+                  onClick={saveResult}
+                  disabled={phase === "saving"}
+                  className={buttonClass}
+                  style={buttonStyle}
+                >
+                  {phase === "saving" ? m.saving : m.save}
+                </button>
+              </div>
             )}
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+/** 시작 브리핑의 "받아낼 것 / 피할 것" 아이콘 줄 — 식별 훈련의 정답표. */
+function ItemRow({
+  label,
+  items,
+  accent,
+}: {
+  label: string;
+  items: readonly FallingItem[];
+  accent: string;
+}) {
+  return (
+    <div
+      className="flex items-center gap-2 rounded-md border px-2.5 py-2"
+      style={{ borderColor: accent, background: "color-mix(in srgb, var(--color-surface) 70%, transparent)" }}
+    >
+      <span
+        className="w-14 shrink-0 font-mono text-[10px] uppercase tracking-widest"
+        style={{ color: accent }}
+      >
+        {label}
+      </span>
+      <span className="flex flex-1 items-center justify-end gap-2">
+        {items.map((it) => (
+          // eslint-disable-next-line @next/next/no-img-element -- 캔버스와 같은 SVG를 그대로 쓴다(최적화 불필요)
+          <img key={it.id} src={it.asset} alt="" aria-hidden className="h-6 w-auto" />
+        ))}
+      </span>
+    </div>
+  );
+}
+
+function Stat({ label, value, tone }: { label: string; value: number; tone: string }) {
+  return (
+    <div
+      className="rounded-md border px-2 py-1.5"
+      style={{ borderColor: "var(--color-neutral-600)" }}
+    >
+      <dt className="text-[10px] uppercase tracking-widest text-[var(--color-muted)]">{label}</dt>
+      <dd className="mt-0.5 text-base font-semibold" style={{ color: tone }}>
+        {value}
+      </dd>
     </div>
   );
 }

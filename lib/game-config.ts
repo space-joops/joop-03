@@ -42,15 +42,18 @@ function num(config: Map<string, unknown>, key: string): number {
   return coerceConfigNumber(spec, config.get(key));
 }
 
-/** DB 값을 DEFAULT_CONFIG 위에 덮어쓴 미니게임 설정. */
+/** DB 값을 DEFAULT_CONFIG 위에 덮어쓴 지상 훈련 미니게임 설정. */
 export async function getMinigameConfig(): Promise<MinigameConfig> {
   const config = await getGameConfig();
   return {
     ...DEFAULT_CONFIG,
-    thrust: num(config, "minigame_thrust"),
-    maxSpeed: num(config, "minigame_max_speed"),
-    fuel: num(config, "minigame_fuel"),
-    friction: num(config, "minigame_friction"),
+    moveSpeed: num(config, "minigame_move_speed"),
+    fallSpeed: num(config, "minigame_fall_speed"),
+    fallRamp: num(config, "minigame_fall_ramp"),
+    spawnInterval: num(config, "minigame_spawn_interval"),
+    hazardRatio: num(config, "minigame_hazard_ratio"),
+    lives: num(config, "minigame_lives"),
+    duration: num(config, "minigame_duration_seconds"),
     xpPerDebris: num(config, "minigame_xp_per_debris"),
   };
 }

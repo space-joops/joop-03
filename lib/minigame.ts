@@ -1,104 +1,116 @@
-// 지상 미니게임 물리/로직 — 순수 함수(부수효과 없음).
-// ⚠️ 아케이드(M5)와 "동일 조작"(FR-7.1)이라 이 엔진을 M5에서 재사용한다.
-// 관성 있음, 마찰 0. 상수는 joop_03_game_config 에서 주입 가능(FR-7.5 / EPIC 10).
+// 지상 훈련 미니게임 로직 — 순수 함수(부수효과 없음). 클라이언트에서 import 해도 안전하다.
+//
+// ── 방식 개편(2026-07-27) ────────────────────────────────────────────────
+// 이전: 화면 어디를 눌러도 그 방향으로 분사(추력)해서 공중을 자유롭게 날아다니며 쓰레기를 먹었다.
+// 문제: "지상 훈련"인데 줍스가 땅에 발을 붙이지 않고 화면 공중에 떠 있어서 장면이 어색했고,
+//       조작 학습(FR-3.1) 외에 "무엇을 먹어도 되는지"를 배우는 요소가 전혀 없었다.
+// 이후: 줍스는 땅에 서서 **좌우로만** 움직인다. 위에서 물체가 떨어지고,
+//   - 우주 쓰레기(SAFE_ITEMS)   → 받아내면 수거 성공, 유대 상승
+//   - 작동 중인 위성(HAZARD_ITEMS) → 부딪히면 내구도 손실, 유대 하락
+// 즉 "먹어도 되는 것 / 충돌하면 안 되는 것"을 식별하는 훈련이다(EPIC 3 · FR-3.1).
+//
+// 관성·분사 물리(applyThrust 등)는 이 화면에서 걷어냈다. 우주 아케이드(M5, FR-7.4/7.5)는
+// 여전히 5원 조이스틱 + 관성이 요구사항이라, 그때 그 화면 몫으로 다시 세운다.
+// 지상과 우주의 조작이 갈라진 셈이므로 FR-7.1("동일 조작")은 M5에서 재확인이 필요하다.
 
 export type MinigameConfig = {
-  thrust: number; // 추력(가속)
-  maxSpeed: number; // 최대 속도
-  fuel: number; // 초기 연료(분사가스)
-  friction: number; // 마찰(0 = 관성 유지)
-  xpPerDebris: number; // 쓰레기당 xp
+  /** 좌우 이동 속도 — 초당 화면 폭의 몇 배를 가는지 */
+  moveSpeed: number;
+  /** 낙하 시작 속도 — 초당 화면 높이의 몇 배를 내려오는지 */
+  fallSpeed: number;
+  /** 난이도 상승 계수 — 경과 초에 비례해 낙하 속도↑ / 생성 간격↓ */
+  fallRamp: number;
+  /** 물체 생성 간격(초, 시작값) */
+  spawnInterval: number;
+  /** 떨어지는 물체 중 위험물(작동 중인 위성) 비율 0~1 */
+  hazardRatio: number;
+  /** 내구도 — 위험물과 이만큼 부딪히면 훈련 종료 */
+  lives: number;
+  /** 훈련 제한 시간(초) */
+  duration: number;
+  /** 쓰레기 1개당 XP (서버에서 계산에 사용) */
+  xpPerDebris: number;
 };
 
 export const DEFAULT_CONFIG: MinigameConfig = {
-  thrust: 0.35,
-  maxSpeed: 6,
-  fuel: 100,
-  friction: 0,
-  xpPerDebris: 8,
+  moveSpeed: 0.85,
+  fallSpeed: 0.3,
+  fallRamp: 0.012,
+  spawnInterval: 0.85,
+  hazardRatio: 0.35,
+  lives: 3,
+  duration: 60,
+  xpPerDebris: 25,
 };
 
-export type Vec = { x: number; y: number };
-
-export type Player = {
-  pos: Vec; // 정규화 좌표(0~1)
-  vel: Vec; // px/frame 기준(월드 스케일에서 곱함)
-  radius: number; // 정규화 반경
+/** 떨어지는 물체 한 종류. asset 은 public/game 아래의 SVG(디자인 2순위 에셋 재사용). */
+export type FallingItem = {
+  id: string;
+  asset: string;
+  /** true = 충돌하면 안 되는 것(작동 중인 위성) */
+  hazard: boolean;
+  /** 화면 최소변(min(W,H)) 대비 높이 비율 */
+  scale: number;
 };
 
-export type Debris = {
-  pos: Vec;
-  vel: Vec;
-  radius: number;
-  alive: boolean;
-};
+/** 받아내야 하는 것 — 궤도를 떠도는 폐기물. */
+export const SAFE_ITEMS: readonly FallingItem[] = [
+  { id: "can", asset: "/game/debris-can.svg", hazard: false, scale: 0.075 },
+  { id: "bolt", asset: "/game/debris-bolt.svg", hazard: false, scale: 0.06 },
+  { id: "panel", asset: "/game/debris-panel.svg", hazard: false, scale: 0.08 },
+  { id: "circuit", asset: "/game/debris-circuit.svg", hazard: false, scale: 0.075 },
+  { id: "antenna", asset: "/game/debris-antenna.svg", hazard: false, scale: 0.08 },
+  { id: "fragment", asset: "/game/debris-satellite-fragment.svg", hazard: false, scale: 0.085 },
+];
+
+/** 피해야 하는 것 — 아직 임무 중인 위성. 부딪히면 줍스도, 위성도 손상된다. */
+export const HAZARD_ITEMS: readonly FallingItem[] = [
+  { id: "comm", asset: "/game/satellite-comm.svg", hazard: true, scale: 0.13 },
+  { id: "probe", asset: "/game/satellite-probe.svg", hazard: true, scale: 0.12 },
+];
+
+export const ALL_ITEMS: readonly FallingItem[] = [...SAFE_ITEMS, ...HAZARD_ITEMS];
 
 /**
- * 추력 적용: 방향(단위 벡터)과 세기(0~1)로 속도를 가속. 마찰이 0이면 관성 유지.
- * 연료가 없으면 추력 없음(관성만).
+ * 다음에 떨어질 물체를 고른다. 난수를 인자로 받아 순수 함수로 유지한다(테스트 가능).
+ * @param hazardRoll 0~1 — hazardRatio 미만이면 위험물
+ * @param pickRoll   0~1 — 해당 목록 안에서의 선택
  */
-export function applyThrust(
-  vel: Vec,
-  dir: Vec | null,
-  strength: number,
-  cfg: MinigameConfig,
-  fuel: number,
-): Vec {
-  let vx = vel.x;
-  let vy = vel.y;
-
-  if (dir && fuel > 0 && strength > 0) {
-    vx += dir.x * cfg.thrust * strength;
-    vy += dir.y * cfg.thrust * strength;
-  }
-
-  // 마찰(관성 게임은 0)
-  if (cfg.friction > 0) {
-    vx *= 1 - cfg.friction;
-    vy *= 1 - cfg.friction;
-  }
-
-  // 최대 속도 클램프
-  const speed = Math.hypot(vx, vy);
-  if (speed > cfg.maxSpeed) {
-    vx = (vx / speed) * cfg.maxSpeed;
-    vy = (vy / speed) * cfg.maxSpeed;
-  }
-  return { x: vx, y: vy };
+export function pickItem(cfg: MinigameConfig, hazardRoll: number, pickRoll: number): FallingItem {
+  const pool = hazardRoll < cfg.hazardRatio ? HAZARD_ITEMS : SAFE_ITEMS;
+  const i = Math.min(pool.length - 1, Math.floor(pickRoll * pool.length));
+  return pool[i];
 }
 
-/** 정규화 위치를 갱신하고 경계(0~1)에서 반사. worldScale 은 vel 을 정규화로 환산하는 계수. */
-export function stepPosition(pos: Vec, vel: Vec, worldScale: number): { pos: Vec; vel: Vec } {
-  let x = pos.x + (vel.x * worldScale) / 1000;
-  let y = pos.y + (vel.y * worldScale) / 1000;
-  let vx = vel.x;
-  let vy = vel.y;
-
-  if (x < 0) {
-    x = 0;
-    vx = -vx * 0.6;
-  } else if (x > 1) {
-    x = 1;
-    vx = -vx * 0.6;
-  }
-  if (y < 0) {
-    y = 0;
-    vy = -vy * 0.6;
-  } else if (y > 1) {
-    y = 1;
-    vy = -vy * 0.6;
-  }
-  return { pos: { x, y }, vel: { x: vx, y: vy } };
+/** 경과 시간에 따른 낙하 속도(화면 높이 배수/초). */
+export function fallSpeedAt(cfg: MinigameConfig, elapsed: number): number {
+  return cfg.fallSpeed * (1 + cfg.fallRamp * Math.max(0, elapsed));
 }
 
-/** 원-원 충돌(정규화 좌표). aspect 로 x축 왜곡 보정. */
-export function collides(a: Vec, ar: number, b: Vec, br: number, aspect: number): boolean {
-  const dx = (a.x - b.x) * aspect;
-  const dy = a.y - b.y;
-  return Math.hypot(dx, dy) < ar + br;
+/** 경과 시간에 따른 생성 간격(초). 너무 촘촘해지면 피할 수 없으므로 하한을 둔다. */
+export function spawnIntervalAt(cfg: MinigameConfig, elapsed: number): number {
+  const scaled = cfg.spawnInterval / (1 + cfg.fallRamp * Math.max(0, elapsed));
+  return Math.max(0.28, scaled);
 }
 
-/** 점수 → 획득 xp */
+/**
+ * 유대(0~100) — 잘 받아내면 쌓이고, 위성에 부딪히면 크게 깎인다.
+ * 지금은 결과 화면 표시용(연출)이고 DB에는 남기지 않는다. 영속화는 인벤토리(EPIC 8)와 함께.
+ */
+export function bondFrom(caught: number, hits: number): number {
+  return Math.max(0, Math.min(100, caught * 5 - hits * 12));
+}
+
+export type BondTier = "cold" | "warm" | "close" | "best";
+
+export function bondTier(bond: number): BondTier {
+  if (bond < 25) return "cold";
+  if (bond < 55) return "warm";
+  if (bond < 85) return "close";
+  return "best";
+}
+
+/** 수거 개수 → 획득 xp */
 export function scoreToXp(collected: number, cfg: MinigameConfig): number {
   return collected * cfg.xpPerDebris;
 }
