@@ -309,10 +309,10 @@ export default function GroundMinigamePage() {
           <p className="font-mono text-sm text-muted mb-8 text-center px-8">You have mastered basic Joop controls. You are now authorized for orbital deployment.</p>
           
           <button 
-            onClick={() => router.push("/arcade")}
+            onClick={() => router.push("/launch")}
             className="bg-surface border-2 border-success text-success font-display text-2xl py-4 px-8 rounded-sm transition-transform active:scale-95 animate-pulse shadow-[0_0_20px_rgba(57,255,20,0.5)]"
           >
-            LAUNCH TO ORBIT 🚀
+            PROCEED TO LAUNCH 🚀
           </button>
         </div>
       )}
