@@ -16,6 +16,43 @@
     },
     "reducedMotion": "애니메이션이 정지되었습니다 (모션 최소화)."
   },
+  "home": {
+    "myJoop": "내 줍스",
+    "ground": "지상",
+    "orbit": "궤도",
+    "level": "Lv.",
+    "openMyJoop": "내 줍스: {name}"
+  },
+  "onboarding": {
+    "title": "줍스를 분양받으세요",
+    "subtitle": "초대 코드를 입력해 줍스를 분양받거나, 이메일을 남겨 초대 코드를 받으세요.",
+    "inviteLabel": "초대 코드",
+    "invitePlaceholder": "JOOP-XXXX-XX",
+    "redeem": "줍스 분양받기",
+    "or": "또는",
+    "waitlistLabel": "이메일",
+    "waitlistPlaceholder": "you@example.com",
+    "join": "알림 신청",
+    "joined": "등록됐어요! 곧 초대 코드를 보내드릴게요.",
+    "back": "뒤로",
+    "errors": {
+      "empty": "코드를 입력하세요",
+      "invalid": "유효하지 않거나 이미 사용된 코드예요",
+      "email": "올바른 이메일을 입력하세요",
+      "session": "세션 생성에 실패했어요",
+      "waitlist": "문제가 발생했어요"
+    },
+    "setup": {
+      "title": "줍스 설정",
+      "nameLabel": "이름 (유니크)",
+      "namePlaceholder": "내 줍스 이름",
+      "colorLabel": "색상",
+      "complete": "완료",
+      "nameTaken": "이미 쓰이는 이름이에요",
+      "nameLen": "2~20자로 입력하세요",
+      "colorErr": "색상을 선택하세요"
+    }
+  },
   "language": {
     "label": "언어",
     "en": "English",
