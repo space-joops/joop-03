@@ -23,7 +23,7 @@ Supabase Auth의 `auth.users`를 신원의 근원으로 쓰고, 게임 프로필
 | `joop_03_inventory` | 사용자 인벤토리 | M6 |
 | `joop_03_upgrades` | 업그레이드 상태 | M6 |
 | `joop_03_friendships` | 친구 관계 | M7 |
-| `joop_03_game_config` | 운영 파라미터(key-value) | M1~(읽기), M8(편집 UI) |
+| `joop_03_game_config` | 운영 파라미터(key-value) | M1~(읽기), **M8(편집 UI 완료)** |
 
 ## M1 필수 테이블 (첫 화면)
 
@@ -66,7 +66,16 @@ Supabase Auth의 `auth.users`를 신원의 근원으로 쓰고, 게임 프로필
 | `value` | jsonb | 예: `10` |
 | `updated_at` | timestamptz | |
 
-M1은 `orbital_tick_seconds`(기본 10)를 읽기 전용으로 사용(FR-1.3/10.1). 편집 UI는 M8.
+M1은 `orbital_tick_seconds`(기본 10)를 읽기 전용으로 사용(FR-1.3/10.1). 편집 UI는 M8에서
+`/admin/config`로 구현했습니다.
+
+- 알려진 키의 라벨·타입·허용범위·폴백은 코드(`lib/config-specs.ts`)에 두고 서버에서 검증합니다.
+  jsonb라 자유 편집이 가능하지만 오타 하나가 게임을 망가뜨리기 때문입니다.
+- 조회는 `lib/game-config.ts`로 일원화되어 있습니다(`React.cache`).
+- ⚠️ **공유 jd-04라 다른 워크스페이스가 넣은 키가 있을 수 있습니다.** 레지스트리에 없는 키는
+  관리자 화면에서 읽기 전용으로 노출됩니다(숨기면 존재를 모르게 되므로).
+- ⚠️ `minigame_max_debris_per_run` × `minigame_xp_per_debris`가 한 판 최대 XP이고
+  `joop_03_joops.xp`는 int4입니다. 두 키의 상한은 함께 조정해야 합니다.
 
 ## RLS 방향 (초안)
 

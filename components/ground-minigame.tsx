@@ -15,10 +15,13 @@ export function GroundMinigame({
   lang,
   dict,
   color,
+  config,
 }: {
   lang: Locale;
   dict: Dictionary;
   color: string;
+  /** joop_03_game_config 에서 읽어 서버가 주입. 없으면 코드 기본값(EPIC 10 / FR-7.5). */
+  config?: MinigameConfig;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const router = useRouter();
@@ -27,13 +30,16 @@ export function GroundMinigame({
   const [result, setResult] = useState<{ xpGained: number; level: number } | null>(null);
   const finalScoreRef = useRef(0);
 
+  // 마운트 시점에 한 번 고정한다 → 진행 중인 판은 설정이 바뀌어도 흔들리지 않고,
+  // 다시 들어와야 반영된다. 요구사항의 "설정값은 게임 재시작 시 반영"(FR-7.5/10.2) 그대로다.
+  const [cfg] = useState<MinigameConfig>(() => config ?? DEFAULT_CONFIG);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const cfg: MinigameConfig = DEFAULT_CONFIG;
     const styles = getComputedStyle(document.documentElement);
     const gridColor = styles.getPropertyValue("--color-grid").trim() || "#1e5a46";
     const amber = styles.getPropertyValue("--color-secondary").trim() || "#ffb23e";
@@ -249,7 +255,8 @@ export function GroundMinigame({
       canvas.removeEventListener("pointerup", onUp);
       canvas.removeEventListener("pointercancel", onUp);
     };
-  }, [color, dict.minigame.score]);
+    // cfg 는 useState 초기화로 고정된 참조라 여기 넣어도 게임 루프가 재시작되지 않는다.
+  }, [color, dict.minigame.score, cfg]);
 
   const saveResult = async () => {
     setPhase("saving");

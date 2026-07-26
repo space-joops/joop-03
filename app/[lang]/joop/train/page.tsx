@@ -3,6 +3,7 @@ import Link from "next/link";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getMyJoop } from "@/lib/profile";
+import { getMinigameConfig } from "@/lib/game-config";
 import { GroundMinigame } from "@/components/ground-minigame";
 
 export const dynamic = "force-dynamic";
@@ -14,7 +15,8 @@ export default async function TrainPage({ params }: PageProps<"/[lang]/joop/trai
   const mine = await getMyJoop();
   if (!mine) redirect(`/${lang}/onboarding`);
 
-  const dict = await getDictionary(lang);
+  // force-dynamic 이라 화면에 들어올 때마다 최신 설정을 읽는다 = "게임 재시작 시 반영".
+  const [dict, minigameConfig] = await Promise.all([getDictionary(lang), getMinigameConfig()]);
 
   return (
     <main
@@ -30,7 +32,7 @@ export default async function TrainPage({ params }: PageProps<"/[lang]/joop/trai
         </span>
       </header>
 
-      <GroundMinigame lang={lang} dict={dict} color={mine.color} />
+      <GroundMinigame lang={lang} dict={dict} color={mine.color} config={minigameConfig} />
     </main>
   );
 }
