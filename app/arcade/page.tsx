@@ -15,28 +15,47 @@ export default function ArcadePage() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let x = window.innerWidth / 2;
+    let x = window.innerWidth / 2; // will be fixed in first render
     let y = window.innerHeight / 2;
     let vx = 0;
     let vy = 0;
     
     // Debris
     const debris = Array.from({ length: 10 }).map(() => ({
-      x: Math.random() * window.innerWidth,
-      y: Math.random() * window.innerHeight,
+      x: Math.random() * 400,
+      y: Math.random() * 800,
       active: true
     }));
 
     let animId: number;
     let lastTime = performance.now();
+    let isInputting = false;
+    let inputX = 0;
+    let inputY = 0;
 
     const render = (time: number) => {
-      const dt = (time - lastTime) / 16;
+      const dt = Math.min((time - lastTime) / 16, 2);
       lastTime = time;
+
+      const rect = canvas.getBoundingClientRect();
+      if (canvas.width !== rect.width || canvas.height !== rect.height) {
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+        if (x === window.innerWidth / 2) { // initialized to window center, fix it
+          x = canvas.width / 2;
+          y = canvas.height / 2;
+        }
+      }
 
       // Clear
       ctx.fillStyle = "#09090b";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      if (isInputting) {
+         vx += inputX * 0.5 * dt;
+         vy += inputY * 0.5 * dt;
+         setFuel(f => Math.max(0, f - 0.5 * dt));
+      }
 
       // Inertia (no friction)
       x += vx * dt;
@@ -73,24 +92,58 @@ export default function ArcadePage() {
       ctx.fill();
       ctx.shadowBlur = 0;
 
+      // Draw Input thrust line
+      if (isInputting) {
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + inputX * 40, y + inputY * 40);
+        ctx.stroke();
+      }
+
       animId = requestAnimationFrame(render);
     };
 
     animId = requestAnimationFrame(render);
 
-    // Mock Joystick input
-    const handleTouch = (e: TouchEvent) => {
-      // Just apply some random thrust for mockup
-      vx += (Math.random() - 0.5) * 2;
-      vy += (Math.random() - 0.5) * 2;
-      setFuel(f => Math.max(0, f - 1));
+    const getCanvasPos = (clientX: number, clientY: number) => {
+      const rect = canvas.getBoundingClientRect();
+      return { x: clientX - rect.left, y: clientY - rect.top };
     };
 
-    canvas.addEventListener('touchstart', handleTouch);
+    const updateInput = (e: PointerEvent) => {
+      const pos = getCanvasPos(e.clientX, e.clientY);
+      const dx = pos.x - x;
+      const dy = pos.y - y;
+      const dist = Math.hypot(dx, dy);
+      if (dist > 5) {
+        inputX = dx / dist;
+        inputY = dy / dist;
+      }
+    };
+
+    const handlePointerDown = (e: PointerEvent) => {
+      isInputting = true;
+      updateInput(e);
+    };
+    const handlePointerMove = (e: PointerEvent) => {
+      if (isInputting) updateInput(e);
+    };
+    const handlePointerUp = () => {
+      isInputting = false;
+      inputX = 0;
+      inputY = 0;
+    };
+
+    window.addEventListener('pointerdown', handlePointerDown);
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
 
     return () => {
       cancelAnimationFrame(animId);
-      canvas.removeEventListener('touchstart', handleTouch);
+      window.removeEventListener('pointerdown', handlePointerDown);
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
     };
   }, []);
 

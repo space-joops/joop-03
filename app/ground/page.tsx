@@ -78,10 +78,12 @@ export default function GroundMinigamePage() {
       const dt = Math.min((time - lastTime) / 16, 2); // cap dt
       lastTime = time;
 
-      // Ensure canvas matches window size
-      if (canvas.width !== window.innerWidth || canvas.height !== window.innerHeight) {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+      const rect = canvas.getBoundingClientRect();
+
+      // Ensure canvas matches element size, not full window
+      if (canvas.width !== rect.width || canvas.height !== rect.height) {
+        canvas.width = rect.width;
+        canvas.height = rect.height;
       }
 
       // Draw background (training room grid)
@@ -214,12 +216,24 @@ export default function GroundMinigamePage() {
 
     animId = requestAnimationFrame(render);
 
+    const getCanvasPos = (clientX: number, clientY: number) => {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: clientX - rect.left,
+        y: clientY - rect.top
+      };
+    };
+
     const handlePointerDown = (e: PointerEvent) => {
       state.isInputting = true;
-      updateInputDirection(e.clientX, e.clientY);
+      const pos = getCanvasPos(e.clientX, e.clientY);
+      updateInputDirection(pos.x, pos.y);
     };
     const handlePointerMove = (e: PointerEvent) => {
-      if (state.isInputting) updateInputDirection(e.clientX, e.clientY);
+      if (state.isInputting) {
+        const pos = getCanvasPos(e.clientX, e.clientY);
+        updateInputDirection(pos.x, pos.y);
+      }
     };
     const handlePointerUp = () => {
       state.isInputting = false;
