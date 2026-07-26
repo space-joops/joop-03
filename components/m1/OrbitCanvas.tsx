@@ -13,6 +13,17 @@ export default function OrbitCanvas() {
     setSnapshot(generateMockSnapshot());
   }, []);
 
+  const imgRef = useRef<HTMLImageElement | null>(null);
+
+  // Load the SVG image
+  useEffect(() => {
+    const img = new Image();
+    img.src = '/game/joop.svg';
+    img.onload = () => {
+      imgRef.current = img;
+    };
+  }, []);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || !snapshot) return;
@@ -73,23 +84,21 @@ export default function OrbitCanvas() {
         // Depth cueing: smaller and dimmer if behind Earth
         const isBehind = pos.z < 0;
         const alpha = isBehind ? 0.3 : 1.0;
-        const size = isBehind ? 2 : 3;
+        const size = isBehind ? 8 : 12; // Half-size of the drawn image
 
-        ctx.beginPath();
-        ctx.arc(dotX, dotY, size, 0, Math.PI * 2);
-        ctx.fillStyle = joop.color;
-        
-        // Apply alpha to fillStyle
         ctx.globalAlpha = alpha;
-        ctx.fill();
-        
-        // Glow effect only for foreground
-        if (!isBehind) {
-          ctx.shadowBlur = 8;
-          ctx.shadowColor = joop.color;
-          ctx.fill(); // Fill again with shadow
-          ctx.shadowBlur = 0; // Reset
+
+        if (imgRef.current) {
+          // Draw the Joop SVG sprite
+          ctx.drawImage(imgRef.current, dotX - size, dotY - size, size * 2, size * 2);
+        } else {
+          // Fallback to dot
+          ctx.beginPath();
+          ctx.arc(dotX, dotY, size / 3, 0, Math.PI * 2);
+          ctx.fillStyle = joop.color;
+          ctx.fill();
         }
+        
       });
       ctx.globalAlpha = 1.0; // Reset alpha
 
