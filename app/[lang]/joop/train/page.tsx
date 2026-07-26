@@ -32,6 +32,8 @@ export default async function TrainPage({ params }: PageProps<"/[lang]/joop/trai
         </span>
       </header>
 
+      {/* 조작 설명은 게임 안의 시작 브리핑에서 보여준다 — 화면 높이를 게임에 최대한 넘긴다. */}
+
       <GroundMinigame lang={lang} dict={dict} color={mine.color} config={minigameConfig} />
     </main>
   );
