@@ -16,6 +16,43 @@
     },
     "reducedMotion": "Animation paused (reduced motion)."
   },
+  "home": {
+    "myJoop": "Your joop",
+    "ground": "On the ground",
+    "orbit": "In orbit",
+    "level": "Lv.",
+    "openMyJoop": "Your joop: {name}"
+  },
+  "onboarding": {
+    "title": "Adopt your joop",
+    "subtitle": "Enter an invite code to receive your joop, or leave your email for one.",
+    "inviteLabel": "Invite code",
+    "invitePlaceholder": "JOOP-XXXX-XX",
+    "redeem": "Adopt my joop",
+    "or": "or",
+    "waitlistLabel": "Email",
+    "waitlistPlaceholder": "you@example.com",
+    "join": "Notify me",
+    "joined": "You're on the list! We'll send an invite code soon.",
+    "back": "Back",
+    "errors": {
+      "empty": "Enter a code",
+      "invalid": "Invalid or used code",
+      "email": "Enter a valid email",
+      "session": "Could not start a session",
+      "waitlist": "Something went wrong"
+    },
+    "setup": {
+      "title": "Set up your joop",
+      "nameLabel": "Name (unique)",
+      "namePlaceholder": "Name your joop",
+      "colorLabel": "Color",
+      "complete": "Done",
+      "nameTaken": "That name is taken",
+      "nameLen": "Use 2–20 characters",
+      "colorErr": "Pick a color"
+    }
+  },
   "language": {
     "label": "Language",
     "en": "English",

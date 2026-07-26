@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import type { OrbitalSnapshot } from "@/lib/joops";
 import type { RankingRow } from "@/lib/rankings";
+import type { MyJoop } from "@/lib/profile";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
 import { OrbitalCanvas } from "@/components/orbital-canvas";
@@ -16,11 +17,13 @@ export function FirstScreen({
   dict,
   initialSnapshot,
   rankings,
+  myJoop,
 }: {
   lang: Locale;
   dict: Dictionary;
   initialSnapshot: OrbitalSnapshot;
   rankings: RankingRow[];
+  myJoop: MyJoop | null;
 }) {
   const [snapshot, setSnapshot] = useState(initialSnapshot);
 
@@ -75,13 +78,33 @@ export function FirstScreen({
       <RankingList rows={rankings} dict={dict} />
 
       <div className="mt-auto px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-3">
-        <a
-          href={`/${lang}/onboarding`}
-          className="block w-full rounded-md py-3 text-center font-mono text-sm font-semibold uppercase tracking-widest"
-          style={{ background: "var(--color-primary)", color: "var(--color-bg)" }}
-        >
-          {dict.firstScreen.cta.startWithInvite}
-        </a>
+        {myJoop ? (
+          <div
+            className="flex w-full items-center justify-center gap-2 rounded-md border py-3 font-mono text-sm"
+            style={{ borderColor: "var(--color-neutral-600)", background: "var(--color-surface)" }}
+          >
+            <span
+              className="h-3 w-3 rounded-full"
+              style={{ background: myJoop.color, boxShadow: `0 0 6px ${myJoop.color}` }}
+              aria-hidden
+            />
+            <span className="text-[var(--color-fg)]">
+              {dict.home.myJoop}: {myJoop.name}
+            </span>
+            <span className="text-[var(--color-muted)]">
+              · {myJoop.status === "orbit" ? dict.home.orbit : dict.home.ground} {dict.home.level}
+              {myJoop.level}
+            </span>
+          </div>
+        ) : (
+          <a
+            href={`/${lang}/onboarding`}
+            className="block w-full rounded-md py-3 text-center font-mono text-sm font-semibold uppercase tracking-widest"
+            style={{ background: "var(--color-primary)", color: "var(--color-bg)" }}
+          >
+            {dict.firstScreen.cta.startWithInvite}
+          </a>
+        )}
       </div>
     </main>
   );
