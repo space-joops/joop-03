@@ -53,6 +53,44 @@
       "colorErr": "Pick a color"
     }
   },
+  "joop": {
+    "title": "Your joop",
+    "back": "← Home",
+    "train": "Ground training (minigame)",
+    "launch": "Book a launch",
+    "hint": "Collect debris to level up, then book a launch vehicle."
+  },
+  "minigame": {
+    "title": "Ground training",
+    "hint": "Press the screen to thrust that way. There's inertia and no friction. Eat debris to score!",
+    "score": "Score",
+    "collected": "Collected",
+    "gameOver": "Training over",
+    "save": "Save result",
+    "saving": "Saving…",
+    "nowLevel": "Level",
+    "toDashboard": "Back"
+  },
+  "launch": {
+    "title": "Book a launch",
+    "subtitle": "You are level {level}. Meet the required level and your seat is confirmed automatically.",
+    "capacity": "Seats",
+    "requiredLevel": "Req. Lv.",
+    "book": "Book",
+    "bookWaitlist": "Join waitlist",
+    "confirmed": "Confirmed",
+    "pending": "Waitlisted",
+    "rejected": "Rejected",
+    "needLevel": "Needs level {level}",
+    "errors": {
+      "auth": "Sign in required",
+      "no_joop": "No joop found",
+      "under_level": "Level too low",
+      "not_found": "Vehicle not found",
+      "duplicate": "Already booked",
+      "save": "Booking failed"
+    }
+  },
   "language": {
     "label": "Language",
     "en": "English",

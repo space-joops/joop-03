@@ -53,6 +53,44 @@
       "colorErr": "색상을 선택하세요"
     }
   },
+  "joop": {
+    "title": "내 줍스",
+    "back": "← 홈",
+    "train": "지상 훈련 (미니게임)",
+    "launch": "발사 청약",
+    "hint": "쓰레기를 수거해 레벨을 올리면 발사체에 청약할 수 있어요."
+  },
+  "minigame": {
+    "title": "지상 훈련",
+    "hint": "화면을 눌러 그 방향으로 분사하세요. 관성이 있고 마찰은 없어요. 쓰레기를 먹으면 점수 획득!",
+    "score": "점수",
+    "collected": "수거",
+    "gameOver": "훈련 종료",
+    "save": "결과 저장",
+    "saving": "저장 중…",
+    "nowLevel": "레벨",
+    "toDashboard": "돌아가기"
+  },
+  "launch": {
+    "title": "발사체 청약",
+    "subtitle": "현재 레벨 {level}. 필요 레벨을 충족하면 청약 시 자동으로 탑승이 확정됩니다.",
+    "capacity": "정원",
+    "requiredLevel": "필요 Lv.",
+    "book": "청약",
+    "bookWaitlist": "대기 청약",
+    "confirmed": "탑승 확정",
+    "pending": "대기 중",
+    "rejected": "거부됨",
+    "needLevel": "레벨 {level} 필요",
+    "errors": {
+      "auth": "로그인이 필요해요",
+      "no_joop": "줍스가 없어요",
+      "under_level": "레벨이 부족해요",
+      "not_found": "발사체를 찾을 수 없어요",
+      "duplicate": "이미 청약했어요",
+      "save": "청약에 실패했어요"
+    }
+  },
   "language": {
     "label": "언어",
     "en": "English",
