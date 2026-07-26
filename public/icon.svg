@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- PWA App Icon (Maskable Safe) -->
+  <rect width="512" height="512" fill="#09090b"/>
+  <!-- Grid background -->
+  <path d="M0 128 L512 128 M0 256 L512 256 M0 384 L512 384" stroke="#1a4d2e" stroke-width="4" opacity="0.5"/>
+  <path d="M128 0 L128 512 M256 0 L256 512 M384 0 L384 512" stroke="#1a4d2e" stroke-width="4" opacity="0.5"/>
+  
+  <g transform="translate(106, 106) scale(3)">
+    <!-- Same as logo-symbol.svg -->
+    <circle cx="50" cy="50" r="42" fill="none" stroke="#39ff14" stroke-width="6" stroke-dasharray="20 10" opacity="0.8"/>
+    <rect x="35" y="35" width="30" height="30" fill="none" stroke="#39ff14" stroke-width="6" stroke-linecap="square" stroke-linejoin="miter"/>
+    <circle cx="50" cy="50" r="6" fill="#39ff14"/>
+    <line x1="50" y1="35" x2="50" y2="15" stroke="#39ff14" stroke-width="6"/>
+    <circle cx="50" cy="15" r="3" fill="#39ff14"/>
+    <line x1="25" y1="50" x2="35" y2="50" stroke="#39ff14" stroke-width="6"/>
+    <line x1="65" y1="50" x2="75" y2="50" stroke="#39ff14" stroke-width="6"/>
+  </g>
+</svg>
