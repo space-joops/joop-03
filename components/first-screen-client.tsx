@@ -11,6 +11,7 @@ import { OrbitalCanvas } from "@/components/orbital-canvas";
 import { CleanupGauge } from "@/components/cleanup-gauge";
 import { RankingList } from "@/components/ranking-list";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { StatusBar } from "@/components/status-bar";
 
 export function FirstScreen({
   lang,
@@ -46,31 +47,49 @@ export function FirstScreen({
       className="mx-auto flex w-full max-w-md flex-1 flex-col"
       style={{ background: "var(--color-bg)" }}
     >
-      <header className="flex items-center justify-between px-4 pb-2 pt-[calc(env(safe-area-inset-top)+0.75rem)]">
-        <span className="flex items-center gap-2">
+      {/* 장식 상태바 — safe-area 상단 패딩은 여기서 처리 */}
+      <StatusBar />
+
+      <header className="px-4 pb-2 pt-2">
+        <div className="panel-amber flex items-center gap-3 px-3 py-2">
           {/* 브랜드 심볼 — 궤도 위 반려 로봇 (public/brand/logo-symbol.svg) */}
           <Image
             src="/brand/logo-symbol.svg"
             alt=""
             width={28}
             height={28}
-            className="block h-7 w-7"
+            className="block h-7 w-7 shrink-0"
             aria-hidden
           />
-          <span className="font-mono text-lg font-semibold tracking-[0.2em] text-[var(--color-primary)]">
-            {dict.common.appName}
+          <span
+            className="flex flex-1 items-center gap-2 text-[var(--color-primary)]"
+            style={{ textShadow: "var(--glow-primary)" }}
+          >
+            <span aria-hidden className="speedlines" />
+            <span className="font-mono text-lg font-semibold tracking-[0.2em]">
+              {dict.common.appName}
+            </span>
+            <span aria-hidden className="speedlines" />
           </span>
-        </span>
-        <LanguageSwitcher current={lang} />
+          <LanguageSwitcher current={lang} />
+        </div>
       </header>
 
       <div className="px-4">
-        <p className="mb-2 text-center font-mono text-sm text-[var(--color-fg)]">
-          {dict.firstScreen.title}
-        </p>
-        <OrbitalCanvas snapshot={snapshot} />
+        <div
+          className="crt-brackets px-3 py-2"
+          style={{ "--bracket-color": "var(--color-primary)" } as React.CSSProperties}
+        >
+          <p className="mb-2 text-center font-mono text-xs uppercase tracking-widest text-[var(--color-primary)]">
+            {dict.firstScreen.orbitLabelTop}
+          </p>
+          <OrbitalCanvas snapshot={snapshot} />
+          <p className="mt-2 text-center font-mono text-xs uppercase tracking-widest text-[var(--color-primary)]">
+            {snapshot.joops.length} {dict.firstScreen.inOrbit}
+          </p>
+        </div>
         <p className="mt-1 text-center font-mono text-xs text-[var(--color-muted)]">
-          {snapshot.joops.length} {dict.firstScreen.inOrbit}
+          {dict.firstScreen.title}
         </p>
       </div>
 

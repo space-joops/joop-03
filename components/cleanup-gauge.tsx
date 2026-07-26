@@ -1,6 +1,7 @@
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 
-// 누적 청소량 게이지 + 수치. 카세트퓨처리즘 세그먼트 계기 느낌.
+// 누적 청소량 게이지 — 이슈 #5 CRT 컨셉의 앰버 진행바.
+// 앰버 헤더 "라벨 [ NN% ]" + 연속 채움 바(인바 라벨) + 마일스톤 ▲ 틱 마커.
 export function CleanupGauge({
   totals,
   dict,
@@ -8,39 +9,76 @@ export function CleanupGauge({
   totals: { debris: number; percent: number };
   dict: Dictionary;
 }) {
-  const segments = 24;
-  const filled = Math.round((Math.min(100, Math.max(0, totals.percent)) / 100) * segments);
+  const percent = Math.min(100, Math.max(0, totals.percent));
+  // 채움 폭이 좁으면 인바 라벨이 넘치므로 바 밖(앰버)으로 뺀다.
+  const labelInside = percent >= 40;
+  const milestones = [25, 50, 75];
 
   return (
     <section className="px-4 py-3">
-      <div className="flex items-baseline justify-between font-mono text-xs uppercase tracking-widest text-[var(--color-muted)]">
-        <span>{dict.firstScreen.totalCollected}</span>
-        <span className="text-[var(--color-primary)]">
-          {totals.percent.toFixed(1)}% {dict.firstScreen.percentCleaned}
-        </span>
-      </div>
+      <div
+        className="crt-brackets px-3 py-3"
+        style={
+          {
+            "--bracket-color": "color-mix(in srgb, var(--color-secondary) 60%, transparent)",
+          } as React.CSSProperties
+        }
+      >
+        <div className="flex items-baseline justify-between font-mono text-xs uppercase tracking-widest text-[var(--color-secondary)]">
+          <span>{dict.firstScreen.totalCollected}</span>
+          <span style={{ textShadow: "var(--glow-secondary)" }}>
+            [ {percent.toFixed(1)}% ]
+          </span>
+        </div>
 
-      <div className="mt-2 flex gap-[3px]" aria-hidden>
-        {Array.from({ length: segments }).map((_, i) => (
-          <span
-            key={i}
-            className="h-3 flex-1 rounded-[1px]"
+        <div
+          className="relative mt-2 h-5 overflow-hidden rounded-[2px]"
+          style={{
+            background: "var(--color-surface)",
+            border: "1px solid color-mix(in srgb, var(--color-secondary) 45%, transparent)",
+          }}
+          aria-hidden
+        >
+          <div
+            className="absolute inset-y-0 left-0"
             style={{
-              background:
-                i < filled ? "var(--color-primary)" : "var(--color-surface)",
-              boxShadow: i < filled ? "0 0 6px var(--color-primary)" : "none",
-              opacity: i < filled ? 1 : 0.5,
+              width: `${percent}%`,
+              background: "var(--color-secondary)",
+              boxShadow: "var(--glow-secondary)",
             }}
           />
-        ))}
-      </div>
+          <span
+            className="absolute inset-y-0 flex items-center px-2 font-mono text-[10px] uppercase tracking-widest"
+            style={
+              labelInside
+                ? { left: 0, color: "var(--color-bg)" }
+                : { left: `${percent}%`, color: "var(--color-secondary)" }
+            }
+          >
+            {dict.firstScreen.percentCleaned}
+          </span>
+        </div>
 
-      <p className="mt-2 font-mono text-2xl text-[var(--color-fg)]">
-        {totals.debris.toLocaleString()}{" "}
-        <span className="text-sm text-[var(--color-muted)]">
-          {dict.firstScreen.pieces}
-        </span>
-      </p>
+        {/* 마일스톤 ▲ 틱 마커 (25/50/75%) */}
+        <div className="relative mt-1 h-4" aria-hidden>
+          {milestones.map((m) => (
+            <span
+              key={m}
+              className="absolute -translate-x-1/2 font-mono text-[10px] text-[var(--color-secondary)]"
+              style={{ left: `${m}%`, opacity: percent >= m ? 1 : 0.45 }}
+            >
+              ▲{m}%
+            </span>
+          ))}
+        </div>
+
+        <p className="mt-1 font-mono text-2xl text-[var(--color-secondary)]" style={{ textShadow: "var(--glow-secondary)" }}>
+          {totals.debris.toLocaleString()}{" "}
+          <span className="text-sm text-[var(--color-muted)]" style={{ textShadow: "none" }}>
+            {dict.firstScreen.pieces}
+          </span>
+        </p>
+      </div>
     </section>
   );
 }
