@@ -58,7 +58,11 @@
     "back": "← 홈",
     "train": "지상 훈련 (미니게임)",
     "launch": "발사 청약",
-    "hint": "쓰레기를 수거해 레벨을 올리면 발사체에 청약할 수 있어요."
+    "hint": "쓰레기를 수거해 레벨을 올리면 발사체에 청약할 수 있어요.",
+    "launchNow": "발사하기",
+    "openMap": "우주 지도 열기",
+    "hintQueued": "탑승이 확정됐어요. 발사 시퀀스를 시작하세요.",
+    "hintOrbit": "궤도에 진입했어요. 우주 지도에서 상태를 확인하세요."
   },
   "minigame": {
     "title": "지상 훈련",
@@ -73,6 +77,12 @@
   },
   "launch": {
     "title": "발사체 청약",
+    "launchTitle": "발사 시퀀스",
+    "countdownLabel": "T-마이너스",
+    "ignition": "점화",
+    "ascent": "상승",
+    "separation": "단 분리",
+    "orbitInsertion": "궤도 진입",
     "subtitle": "현재 레벨 {level}. 필요 레벨을 충족하면 청약 시 자동으로 탑승이 확정됩니다.",
     "capacity": "정원",
     "requiredLevel": "필요 Lv.",
@@ -90,6 +100,17 @@
       "duplicate": "이미 청약했어요",
       "save": "청약에 실패했어요"
     }
+  },
+  "space": {
+    "title": "우주 지도",
+    "altitude": "고도",
+    "speed": "속도",
+    "overhead": "현재 상공",
+    "link": "교신",
+    "linkActive": "수신 가능",
+    "shadowAuto": "음영 · 자동 수거",
+    "collectedWhileAway": "자리를 비운 사이 {n} 조각을 수거했어요.",
+    "hint": "음영 지역에서는 자동으로 쓰레기를 수거해요. 수거량은 랭킹에 반영됩니다."
   },
   "language": {
     "label": "언어",

@@ -58,7 +58,11 @@
     "back": "← Home",
     "train": "Ground training (minigame)",
     "launch": "Book a launch",
-    "hint": "Collect debris to level up, then book a launch vehicle."
+    "hint": "Collect debris to level up, then book a launch vehicle.",
+    "launchNow": "Launch now",
+    "openMap": "Open space map",
+    "hintQueued": "Your seat is confirmed. Start the launch sequence.",
+    "hintOrbit": "You're in orbit. Check your status on the space map."
   },
   "minigame": {
     "title": "Ground training",
@@ -73,6 +77,12 @@
   },
   "launch": {
     "title": "Book a launch",
+    "launchTitle": "Launch sequence",
+    "countdownLabel": "T-minus",
+    "ignition": "Ignition",
+    "ascent": "Ascent",
+    "separation": "Stage separation",
+    "orbitInsertion": "Orbit insertion",
     "subtitle": "You are level {level}. Meet the required level and your seat is confirmed automatically.",
     "capacity": "Seats",
     "requiredLevel": "Req. Lv.",
@@ -90,6 +100,17 @@
       "duplicate": "Already booked",
       "save": "Booking failed"
     }
+  },
+  "space": {
+    "title": "Space map",
+    "altitude": "Altitude",
+    "speed": "Speed",
+    "overhead": "Now over",
+    "link": "Link",
+    "linkActive": "Downlink OK",
+    "shadowAuto": "Shadow · auto-collect",
+    "collectedWhileAway": "Collected {n} pieces while you were away.",
+    "hint": "In Earth's shadow your joop auto-collects debris. It counts toward the ranking."
   },
   "language": {
     "label": "Language",
