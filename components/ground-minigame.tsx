@@ -111,7 +111,13 @@ export function GroundMinigame({
     };
 
     const draw = () => {
+      // 레이아웃 확정 전(크기 0)이면 이번 프레임 스킵
+      if (W < 2 || H < 2) {
+        if (running) raf = requestAnimationFrame(draw);
+        return;
+      }
       const u = unit();
+      player.r = u * 0.035; // 크기 확정/리사이즈 반영
       // 물리
       let dir: { x: number; y: number } | null = null;
       let strength = 0;
@@ -180,10 +186,9 @@ export function GroundMinigame({
         d.y += d.vy;
         if (d.x < 0 || d.x > W) d.vx = -d.vx;
         if (d.y < 0 || d.y > H) d.vy = -d.vy;
-        // 충돌
+        // 충돌 (점수는 Canvas HUD 로만 표시 — rAF 중 setState 금지)
         if (Math.hypot(d.x - player.x, d.y - player.y) < d.r + player.r) {
           localScore++;
-          setScore(localScore);
           Object.assign(d, spawn());
           continue;
         }
