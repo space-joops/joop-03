@@ -5,6 +5,7 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getMyJoop } from "@/lib/profile";
 import { getLaunchVehicles } from "@/lib/launch";
 import { LaunchList } from "@/components/launch-list";
+import { TabBar } from "@/components/tab-bar";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +20,7 @@ export default async function LaunchPage({ params }: PageProps<"/[lang]/launch">
 
   return (
     <main
-      className="mx-auto flex w-full max-w-md flex-1 flex-col px-5 pt-[calc(env(safe-area-inset-top)+1.5rem)] pb-8"
+      className="mx-auto flex w-full max-w-md flex-1 flex-col px-5 pt-[calc(env(safe-area-inset-top)+1.5rem)] pb-[calc(env(safe-area-inset-bottom)+5.5rem)]"
       style={{ background: "var(--color-bg)" }}
     >
       <header className="mb-4 flex items-center justify-between">
@@ -39,6 +40,8 @@ export default async function LaunchPage({ params }: PageProps<"/[lang]/launch">
       </p>
 
       <LaunchList lang={lang} dict={dict} vehicles={vehicles} myLevel={mine.level} />
+
+      <TabBar lang={lang} tab={dict.tab} />
     </main>
   );
 }

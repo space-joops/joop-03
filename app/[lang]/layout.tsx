@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
-import { VersionBadge } from "../version-badge";
+import { ToastProvider } from "@/components/toast";
 import { locales, isLocale } from "@/lib/i18n/config";
 import "../globals.css";
 
@@ -34,7 +34,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#05070f",
+  themeColor: "#05080a", // = --color-bg (globals.css 토큰 v1.0)
   colorScheme: "dark",
 };
 
@@ -48,8 +48,8 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        {children}
-        <VersionBadge />
+        {/* 버전 표시는 설정 화면으로 이전(탭바와 우하단 겹침 해소) */}
+        <ToastProvider>{children}</ToastProvider>
       </body>
     </html>
   );

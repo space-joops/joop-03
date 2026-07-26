@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { applyThrust, DEFAULT_CONFIG, type MinigameConfig } from "@/lib/minigame";
 import { submitMinigameResult } from "@/app/[lang]/joop/actions";
+import { Button } from "@/components/button";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
 
@@ -283,23 +284,19 @@ export function GroundMinigame({
                 <p className="font-mono text-sm text-[var(--color-primary)]">
                   +{result.xpGained} XP · {dict.minigame.nowLevel} {result.level}
                 </p>
-                <button
-                  onClick={() => router.push(`/${lang}/joop`)}
-                  className="rounded-md px-6 py-2.5 font-mono text-sm font-semibold uppercase tracking-widest"
-                  style={{ background: "var(--color-primary)", color: "var(--color-bg)" }}
-                >
+                <Button variant="primary" className="px-6" onClick={() => router.push(`/${lang}/joop`)}>
                   {dict.minigame.toDashboard}
-                </button>
+                </Button>
               </>
             ) : (
-              <button
+              <Button
+                variant="primary"
+                className="px-6"
                 onClick={saveResult}
                 disabled={phase === "saving"}
-                className="rounded-md px-6 py-2.5 font-mono text-sm font-semibold uppercase tracking-widest disabled:opacity-60"
-                style={{ background: "var(--color-primary)", color: "var(--color-bg)" }}
               >
                 {phase === "saving" ? dict.minigame.saving : dict.minigame.save}
-              </button>
+              </Button>
             )}
           </div>
         )}

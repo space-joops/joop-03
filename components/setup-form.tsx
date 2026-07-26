@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { completeSetup, type SetupState } from "@/app/[lang]/onboarding/setup/actions";
+import { Button } from "@/components/button";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
 
@@ -62,14 +63,9 @@ export function SetupForm({ lang, dict }: { lang: Locale; dict: Dictionary }) {
 
       {err && <p className="font-mono text-xs text-[var(--color-danger)]">{errorMap[err] ?? ""}</p>}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="mt-2 rounded-md py-3 font-mono text-sm font-semibold uppercase tracking-widest disabled:opacity-60"
-        style={{ background: "var(--color-primary)", color: "var(--color-bg)" }}
-      >
+      <Button type="submit" variant="primary" disabled={pending} className="mt-2 w-full">
         {t.complete}
-      </button>
+      </Button>
     </form>
   );
 }

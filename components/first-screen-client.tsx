@@ -11,6 +11,7 @@ import { OrbitalCanvas } from "@/components/orbital-canvas";
 import { CleanupGauge } from "@/components/cleanup-gauge";
 import { RankingList } from "@/components/ranking-list";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import { ButtonLink } from "@/components/button";
 
 export function FirstScreen({
   lang,
@@ -61,7 +62,8 @@ export function FirstScreen({
             {dict.common.appName}
           </span>
         </span>
-        <LanguageSwitcher current={lang} />
+        {/* 로그인 사용자는 설정 화면(탭바)에서 언어 변경 — 미로그인 랜딩만 헤더 스위처 유지 */}
+        {!myJoop && <LanguageSwitcher current={lang} />}
       </header>
 
       <div className="px-4">
@@ -77,7 +79,13 @@ export function FirstScreen({
       <CleanupGauge totals={snapshot.totals} dict={dict} />
       <RankingList rows={rankings} dict={dict} />
 
-      <div className="mt-auto px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-3">
+      <div
+        className={`mt-auto px-4 pt-3 ${
+          myJoop
+            ? "pb-[calc(env(safe-area-inset-bottom)+5rem)]" // 탭바(56px+safe) 가림 방지
+            : "pb-[calc(env(safe-area-inset-bottom)+1rem)]"
+        }`}
+      >
         {myJoop ? (
           <a
             href={`/${lang}/joop`}
@@ -98,13 +106,9 @@ export function FirstScreen({
             </span>
           </a>
         ) : (
-          <a
-            href={`/${lang}/onboarding`}
-            className="block w-full rounded-md py-3 text-center font-mono text-sm font-semibold uppercase tracking-widest"
-            style={{ background: "var(--color-primary)", color: "var(--color-bg)" }}
-          >
+          <ButtonLink href={`/${lang}/onboarding`} variant="primary" className="w-full">
             {dict.firstScreen.cta.startWithInvite}
-          </a>
+          </ButtonLink>
         )}
       </div>
     </main>

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- 아이템: 렌치(업그레이드) -->
+  <path d="M21 4 a7 7 0 0 0 -6.6 9.3 L6 21.7 a3.2 3.2 0 0 0 4.5 4.5 L18.9 17.8 A7 7 0 0 0 28 11 l-4.6 2.4 -3 -3 L23 6 A7 7 0 0 0 21 4 Z" fill="#aebfab" stroke="#5c6b5e" stroke-width="2"/>
+  <circle cx="8.2" cy="24" r="1.6" fill="#414d43"/>
+</svg>

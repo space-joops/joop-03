@@ -1,6 +1,19 @@
 {
   "common": {
-    "appName": "JOOPS"
+    "appName": "JOOPS",
+    "cancel": "Cancel"
+  },
+  "tab": {
+    "map": "Map",
+    "inventory": "Inventory",
+    "ranking": "Ranking",
+    "settings": "Settings",
+    "soon": "Coming soon"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "version": "Version"
   },
   "firstScreen": {
     "title": "Cleaning Earth's orbit, together",
@@ -82,6 +95,10 @@
     "pending": "Waitlisted",
     "rejected": "Rejected",
     "needLevel": "Needs level {level}",
+    "confirmTitle": "Book {name}?",
+    "confirmBody": "Your joop will launch to orbit. Bookings cannot be cancelled.",
+    "toastConfirmed": "Seat confirmed — get ready for launch!",
+    "toastPending": "You're on the waitlist for this launch.",
     "errors": {
       "auth": "Sign in required",
       "no_joop": "No joop found",

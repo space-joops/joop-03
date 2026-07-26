@@ -1,6 +1,19 @@
 {
   "common": {
-    "appName": "줍스"
+    "appName": "줍스",
+    "cancel": "취소"
+  },
+  "tab": {
+    "map": "지도",
+    "inventory": "인벤토리",
+    "ranking": "랭킹",
+    "settings": "설정",
+    "soon": "준비 중"
+  },
+  "settings": {
+    "title": "설정",
+    "language": "언어",
+    "version": "버전"
   },
   "firstScreen": {
     "title": "함께 지구 궤도를 청소합니다",
@@ -82,6 +95,10 @@
     "pending": "대기 중",
     "rejected": "거부됨",
     "needLevel": "레벨 {level} 필요",
+    "confirmTitle": "{name}에 청약할까요?",
+    "confirmBody": "발사가 확정되면 줍스가 궤도로 올라가요. 청약은 되돌릴 수 없어요.",
+    "toastConfirmed": "탑승이 확정됐어요 — 발사를 기다리세요!",
+    "toastPending": "이 발사체의 대기 명단에 올랐어요.",
     "errors": {
       "auth": "로그인이 필요해요",
       "no_joop": "줍스가 없어요",
