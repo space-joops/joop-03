@@ -8,7 +8,8 @@
     "inventory": "인벤토리",
     "ranking": "랭킹",
     "settings": "설정",
-    "soon": "준비 중"
+    "soon": "준비 중",
+    "comingSoon": "준비 중이에요"
   },
   "settings": {
     "title": "설정",

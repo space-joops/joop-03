@@ -1,10 +1,11 @@
-// 하단 탭바 — handoff-m6.md §4-3.
+// 하단 탭바 — handoff-m6.md §4-3 (미출시 탭·인터림 내비 규칙은 2026-07-27 보강판).
 // 노출: 관리 화면(로그인 홈·내 줍스·청약·설정)에서만. 게임 장면·온보딩·미로그인 랜딩은 숨김(몰입 우선)
 // → 페이지가 명시적으로 렌더한다(첫 화면은 myJoop 서버 데이터 조건부라 layout 전역 렌더 불가).
-// 지도(M4)·인벤토리(M6) 화면이 생기기 전까지 해당 탭은 비활성(스펙 외 인터림 상태 — PR #19 질의 중).
+// 인터림 내비(M4 이전): 로그인 홈=궤도 대시보드, 지도 탭=홈. 인벤토리·랭킹은 미출시 탭(op .55 + 정보 토스트).
 // 아이콘은 public/ui/icon-*.svg 와 동일 지오메트리의 인라인 SVG(currentColor 연동, sparkline.tsx 선례).
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { ComingSoonTab } from "@/components/tab-bar-coming-soon";
 import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 
@@ -70,17 +71,24 @@ function TabItem({
   label,
   active,
   href,
-  disabledHint,
   children,
 }: {
   label: string;
   active: boolean;
-  href?: string;
-  disabledHint?: string;
+  href: string;
   children: ReactNode;
 }) {
-  const inner = (
-    <>
+  return (
+    <Link
+      href={href}
+      aria-current={active ? "page" : undefined}
+      className="flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5"
+      style={
+        active
+          ? { color: "var(--color-primary)", textShadow: "var(--glow-text)" }
+          : { color: "var(--color-muted)" }
+      }
+    >
       <span
         className="grid place-items-center"
         style={active ? { filter: "drop-shadow(0 0 4px rgba(57, 255, 20, 0.45))" } : undefined}
@@ -88,35 +96,6 @@ function TabItem({
         {children}
       </span>
       <span className="text-[11px] leading-[14px]">{label}</span>
-    </>
-  );
-  const baseClass = "flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5";
-
-  if (!href) {
-    // 미개발 목적지(지도 M4 전 인벤토리·랭킹) — 비활성 인터림 상태
-    return (
-      <span
-        aria-disabled
-        title={disabledHint}
-        className={`${baseClass} opacity-40`}
-        style={{ color: "var(--color-muted)" }}
-      >
-        {inner}
-      </span>
-    );
-  }
-  return (
-    <Link
-      href={href}
-      aria-current={active ? "page" : undefined}
-      className={baseClass}
-      style={
-        active
-          ? { color: "var(--color-primary)", textShadow: "var(--glow-text)" }
-          : { color: "var(--color-muted)" }
-      }
-    >
-      {inner}
     </Link>
   );
 }
@@ -143,12 +122,12 @@ export function TabBar({
       <TabItem label={tab.map} active={active === "map"} href={`/${lang}`}>
         <TabIcon tab="map" />
       </TabItem>
-      <TabItem label={tab.inventory} active={false} disabledHint={tab.soon}>
+      <ComingSoonTab label={tab.inventory} ariaSuffix={tab.soon} message={tab.comingSoon}>
         <TabIcon tab="inventory" />
-      </TabItem>
-      <TabItem label={tab.ranking} active={false} disabledHint={tab.soon}>
+      </ComingSoonTab>
+      <ComingSoonTab label={tab.ranking} ariaSuffix={tab.soon} message={tab.comingSoon}>
         <TabIcon tab="ranking" />
-      </TabItem>
+      </ComingSoonTab>
       <TabItem label={tab.settings} active={active === "settings"} href={`/${lang}/settings`}>
         <TabIcon tab="settings" />
       </TabItem>
