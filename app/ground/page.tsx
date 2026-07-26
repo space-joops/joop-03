@@ -35,6 +35,16 @@ export default function GroundMinigamePage() {
     let animId: number;
     let lastTime = performance.now();
 
+    // Helper for random pos
+    const getRandomPos = () => {
+      const cw = canvasRef.current?.clientWidth || window.innerWidth;
+      const ch = canvasRef.current?.clientHeight || window.innerHeight;
+      return {
+        x: Math.random() * (cw - 40) + 20,
+        y: Math.random() * (ch - 200) + 100,
+      };
+    };
+
     // Game state
     const state = {
       x: window.innerWidth / 2,
@@ -42,8 +52,7 @@ export default function GroundMinigamePage() {
       vx: 0,
       vy: 0,
       debris: Array.from({ length: 5 }).map(() => ({
-        x: Math.random() * (window.innerWidth - 40) + 20,
-        y: Math.random() * (window.innerHeight - 200) + 100, // Keep away from edges
+        ...getRandomPos(),
         active: true,
         scale: 1,
       })),
@@ -56,8 +65,7 @@ export default function GroundMinigamePage() {
 
     const spawnDebris = () => {
       state.debris.push({
-        x: Math.random() * (window.innerWidth - 40) + 20,
-        y: Math.random() * (window.innerHeight - 200) + 100,
+        ...getRandomPos(),
         active: true,
         scale: 0, // for pop-in animation
       });

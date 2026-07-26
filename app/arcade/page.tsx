@@ -22,8 +22,8 @@ export default function ArcadePage() {
     
     // Debris
     const debris = Array.from({ length: 10 }).map(() => ({
-      x: Math.random() * 400,
-      y: Math.random() * 800,
+      x: Math.random() * (canvas.clientWidth || window.innerWidth),
+      y: Math.random() * (canvas.clientHeight || window.innerHeight),
       active: true
     }));
 
