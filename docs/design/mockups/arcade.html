@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>줍스 — M5 시안 · 아케이드 모드</title>
+<!--
+  M5 아케이드 시안: [1] 플레이 중(FR-7.1~7.5) · [2] 게임오버·수거 결과(FR-7.6 → EPIC 8 인벤토리).
+  - 배경은 실제 납품 에셋(public/game/bg-*.webp)을 상대경로로 참조해 실전 조합을 검증.
+  - 캐릭터·쓰레기·위성·조이스틱은 각 시트/명세와 동일 지오메트리. 수치는 handoff-m5.md.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Doto:wght@700;900&family=VT323&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --color-bg:#05080a; --color-surface:#0d1412; --color-surface-raised:#141c19;
+    --color-fg:#d8e6d4; --color-primary:#39ff14; --color-primary-dim:#1d7a10;
+    --color-secondary:#ffb000; --color-accent:#2de2e6; --color-danger:#ff4545;
+    --color-success:#00e08f; --color-muted:#7d8f7f;
+    --color-neutral-700:#2a332c; --color-neutral-800:#141c19;
+    --glow-primary:0 0 6px rgba(57,255,20,.55),0 0 18px rgba(57,255,20,.25);
+    --glow-text:0 0 4px rgba(57,255,20,.45);
+    --font-display:"Doto","VT323",monospace;
+    --font-body:system-ui,"Apple SD Gothic Neo","Noto Sans KR","Noto Sans",sans-serif;
+    --font-mono:ui-monospace,"SFMono-Regular","Cascadia Mono","Noto Sans Mono",monospace;
+    --page-pad-x:20px; --safe-top:12px; --safe-bottom:12px;
+    --radius-xs:2px; --radius-sm:4px; --radius-md:8px;
+    --bezel-highlight:rgba(255,255,255,.06); --bezel-shadow:rgba(0,0,0,.6);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#1a1d1f;color:var(--color-fg);font-family:var(--font-body);font-size:15px;line-height:22px;padding:24px}
+  h1{font:600 15px/22px var(--font-body);color:#9aa;margin-bottom:16px}
+  .sheet{display:flex;gap:24px;align-items:flex-start;overflow-x:auto;padding-bottom:16px}
+  .col{flex:none}
+  .col>p{font-size:12px;line-height:16px;color:#889;margin-bottom:8px;max-width:393px}
+  .device{width:393px;height:852px;overflow:hidden;position:relative;background:var(--color-bg);outline:1px solid #333;border-radius:24px;display:flex;flex-direction:column}
+
+  .panel{background:var(--color-surface);border:2px solid var(--color-neutral-700);border-radius:var(--radius-md);
+    box-shadow:inset 0 1px 0 var(--bezel-highlight),inset 0 -2px 6px var(--bezel-shadow);padding:14px 16px}
+  .panel-label{font-size:12px;line-height:16px;letter-spacing:.08em;color:var(--color-secondary);text-transform:uppercase}
+  .cta{width:100%;min-height:56px;cursor:pointer;font:600 17px/24px var(--font-body);letter-spacing:.02em;
+    color:#05080a;background:var(--color-primary);border:2px solid #63ff47;border-radius:var(--radius-sm);
+    box-shadow:inset 0 2px 0 rgba(255,255,255,.35),inset 0 -3px 0 rgba(0,0,0,.35),0 0 6px rgba(57,255,20,.55),0 0 18px rgba(57,255,20,.25)}
+  .btn-secondary{min-height:44px;padding:0 16px;cursor:pointer;font:600 15px/22px var(--font-body);
+    color:var(--color-secondary);background:transparent;border:2px solid var(--color-secondary);border-radius:var(--radius-sm);
+    box-shadow:0 0 6px rgba(255,176,0,.25)}
+  .note{font-size:12px;line-height:16px;color:var(--color-muted)}
+
+  /* ① 아케이드 */
+  .space{position:absolute;inset:0;overflow:hidden;background:#05080a url("../../../public/game/bg-galaxy.webp") center/cover no-repeat}
+  .earth{position:absolute;left:-260px;bottom:-300px;width:620px;height:620px;background:url("../../../public/game/bg-earth.webp") center/contain no-repeat}
+  .sat{position:absolute;right:18px;top:236px;width:170px;opacity:.95}
+  .hud{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;pointer-events:none;padding:var(--safe-top) 12px calc(var(--safe-bottom) + 8px)}
+  .hud-row{display:flex;align-items:center;gap:10px}
+  .icon-btn{width:44px;height:44px;display:grid;place-items:center;background:none;border:none;color:var(--color-muted);cursor:pointer;pointer-events:auto}
+  .score{margin-left:auto;text-align:right}
+  .score b{font-family:var(--font-display);font-weight:700;font-size:24px;color:var(--color-fg)}
+  .score span{display:block;font-size:11px;line-height:14px;color:var(--color-muted)}
+  .fuel{display:flex;align-items:center;gap:8px;margin-top:4px}
+  .fuel .lab{font-size:11px;line-height:14px;color:var(--color-muted);letter-spacing:.06em}
+  .fuel .bar{display:flex;gap:2px;height:8px;flex:1}
+  .fuel .bar i{flex:1;border-radius:2px;background:rgba(122,85,0,.35)}
+  .fuel .bar i.on{background:var(--color-secondary);box-shadow:0 0 6px rgba(255,176,0,.45)}
+  .edge-hint{position:absolute;right:6px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--color-muted);font-size:11px;line-height:14px;writing-mode:vertical-rl}
+  .pop{position:absolute;font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--color-primary);text-shadow:var(--glow-text)}
+
+  /* ② 결과 */
+  .page{flex:1;display:flex;flex-direction:column;gap:12px;padding:8px var(--page-pad-x) 0;min-height:0;overflow:hidden}
+  .over-hero{text-align:center;margin-top:32px}
+  .over-hero .big{font:800 26px/34px var(--font-body);color:var(--color-danger);text-shadow:0 0 6px rgba(255,69,69,.4)}
+  .over-hero .sub{color:var(--color-muted);margin-top:4px;font-size:13px}
+  .haul{list-style:none;display:flex;flex-direction:column}
+  .haul li{display:grid;grid-template-columns:40px 1fr auto auto;align-items:center;gap:10px;min-height:44px;border-top:1px solid var(--color-neutral-800)}
+  .haul li:first-child{border-top:0}
+  .haul .cnt{font-family:var(--font-mono);font-size:13px;color:var(--color-muted)}
+  .haul .pts{font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--color-primary);min-width:52px;text-align:right}
+  .total{display:flex;justify-content:space-between;align-items:baseline;border-top:1px dashed var(--color-neutral-700);padding-top:10px;margin-top:4px}
+  .total b{font-family:var(--font-display);font-weight:900;font-size:30px;color:var(--color-primary);text-shadow:var(--glow-text)}
+  .cta-row{display:flex;gap:10px}
+  .cta-row .btn-secondary{flex:1;justify-content:center;display:inline-flex;align-items:center}
+  .cta-row .cta{flex:1.6}
+  .cta-wrap{margin-top:auto;padding:12px 0 calc(var(--safe-bottom) + 12px)}
+  .scanlines::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:5;background:repeating-linear-gradient(0deg,rgba(57,255,20,.05) 0 1px,transparent 1px 3px)}
+  @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<h1>줍스 M5 시안 — ① 아케이드 모드(교신 중 능동 수거) → ② 게임오버·수거 결과</h1>
+<div class="sheet">
+
+  <!-- ①==================== 아케이드 플레이 ====================-->
+  <div class="col"><p>① 아케이드 — FR-7.1~7.5. 배경은 실제 에셋(bg-galaxy·bg-earth) 참조, 위성은 satellite.png 지오메트리</p>
+  <div class="device">
+    <div class="space">
+      <div class="earth"></div>
+      <!-- 위성 (satellite.png 지오메트리 인라인, 원근 스케일 0.55) -->
+      <svg class="sat" viewBox="0 0 512 256">
+        <g stroke="#5c6b5e" stroke-width="3">
+          <g fill="#0e2f38"><rect x="16" y="88" width="150" height="80" rx="4"/><rect x="346" y="88" width="150" height="80" rx="4"/></g>
+          <g stroke="#2de2e6" stroke-width="1.5" opacity=".5">
+            <path d="M53 88v80M91 88v80M129 88v80M383 88v80M421 88v80M459 88v80"/>
+            <path d="M16 115h150M16 142h150M346 115h150M346 142h150"/>
+          </g>
+          <path d="M166 128h34M312 128h34" stroke="#8ba08c" stroke-width="6"/>
+          <rect x="200" y="76" width="112" height="104" rx="8" fill="#8a6100"/>
+          <rect x="200" y="76" width="112" height="30" rx="8" fill="#ffb000" opacity=".85"/>
+          <path d="M200 118h112M200 146h112" stroke="#5c3f00" stroke-width="2"/>
+          <ellipse cx="256" cy="52" rx="40" ry="16" fill="#c8d2c4"/>
+          <path d="M256 52 V76" stroke="#8ba08c" stroke-width="5"/>
+          <circle cx="256" cy="40" r="5" fill="#ff4545" stroke="none"/>
+        </g>
+      </svg>
+      <svg width="393" height="852" viewBox="0 0 393 852" style="position:absolute;inset:0">
+        <!-- 쓰레기(debris-sheet 지오메트리) -->
+        <g transform="translate(40 150) scale(1.05) rotate(14 32 32)">
+          <rect x="20" y="14" width="24" height="36" rx="4" fill="#aebfab" stroke="#5c6b5e" stroke-width="2"/>
+          <ellipse cx="32" cy="15.5" rx="11" ry="4" fill="#8ba08c" stroke="#5c6b5e" stroke-width="1.5"/>
+          <rect x="20" y="26" width="24" height="10" fill="#ffb000" opacity=".85"/>
+        </g>
+        <g transform="translate(290 480) scale(.7) rotate(-30 32 32)">
+          <path d="M24 14 L40 14 L44 21 L40 28 L24 28 L20 21 Z" fill="#8ba08c" stroke="#5c6b5e" stroke-width="2"/>
+          <rect x="27" y="28" width="10" height="24" fill="#aebfab" stroke="#5c6b5e" stroke-width="2"/>
+        </g>
+        <g transform="translate(110 560) scale(.6)">
+          <path d="M32 12 L48 21 L48 41 L32 50 L16 41 L16 21 Z" fill="#8ba08c" stroke="#5c6b5e" stroke-width="2"/>
+          <circle cx="32" cy="31" r="8" fill="#05080a" stroke="#414d43" stroke-width="2"/>
+        </g>
+        <g transform="translate(230 210) scale(1.15) rotate(24 32 32)">
+          <path d="M14 18 L52 14 L54 44 L34 50 L18 46 Z" fill="#0e2f38" stroke="#5c6b5e" stroke-width="2"/>
+          <path d="M23 16.2 L26 47.5 M35 15 L40 48.6 M15 27 L53 24" stroke="#2de2e6" stroke-width="1.2" opacity=".5"/>
+          <path d="M52 14 L54 44 L34 50" fill="none" stroke="#8ba08c" stroke-width="2.5"/>
+        </g>
+        <g transform="translate(60 380) scale(.62) rotate(40 32 32)">
+          <path d="M16 20 L48 16 L50 42 L40 46 L18 44 Z" fill="#14401f" stroke="#5c6b5e" stroke-width="2"/>
+          <path d="M22 24 h10 v6 h8 M24 38 h14 v-6" fill="none" stroke="#39ff14" stroke-width="1.4" opacity=".6"/>
+          <circle cx="20" cy="40" r="1.8" fill="#ffd25e"/>
+        </g>
+        <!-- 줍스(move, 분사) + 분사가스 파티클(코드 원 명세) -->
+        <g transform="translate(150 330) scale(1)">
+          <g transform="translate(64 64) rotate(-18) translate(-64 -64)">
+            <path d="M64 24 V13" stroke="#8ba08c" stroke-width="3"/>
+            <circle cx="64" cy="11" r="3.2" fill="#39ff14"/>
+            <g fill="#c8d2c4" stroke="#5c6b5e" stroke-width="2">
+              <rect x="22" y="46" width="12" height="18" rx="6" transform="rotate(-14 28 50)"/>
+              <rect x="94" y="46" width="12" height="18" rx="6" transform="rotate(14 100 50)"/>
+            </g>
+            <rect x="34" y="24" width="60" height="54" rx="10" fill="#c8d2c4" stroke="#5c6b5e" stroke-width="2.5"/>
+            <rect x="42" y="32" width="44" height="32" rx="4" fill="#071a0d" stroke="#414d43" stroke-width="2"/>
+            <rect x="50" y="40" width="7" height="10" rx="1.5" fill="#39ff14"/>
+            <rect x="71" y="40" width="7" height="10" rx="1.5" fill="#39ff14"/>
+            <rect x="56" y="55" width="16" height="3" rx="1.5" fill="#39ff14" opacity=".9"/>
+            <path d="M46 78 H82 L78 88 H50 Z" fill="#414d43"/>
+            <rect x="55" y="88" width="18" height="5" rx="2" fill="#2a332c"/>
+            <path d="M56 92 Q64 116 72 92 Z" fill="#39ff14" opacity=".85"/>
+            <path d="M59 92 Q64 106 69 92 Z" fill="#f2f7f0" opacity=".8"/>
+          </g>
+        </g>
+        <g fill="#39ff14">
+          <circle cx="196" cy="472" r="5" opacity=".35"/><circle cx="206" cy="500" r="7" opacity=".22"/>
+          <circle cx="192" cy="530" r="9" opacity=".14"/><circle cx="204" cy="562" r="11" opacity=".08"/>
+        </g>
+        <!-- 조이스틱(우하단, 분사 2단계) -->
+        <g transform="translate(285 700)">
+          <circle r="60" fill="rgba(216,230,212,.04)" stroke="rgba(57,255,20,.22)" stroke-width="1.5"/>
+          <circle r="46" fill="rgba(216,230,212,.04)" stroke="rgba(57,255,20,.22)" stroke-width="1.5"/>
+          <circle r="32" fill="rgba(216,230,212,.04)" stroke="rgba(57,255,20,.5)" stroke-width="1.5"/>
+          <circle r="18" fill="rgba(216,230,212,.04)" stroke="rgba(57,255,20,.22)" stroke-width="1.5"/>
+          <path d="M0 0 L-20 -20" stroke="rgba(57,255,20,.5)" stroke-width="1.5"/>
+          <circle cx="-20" cy="-20" r="14" fill="rgba(57,255,20,.25)" stroke="#39ff14" stroke-width="2"/>
+        </g>
+      </svg>
+      <span class="pop" style="left:236px;top:186px">+5</span>
+    </div>
+    <div class="hud">
+      <div class="hud-row">
+        <button class="icon-btn" aria-label="일시정지">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+        </button>
+        <div class="score"><b>36</b><span>이번 교신 수거</span></div>
+      </div>
+      <div class="fuel">
+        <span class="lab">분사가스</span>
+        <div class="bar"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+      <div class="edge-hint">달 방면 →</div>
+    </div>
+  </div></div>
+
+  <!-- ②==================== 게임오버·수거 결과 ====================-->
+  <div class="col"><p>② 게임오버·수거 결과 — FR-7.6 (분사가스 소진 → 인벤토리 저장, EPIC 8 연결)</p>
+  <div class="device scanlines">
+    <div class="page">
+      <div class="over-hero">
+        <div class="big">분사가스 소진</div>
+        <p class="sub">ORBITA가 자동 수거 모드로 복귀했어요</p>
+      </div>
+
+      <section class="panel">
+        <span class="panel-label">이번 교신 수거</span>
+        <ul class="haul" style="margin-top:6px">
+          <li>
+            <svg width="34" height="34" viewBox="0 0 64 64"><g transform="rotate(-18 32 32)"><rect x="20" y="14" width="24" height="36" rx="4" fill="#aebfab" stroke="#5c6b5e" stroke-width="2"/><rect x="20" y="26" width="24" height="10" fill="#ffb000" opacity=".85"/></g></svg>
+            <span>음료캔</span><span class="cnt">×4</span><span class="pts">+12</span>
+          </li>
+          <li>
+            <svg width="34" height="34" viewBox="0 0 64 64"><g transform="rotate(24 32 32)"><path d="M24 14 L40 14 L44 21 L40 28 L24 28 L20 21 Z" fill="#8ba08c" stroke="#5c6b5e" stroke-width="2"/><rect x="27" y="28" width="10" height="24" fill="#aebfab" stroke="#5c6b5e" stroke-width="2"/></g></svg>
+            <span>볼트·너트</span><span class="cnt">×9</span><span class="pts">+9</span>
+          </li>
+          <li>
+            <svg width="34" height="34" viewBox="0 0 64 64"><g transform="rotate(12 32 32)"><path d="M14 18 L52 14 L54 44 L34 50 L18 46 Z" fill="#0e2f38" stroke="#5c6b5e" stroke-width="2"/><path d="M23 16.2 L26 47.5 M15 27 L53 24" stroke="#2de2e6" stroke-width="1.2" opacity=".5"/></g></svg>
+            <span>태양전지판 파편</span><span class="cnt">×2</span><span class="pts">+10</span>
+          </li>
+          <li>
+            <svg width="34" height="34" viewBox="0 0 64 64"><g transform="rotate(8 32 32)"><path d="M16 20 L48 16 L50 42 L40 46 L18 44 Z" fill="#14401f" stroke="#5c6b5e" stroke-width="2"/><circle cx="20" cy="40" r="1.8" fill="#ffd25e"/><circle cx="45" cy="20" r="1.8" fill="#ffd25e"/></g></svg>
+            <span>회로기판 조각</span><span class="cnt">×5</span><span class="pts">+10</span>
+          </li>
+        </ul>
+        <div class="total"><span class="note">인벤토리에 저장됐어요</span><b>+41</b></div>
+      </section>
+
+      <section class="panel">
+        <span class="panel-label" style="color:var(--color-accent)">Next</span>
+        <p class="note" style="margin-top:4px">수집한 부품은 인벤토리에서 <b style="color:var(--color-fg)">합성·업그레이드</b>에 쓸 수 있어요. 분사가스는 음영 구간 동안 자동 충전됩니다.</p>
+      </section>
+
+      <div class="cta-wrap">
+        <div class="cta-row">
+          <button class="btn-secondary">지도로</button>
+          <button class="cta">인벤토리 열기</button>
+        </div>
+      </div>
+    </div>
+  </div></div>
+</div>
+</body>
+</html>
