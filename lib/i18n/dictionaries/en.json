@@ -93,6 +93,7 @@
     "reasonBroken": "Too many satellite collisions.",
     "save": "Save result",
     "saving": "Saving…",
+    "saveError": "Couldn't save. Please try again.",
     "retry": "Train again",
     "nowLevel": "Level",
     "toDashboard": "Back"
