@@ -3,6 +3,10 @@
     "appName": "JOOPS",
     "skip": "Skip"
   },
+  "meta": {
+    "title": "JOOPS — clean up space together",
+    "description": "Adopt a space robot and help clean up Earth's orbit. Play free in your browser."
+  },
   "firstScreen": {
     "title": "Cleaning Earth's orbit, together",
     "totalCollected": "Debris collected",
