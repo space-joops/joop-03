@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { positionAt, project2D } from "@/lib/orbit";
 import { tickOrbitClock, type OrbitClock } from "@/lib/orbit-clock";
+import { JOOP_FRAME, joopSheetPath, sheetForColor, spriteFrame } from "@/lib/joop-sprite";
 import type { OrbitalSnapshot } from "@/lib/joops";
 
 // 지구 + 궤도 줍스 100개를 Canvas 2D로 렌더 (docs/architecture/adr/0003-rendering-canvas2d.md).
@@ -14,18 +15,25 @@ export function OrbitalCanvas({
   snapshot,
   speed = 1,
   clock,
+  myJoopId = null,
+  myColor = null,
 }: {
   snapshot: OrbitalSnapshot;
   /** 표시 배속(1 = 실속도). 렌더 중에도 바꿀 수 있다. */
   speed?: number;
   /** 뷰 간 공유하는 가상 시계. 없으면 실시간(배속 무시). */
   clock?: OrbitClock;
+  /** 강조할 내 줍스 — 점 대신 애니메이션 스프라이트 + 궤도 링으로 그린다 */
+  myJoopId?: string | null;
+  myColor?: string | null;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   // rAF 콜백이 항상 최신 스냅샷/배속을 참조하도록 ref 로 보관
   const snapshotRef = useRef(snapshot);
   const speedRef = useRef(speed);
   const clockRef = useRef(clock);
+  const myIdRef = useRef(myJoopId);
+  const sheetRef = useRef<HTMLImageElement | null>(null);
   useEffect(() => {
     snapshotRef.current = snapshot;
   }, [snapshot]);
@@ -35,6 +43,20 @@ export function OrbitalCanvas({
   useEffect(() => {
     clockRef.current = clock;
   }, [clock]);
+  useEffect(() => {
+    myIdRef.current = myJoopId;
+  }, [myJoopId]);
+
+  // 내 줍스 스프라이트 시트(색상 변형) 선로딩 — 없으면 점으로 폴백한다.
+  useEffect(() => {
+    if (!myJoopId || !myColor) {
+      sheetRef.current = null;
+      return;
+    }
+    const img = new Image();
+    img.src = joopSheetPath(sheetForColor(myColor));
+    sheetRef.current = img;
+  }, [myJoopId, myColor]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -101,6 +123,27 @@ export function OrbitalCanvas({
       // 줍스 — 가상 시계(배속) 기준. t0=0 이라 스냅샷 갱신과 무관하게 위상 연속.
       const clk = clockRef.current;
       const t = clk ? tickOrbitClock(clk, speedRef.current) : Date.now() / 1000;
+      const myId = myIdRef.current;
+      const mine = myId ? snap.joops.find((j) => j.id === myId) : undefined;
+
+      // 내 궤도 링 — 한 주기를 64등분해 폴리라인으로(예전 space-map 패턴 이식)
+      if (mine) {
+        ctx.strokeStyle = mine.color;
+        ctx.globalAlpha = 0.3;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        const period = (2 * Math.PI) / (Math.abs(mine.orbit.angularVelocity) || 1e-9);
+        for (let a = 0; a <= 64; a++) {
+          const p = project2D(positionAt(mine.orbit, t + (a / 64) * period, 0));
+          const px = cx + p.x * scale;
+          const py = cy - p.y * scale;
+          if (a === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+
       for (const j of snap.joops) {
         const pos = positionAt(j.orbit, t, 0);
         const pt = project2D(pos);
@@ -109,6 +152,7 @@ export function OrbitalCanvas({
         const front = pos.z >= 0;
         const behindEarth = !front && Math.hypot(pt.x, pt.y) < 1;
         if (behindEarth) continue; // 지구 뒤로 가려짐
+        if (mine && j.id === mine.id) continue; // 내 줍스는 마지막에 스프라이트로
 
         ctx.beginPath();
         ctx.arc(sx, sy, front ? 2.4 : 1.6, 0, Math.PI * 2);
@@ -120,6 +164,49 @@ export function OrbitalCanvas({
       }
       ctx.globalAlpha = 1;
       ctx.shadowBlur = 0;
+
+      // 내 줍스 — 애니메이션 스프라이트 + 조준링으로 한눈에 식별되게
+      if (mine) {
+        const pos = positionAt(mine.orbit, t, 0);
+        const pt = project2D(pos);
+        const sx = cx + pt.x * scale;
+        const sy = cy - pt.y * scale;
+        const front = pos.z >= 0;
+        const size = Math.max(22, Math.min(w, h) * 0.11);
+        const sheet = sheetRef.current;
+
+        ctx.globalAlpha = front ? 1 : 0.55;
+        if (sheet && sheet.complete && sheet.naturalWidth > 0) {
+          // 궤도에서는 늘 움직이는 중이라 move 상태(reduced-motion 이면 첫 프레임 고정).
+          // ⚠️ 프레임 진행은 **실시간**으로 센다 — 게임 배속이 곱해진 t 를 쓰면
+          //    8fps 애니메이션이 배속만큼 빨라져 깜빡임으로 보인다.
+          const frame = spriteFrame("move", performance.now() / 1000, reduceMotion);
+          ctx.drawImage(
+            sheet,
+            frame * JOOP_FRAME,
+            0,
+            JOOP_FRAME,
+            JOOP_FRAME,
+            sx - size / 2,
+            sy - size / 2,
+            size,
+            size,
+          );
+        } else {
+          ctx.beginPath();
+          ctx.arc(sx, sy, 4, 0, Math.PI * 2);
+          ctx.fillStyle = mine.color;
+          ctx.fill();
+        }
+        // 조준링
+        ctx.strokeStyle = mine.color;
+        ctx.globalAlpha = front ? 0.75 : 0.4;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(sx, sy, size * 0.62, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
 
       if (running && !reduceMotion) raf = requestAnimationFrame(draw);
     };

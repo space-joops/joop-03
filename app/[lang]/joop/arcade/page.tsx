@@ -4,7 +4,7 @@ import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getMyJoop } from "@/lib/profile";
 import { getMyOrbitState } from "@/lib/space";
-import { getArcadeConfig, getArcadeRequireLink } from "@/lib/game-config";
+import { getArcadeConfig, getArcadeShadowXpCost } from "@/lib/game-config";
 import { ArcadeGame } from "@/components/arcade-game";
 
 export const dynamic = "force-dynamic";
@@ -19,11 +19,14 @@ export default async function ArcadePage({ params }: PageProps<"/[lang]/joop/arc
   if (!mine) redirect(`/${lang}/onboarding`);
   if (mine.status !== "orbit") redirect(`/${lang}/joop`); // 궤도 아니면 대시보드로
 
-  const [state, requireLink] = await Promise.all([getMyOrbitState(), getArcadeRequireLink()]);
+  const [state, shadowXpCost] = await Promise.all([
+    getMyOrbitState(),
+    getArcadeShadowXpCost(),
+  ]);
   if (!state) redirect(`/${lang}/joop`);
-  // 음영(교신 불가)이면 지도로 — 지도의 진입 버튼이 잠금 사유를 보여준다
-  if (requireLink && state.inShadow) redirect(`/${lang}/joop/map`);
 
+  // ⚠️ 음영이어도 리다이렉트하지 않는다(초기 개발 단계). 대신 게임 시작 오버레이에서
+  //    XP 를 지불하거나 수신 복귀를 기다리게 한다 — 결제·재판정은 서버 액션이 담당.
   // force-dynamic 이라 진입할 때마다 최신 설정 = "게임 재시작 시 반영"(FR-10.2)
   const [dict, config] = await Promise.all([getDictionary(lang), getArcadeConfig()]);
 
@@ -44,7 +47,20 @@ export default async function ArcadePage({ params }: PageProps<"/[lang]/joop/arc
         </span>
       </header>
 
-      <ArcadeGame lang={lang} dict={dict} color={mine.color} name={mine.name} config={config} />
+      <ArcadeGame
+        lang={lang}
+        dict={dict}
+        color={mine.color}
+        name={mine.name}
+        config={config}
+        shadowGate={{
+          inShadow: state.inShadow,
+          cost: shadowXpCost,
+          xp: mine.xp,
+          nextChangeAt: state.nextChangeAt,
+          serverNow: state.serverTime,
+        }}
+      />
     </main>
   );
 }

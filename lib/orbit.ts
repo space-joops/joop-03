@@ -18,6 +18,7 @@ export type Vec3 = { x: number; y: number; z: number };
 export type Vec2 = { x: number; y: number };
 
 const DEG = Math.PI / 180;
+const TAU = Math.PI * 2;
 
 /**
  * 시각 `tSeconds`(초)에서 줍스의 3D 궤도 위치.
@@ -63,6 +64,52 @@ export function project2D(pos: Vec3): Vec2 {
 }
 
 export const EARTH_RADIUS_KM = 6371;
+
+// ── 음영(그림자) 모델 ─────────────────────────────────────────
+// 태양을 +x 방향으로 가정하므로 물리적 음영은 x(t) < 0 이다. 이 x 는 전개하면
+//   x(t) = r·R·cos(φ(t) − ψ),   R = hypot(cos Ω, cos i·sin Ω),  ψ = atan2(−cos i·sin Ω, cos Ω)
+// 즉 위상의 순수 사인파라서 **음영은 정확히 반주기**(비율 0.5)이고, 전환 시각을 수치 탐색 없이
+// 해석적으로 구할 수 있다(검증: positionAt 과 오차 1e-13).
+//
+// 게임에서는 반주기(31~65분)를 기다릴 수 없으므로 두 손잡이를 둔다.
+//   1) 음영 비율 fraction — 음영 호를 좁힌다(0.5 = 물리 그대로).
+//   2) 게임 배속 — 시각 자체를 빠르게 돌린다(lib/orbit-clock.ts, config orbit_game_speed).
+
+/** 음영 중심(가장 깊은 그늘)을 θ=π 로 두는 위상각 θ ∈ [0, 2π). */
+function shadowTheta(p: OrbitParams, tSeconds: number): number {
+  const psi = Math.atan2(
+    -Math.cos(p.inclination * DEG) * Math.sin(p.raan * DEG),
+    Math.cos(p.raan * DEG),
+  );
+  const theta = p.phase0 + p.angularVelocity * tSeconds - psi;
+  return ((theta % TAU) + TAU) % TAU;
+}
+
+export type ShadowState = {
+  inShadow: boolean;
+  /** 다음 전환(음영→수신 또는 수신→음영)까지 남은 **게임 초** */
+  gameSecondsToChange: number;
+};
+
+/**
+ * 시각 t(게임 초)의 음영 여부와 다음 전환까지 남은 시간.
+ * @param fraction 한 궤도 중 음영이 차지하는 비율(0~0.5). 0.5 면 물리 그대로(x<0)와 동일.
+ */
+export function shadowStateAt(
+  p: OrbitParams,
+  tSeconds: number,
+  fraction: number,
+): ShadowState {
+  const f = Math.max(0, Math.min(0.5, fraction));
+  const theta = shadowTheta(p, tSeconds);
+  const half = Math.PI * f; // 음영 반폭(중심 π)
+  const inShadow = Math.abs(theta - Math.PI) < half;
+  // 음영이면 빠져나가는 각(π+half), 수신이면 들어가는 각(π−half)까지의 전진량
+  const target = inShadow ? Math.PI + half : Math.PI - half;
+  const dTheta = ((target - theta) % TAU + TAU) % TAU;
+  const omega = Math.abs(p.angularVelocity) || 1e-9;
+  return { inShadow, gameSecondsToChange: dTheta / omega };
+}
 
 /** 지구 자전 각속도(rad/s, 항성일 기준). 지상 궤적(ground track)의 서향 드리프트에 쓴다. */
 export const EARTH_ROTATION_RAD_S = 7.2921159e-5;

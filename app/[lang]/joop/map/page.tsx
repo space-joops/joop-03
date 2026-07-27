@@ -2,10 +2,13 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
-import { getMyOrbitState, settleIdleCollection } from "@/lib/space";
-import { getArcadeRequireLink } from "@/lib/game-config";
-import { SpaceMap } from "@/components/space-map";
+import { getMyOrbitState, getSpaceConfig, settleIdleCollection } from "@/lib/space";
+import { getMyJoop } from "@/lib/profile";
+import { getOrbitalSnapshot } from "@/lib/joops";
+import { getArcadeShadowXpCost } from "@/lib/game-config";
+import { OrbitViewer } from "@/components/orbit-viewer";
 import { OrbitStatus } from "@/components/orbit-status";
+import { LinkStatus } from "@/components/link-status";
 
 export const dynamic = "force-dynamic";
 
@@ -18,9 +21,15 @@ export default async function MapPage({ params }: PageProps<"/[lang]/joop/map">)
   const state = await getMyOrbitState();
   if (!state) redirect(`/${lang}/joop`); // 궤도 아님
 
-  const [dict, requireLink] = await Promise.all([getDictionary(lang), getArcadeRequireLink()]);
-  // 수신 지역(음영 아님)에서만 아케이드 진입(FR-6.6). 게이트를 끄면 항상 열린다(테스트용).
-  const arcadeOpen = !requireLink || !state.inShadow;
+  // 지구본·궤도 추적은 첫 화면과 **같은 컴포넌트·같은 게임 배속**을 쓴다(통일감).
+  // 스냅샷은 궤도의 모든 줍스를 담으므로 이웃 줍스까지 함께 보인다.
+  const [dict, snapshot, mine, shadowXpCost, spaceCfg] = await Promise.all([
+    getDictionary(lang),
+    getOrbitalSnapshot(),
+    getMyJoop(),
+    getArcadeShadowXpCost(),
+    getSpaceConfig(),
+  ]);
 
   return (
     <main
@@ -47,8 +56,20 @@ export default async function MapPage({ params }: PageProps<"/[lang]/joop/map">)
         </span>
       </div>
 
-      <div className="my-3">
-        <SpaceMap state={state} />
+      <div
+        className="crt-brackets my-3 px-3 py-2"
+        style={{ "--bracket-color": "var(--color-primary)" } as React.CSSProperties}
+      >
+        <OrbitViewer
+          snapshot={snapshot}
+          myJoopId={state.id}
+          myColor={state.color}
+          gameSpeed={state.gameSpeed}
+          shadowFraction={spaceCfg.shadowFraction}
+          lang={lang}
+          dict={dict}
+          layout="stack"
+        />
       </div>
 
       {collected > 0 && (
@@ -57,24 +78,17 @@ export default async function MapPage({ params }: PageProps<"/[lang]/joop/map">)
         </p>
       )}
 
-      <OrbitStatus state={state} dict={dict} />
+      <LinkStatus
+        state={state}
+        dict={dict}
+        lang={lang}
+        shadowXpCost={shadowXpCost}
+        myXp={mine?.xp ?? 0}
+      />
 
-      {arcadeOpen ? (
-        <Link
-          href={`/${lang}/joop/arcade`}
-          className="mt-3 block w-full rounded-md py-3 text-center font-mono text-sm font-semibold uppercase tracking-widest"
-          style={{ background: "var(--color-primary)", color: "var(--color-bg)" }}
-        >
-          {dict.arcade.enter}
-        </Link>
-      ) : (
-        <div
-          className="mt-3 w-full rounded-md border py-3 text-center font-mono text-xs"
-          style={{ borderColor: "var(--color-neutral-600)", color: "var(--color-muted)" }}
-        >
-          {dict.arcade.locked}
-        </div>
-      )}
+      <div className="mt-3">
+        <OrbitStatus state={state} dict={dict} />
+      </div>
 
       <p className="mt-3 font-mono text-xs leading-relaxed text-[var(--color-muted)]">
         {dict.space.hint}

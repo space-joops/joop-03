@@ -53,6 +53,21 @@ export const CONFIG_SPECS: readonly ConfigSpec[] = [
     fallback: 10,
   },
   {
+    key: "orbit_game_speed",
+    label: "궤도 게임 배속",
+    description:
+      "궤도 위상이 실제보다 몇 배 빠르게 진행하는지. 실제 궤도는 한 바퀴 62~131분이라 음영을 " +
+      "그대로 기다릴 수 없어 시간을 압축합니다. 첫 화면 지구본·우주 지도·음영 판정이 모두 이 값을 " +
+      "따릅니다. 고도·속도 계기는 궤도 상수라 영향을 받지 않습니다.",
+    group: "orbital",
+    type: "int",
+    min: 1,
+    max: 600,
+    step: 1,
+    unit: "배",
+    fallback: 30,
+  },
+  {
     key: "debris_target",
     label: "전체 청소 목표",
     description: "첫 화면의 청소 완료 퍼센트를 계산하는 기준 조각 수입니다.",
@@ -283,6 +298,20 @@ export const CONFIG_SPECS: readonly ConfigSpec[] = [
     warn: "올릴수록 클라이언트 조작 여지가 커집니다. 연료·생성 간격을 크게 바꿨을 때만 함께 조정하세요.",
   },
   {
+    key: "arcade_shadow_xp_cost",
+    label: "음영 진입 XP 비용",
+    description:
+      "음영(교신 불가) 중에 아케이드를 열 때 지불하는 XP. 0이면 무료로 진입합니다. " +
+      "XP가 줄면 레벨(1 + XP/100)도 함께 내려갈 수 있으니 발사 자격과의 관계를 고려해 정하세요.",
+    group: "arcade",
+    type: "int",
+    min: 0,
+    max: 500,
+    step: 5,
+    unit: "XP",
+    fallback: 20,
+  },
+  {
     key: "arcade_require_link",
     label: "수신 지역 게이트",
     description:
@@ -306,6 +335,19 @@ export const CONFIG_SPECS: readonly ConfigSpec[] = [
     step: 10,
     unit: "조각/시간",
     fallback: 120,
+  },
+  {
+    key: "shadow_fraction",
+    label: "음영 구간 비율",
+    description:
+      "한 궤도 중 음영(교신 불가)이 차지하는 비율. 물리적으로는 정확히 0.5(반주기)지만, 낮추면 " +
+      "음영이 짧아져 수신 지역이 더 빨리 돌아옵니다. 게임 배속과 함께 대기 시간을 결정합니다.",
+    group: "space",
+    type: "float",
+    min: 0.05,
+    max: 0.5,
+    step: 0.01,
+    fallback: 0.35,
   },
   {
     key: "idle_collect_cap_hours",

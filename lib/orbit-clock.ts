@@ -14,8 +14,15 @@ export type OrbitClock = {
   lastReal: number | null;
 };
 
-export function createOrbitClock(): OrbitClock {
-  return { vt: Date.now() / 1000, lastReal: null };
+/**
+ * @param gameSpeed 궤도 게임 배속(config orbit_game_speed).
+ * @param anchorMs  기준 실시각(epoch ms). **스냅샷의 serverTime 을 넘겨라** —
+ *   서버·클라가 같은 값에서 출발하므로 (1) 첫 렌더가 결정적이어서 하이드레이션 불일치가 없고,
+ *   (2) 클라 시계가 틀어져 있어도 서버 기준 위상을 따라간다(orbit-model.md 의 시계 보정).
+ *   생략하면 로컬 시계를 쓴다(하네스·단독 사용).
+ */
+export function createOrbitClock(gameSpeed = 1, anchorMs?: number): OrbitClock {
+  return { vt: ((anchorMs ?? Date.now()) / 1000) * gameSpeed, lastReal: null };
 }
 
 /**

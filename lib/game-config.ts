@@ -84,9 +84,16 @@ export async function getArcadeMaxPerRun(): Promise<number> {
   return num(await getGameConfig(), "arcade_max_debris_per_run");
 }
 
-/** 수신 지역(교신 가능) 게이트 — 1이면 음영에서 아케이드 진입 불가(FR-6.6). */
+/** 수신 지역(교신 가능) 게이트 — 1이면 음영 진입에 XP 비용이 붙는다(FR-6.6). */
 export async function getArcadeRequireLink(): Promise<boolean> {
   return num(await getGameConfig(), "arcade_require_link") === 1;
+}
+
+/** 음영 중 아케이드 진입에 청구할 XP. 게이트가 꺼져 있으면 0(무료). */
+export async function getArcadeShadowXpCost(): Promise<number> {
+  const config = await getGameConfig();
+  if (num(config, "arcade_require_link") !== 1) return 0;
+  return num(config, "arcade_shadow_xp_cost");
 }
 
 /** 새 발사체 등록 시 채워질 필요 레벨 기본값. */
