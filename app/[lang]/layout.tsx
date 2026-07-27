@@ -23,9 +23,17 @@ export function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
 }
 
-// OG 프리뷰(카톡/슬랙/트위터 공유)용 이미지는 app/[lang]/opengraph-image.jpg,
-// twitter-image.jpg 파일 기반 컨벤션으로 자동 주입된다(og:image 등).
-// 소스: public/design-src/og/joops-cover-source.jpg → scripts/generate-og-image.mjs.
+// OG 프리뷰(카톡/슬랙/트위터 공유)용 이미지는 public/og/opengraph-image.jpg를 명시 참조한다.
+// ⚠️ app/[lang]/opengraph-image.jpg 같은 파일 기반 컨벤션은 쓰지 않는다 — generateStaticParams가
+// 있는 동적 [lang] 세그먼트 안에 두면 Vercel 빌드에서 prerender invariant 오류가 난다
+// (scripts/generate-og-image.mjs 상단 주석 참고). 소스: public/design-src/og/joops-cover-source.jpg.
+const OG_IMAGE = {
+  url: "/og/opengraph-image.jpg",
+  width: 1200,
+  height: 630,
+  alt: "JOOPS Unit — a pet space robot floating in orbit, surrounded by small space debris",
+};
+
 export async function generateMetadata({
   params,
 }: LayoutProps<"/[lang]">): Promise<Metadata> {
@@ -49,11 +57,13 @@ export async function generateMetadata({
       siteName: "JOOPS",
       locale: lang === "ko" ? "ko_KR" : "en_US",
       type: "website",
+      images: [OG_IMAGE],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      images: [OG_IMAGE],
     },
   };
 }
