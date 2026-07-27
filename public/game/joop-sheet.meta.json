@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "image": "joop-sheet-{color}.png",
+  "colors": {
+    "green": "#39ff14",
+    "amber": "#ffb000",
+    "cyan": "#2de2e6",
+    "magenta": "#ff2e97",
+    "lime": "#a0ff70",
+    "gold": "#ffd25e"
+  },
+  "frameSize": [
+    128,
+    128
+  ],
+  "anchor": [
+    64,
+    64
+  ],
+  "anchorNote": "프레임 기하 중심. 지상(미니게임) 배치는 바닥 기준 [64, 93](노즐 하단) 오프셋 사용.",
+  "states": {
+    "idle": {
+      "frames": [
+        0,
+        1
+      ],
+      "fps": 2,
+      "loop": true
+    },
+    "move": {
+      "frames": [
+        2,
+        3
+      ],
+      "fps": 8,
+      "loop": true
+    },
+    "collect": {
+      "frames": [
+        4,
+        5
+      ],
+      "fps": 6,
+      "loop": true
+    }
+  },
+  "reducedMotion": "idle 프레임 0 고정"
+}
