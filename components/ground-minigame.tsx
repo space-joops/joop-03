@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ALL_ITEMS,
+  DEBRIS_FRAME,
+  DEBRIS_SHEET,
   DEFAULT_CONFIG,
   HAZARD_ITEMS,
   SAFE_ITEMS,
@@ -76,6 +78,7 @@ export function GroundMinigame({
     const sources: [string, string][] = [
       ...ALL_ITEMS.filter((it) => it.asset).map((it) => [it.id, it.asset!] as [string, string]),
       ["joop-sheet", joopSheetPath(sheetForColor(color))],
+      ["debris-sheet", DEBRIS_SHEET],
     ];
     let remaining = sources.length;
     const done = () => {
@@ -181,8 +184,9 @@ export function GroundMinigame({
       const img = imagesRef.current.get(item.id);
       const u = unit();
       const h = u * item.scale;
+      // 시트 프레임은 정사각(64), 단일 에셋은 고유 종횡비 유지
       const ratio =
-        img && img.naturalWidth > 0 && img.naturalHeight > 0
+        item.sheetFrame == null && img && img.naturalWidth > 0 && img.naturalHeight > 0
           ? img.naturalWidth / img.naturalHeight
           : 1;
       const w = h * ratio;
@@ -425,7 +429,21 @@ export function GroundMinigame({
       // 위험물은 붉은 기운, 쓰레기는 앰버 기운 — 실루엣만으로 판단하기 어려운 순간의 단서.
       ctx.shadowColor = f.item.hazard ? dangerColor : amber;
       ctx.shadowBlur = f.item.hazard ? 16 : 8;
-      if (img && img.complete && img.naturalWidth > 0) {
+      const sheet = f.item.sheetFrame != null ? imagesRef.current.get("debris-sheet") : undefined;
+      if (sheet && sheet.complete && sheet.naturalWidth > 0 && f.item.sheetFrame != null) {
+        // 쓰레기 시트(PR #19) 프레임 슬라이스
+        ctx.drawImage(
+          sheet,
+          f.item.sheetFrame * DEBRIS_FRAME,
+          0,
+          DEBRIS_FRAME,
+          DEBRIS_FRAME,
+          -f.w / 2,
+          -f.h / 2,
+          f.w,
+          f.h,
+        );
+      } else if (img && img.complete && img.naturalWidth > 0) {
         ctx.drawImage(img, -f.w / 2, -f.h / 2, f.w, f.h);
       } else {
         // 에셋 로딩 실패 폴백
@@ -879,10 +897,25 @@ function ItemRow({
         {label}
       </span>
       <span className="flex flex-1 items-center justify-end gap-2">
-        {items.map((it) => (
-          // eslint-disable-next-line @next/next/no-img-element -- 캔버스와 같은 SVG를 그대로 쓴다(최적화 불필요)
-          <img key={it.id} src={it.asset} alt="" aria-hidden className="h-6 w-auto" />
-        ))}
+        {items.map((it) =>
+          it.sheetFrame != null ? (
+            // 쓰레기 시트 프레임 크롭 — 캔버스와 같은 그림을 정답표에도 쓴다
+            <span
+              key={it.id}
+              aria-hidden
+              className="inline-block h-6 w-6"
+              style={{
+                backgroundImage: `url(${DEBRIS_SHEET})`,
+                backgroundRepeat: "no-repeat",
+                backgroundSize: "600% 100%",
+                backgroundPosition: `${it.sheetFrame * 20}% 0`,
+              }}
+            />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element -- 캔버스와 같은 SVG를 그대로 쓴다(최적화 불필요)
+            <img key={it.id} src={it.asset} alt="" aria-hidden className="h-6 w-auto" />
+          ),
+        )}
       </span>
     </div>
   );
