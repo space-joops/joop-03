@@ -49,6 +49,7 @@ export function GroundMinigame({
   const router = useRouter();
   const [phase, setPhase] = useState<Phase>("ready");
   const [assetsReady, setAssetsReady] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [summary, setSummary] = useState<Summary | null>(null);
   const [result, setResult] = useState<{ xpGained: number; level: number } | null>(null);
   const imagesRef = useRef<Map<string, HTMLImageElement>>(new Map());
@@ -85,6 +86,10 @@ export function GroundMinigame({
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+
+    // 모션 최소화(OS 설정): 판단 단서(경고등·붉은 외곽선)는 유지하되 장식 모션만 끈다.
+    // 낙하 자체는 게임의 본질이라 끌 수 없다 — 흔들림·깜빡임 같은 부가 모션만 줄인다.
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const styles = getComputedStyle(document.documentElement);
     const pick = (name: string, fallback: string) =>
@@ -234,7 +239,7 @@ export function GroundMinigame({
 
     // 줍스 — 카세트퓨처리즘 청소로봇. 눌린 색(color)이 액센트, 앰버 비콘은 브랜드 고정.
     const drawJoop = (cx: number, feetY: number, w: number, h: number) => {
-      const shake = joop.hurt > 0 ? Math.sin(joop.hurt * 60) * w * 0.06 : 0;
+      const shake = !reduceMotion && joop.hurt > 0 ? Math.sin(joop.hurt * 60) * w * 0.06 : 0;
       const x = cx + shake;
       const bodyH = h * 0.62;
       const bodyW = w * 0.78;
@@ -373,15 +378,27 @@ export function GroundMinigame({
       ctx.shadowBlur = 0;
       ctx.restore();
 
-      // 작동 중인 위성 표시 — 깜빡이는 경고등
+      // 작동 중인 위성 표시 — 경고등 + 점선 링.
+      // 점선 링은 색각과 무관한 형태 단서다(붉은 기운만으로는 색약 사용자가 구분하기 어렵다).
+      // 시작 브리핑의 "피하기" 상자 테두리도 같은 점선이라 단서가 이어진다.
       if (f.item.hazard) {
-        const blink = 0.35 + 0.65 * Math.abs(Math.sin(elapsed * 6));
+        const blink = reduceMotion ? 1 : 0.35 + 0.65 * Math.abs(Math.sin(elapsed * 6));
         ctx.globalAlpha = blink;
         ctx.fillStyle = dangerColor;
         ctx.beginPath();
         ctx.arc(f.x, f.y - f.h * 0.5 - 6, Math.max(2, f.h * 0.06), 0, Math.PI * 2);
         ctx.fill();
         ctx.globalAlpha = 1;
+
+        ctx.save();
+        ctx.strokeStyle = dangerColor;
+        ctx.globalAlpha = 0.6;
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([5, 4]);
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, Math.max(f.w, f.h) * 0.62, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
       }
     };
 
@@ -418,7 +435,13 @@ export function GroundMinigame({
 
       joop.joy = Math.max(0, joop.joy - dt);
       joop.hurt = Math.max(0, joop.hurt - dt);
-      joop.blink = joop.blink > 0 ? joop.blink - dt : Math.random() < dt * 0.35 ? 0.24 : 0;
+      joop.blink = reduceMotion
+        ? 0
+        : joop.blink > 0
+          ? joop.blink - dt
+          : Math.random() < dt * 0.35
+            ? 0.24
+            : 0;
 
       // ── 생성
       spawnTimer -= dt;
@@ -597,11 +620,20 @@ export function GroundMinigame({
   const saveResult = useCallback(async () => {
     if (!summary) return;
     setPhase("saving");
-    const res = await submitMinigameResult(summary.caught);
-    if (res.ok) {
-      setResult({ xpGained: res.xpGained, level: res.level });
-      setPhase("saved");
-    } else {
+    setSaveError(null);
+    // 실패를 조용히 삼키면 사용자는 한 판을 통째로 잃고도 이유를 모른다.
+    // 문구를 보여주고 결과 화면(over)에 남겨 재시도할 수 있게 한다.
+    try {
+      const res = await submitMinigameResult(summary.caught);
+      if (res.ok) {
+        setResult({ xpGained: res.xpGained, level: res.level });
+        setPhase("saved");
+      } else {
+        setSaveError(res.error);
+        setPhase("over");
+      }
+    } catch {
+      setSaveError("network");
       setPhase("over");
     }
   }, [summary]);
@@ -609,6 +641,7 @@ export function GroundMinigame({
   const retry = () => {
     setSummary(null);
     setResult(null);
+    setSaveError(null);
     setPhase("ready");
   };
 
@@ -640,7 +673,8 @@ export function GroundMinigame({
 
             <div className="flex w-full max-w-xs flex-col gap-3">
               <ItemRow label={m.safeLabel} items={SAFE_ITEMS.slice(0, 4)} accent="var(--color-secondary)" />
-              <ItemRow label={m.hazardLabel} items={HAZARD_ITEMS} accent="var(--color-danger)" />
+              {/* 점선 테두리 = 게임 화면에서 위험물을 감싸는 점선 링과 같은 단서 */}
+              <ItemRow label={m.hazardLabel} items={HAZARD_ITEMS} accent="var(--color-danger)" dashed />
             </div>
 
             <p className="font-mono text-[11px] leading-relaxed text-[var(--color-muted)]">
@@ -720,24 +754,34 @@ export function GroundMinigame({
                 </div>
               </>
             ) : (
-              <div className="flex gap-2">
-                <button
-                  onClick={retry}
-                  disabled={phase === "saving"}
-                  className={`${buttonClass} border bg-transparent`}
-                  style={{ borderColor: "var(--color-neutral-600)", color: "var(--color-fg)" }}
-                >
-                  {m.retry}
-                </button>
-                <button
-                  onClick={saveResult}
-                  disabled={phase === "saving"}
-                  className={buttonClass}
-                  style={buttonStyle}
-                >
-                  {phase === "saving" ? m.saving : m.save}
-                </button>
-              </div>
+              <>
+                {saveError && (
+                  <p
+                    role="alert"
+                    className="font-mono text-xs text-[var(--color-danger)]"
+                  >
+                    {m.saveError} <span className="opacity-60">({saveError})</span>
+                  </p>
+                )}
+                <div className="flex gap-2">
+                  <button
+                    onClick={retry}
+                    disabled={phase === "saving"}
+                    className={`${buttonClass} border bg-transparent`}
+                    style={{ borderColor: "var(--color-neutral-600)", color: "var(--color-fg)" }}
+                  >
+                    {m.retry}
+                  </button>
+                  <button
+                    onClick={saveResult}
+                    disabled={phase === "saving"}
+                    className={buttonClass}
+                    style={buttonStyle}
+                  >
+                    {phase === "saving" ? m.saving : m.save}
+                  </button>
+                </div>
+              </>
             )}
           </div>
         )}
@@ -751,15 +795,21 @@ function ItemRow({
   label,
   items,
   accent,
+  dashed = false,
 }: {
   label: string;
   items: readonly FallingItem[];
   accent: string;
+  dashed?: boolean;
 }) {
   return (
     <div
       className="flex items-center gap-2 rounded-md border px-2.5 py-2"
-      style={{ borderColor: accent, background: "color-mix(in srgb, var(--color-surface) 70%, transparent)" }}
+      style={{
+        borderColor: accent,
+        borderStyle: dashed ? "dashed" : "solid",
+        background: "color-mix(in srgb, var(--color-surface) 70%, transparent)",
+      }}
     >
       <span
         className="w-14 shrink-0 font-mono text-[10px] uppercase tracking-widest"
