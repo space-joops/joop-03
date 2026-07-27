@@ -3,6 +3,7 @@ import Link from "next/link";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getMyOrbitState, settleIdleCollection } from "@/lib/space";
+import { getArcadeRequireLink } from "@/lib/game-config";
 import { SpaceMap } from "@/components/space-map";
 import { OrbitStatus } from "@/components/orbit-status";
 
@@ -17,7 +18,9 @@ export default async function MapPage({ params }: PageProps<"/[lang]/joop/map">)
   const state = await getMyOrbitState();
   if (!state) redirect(`/${lang}/joop`); // 궤도 아님
 
-  const dict = await getDictionary(lang);
+  const [dict, requireLink] = await Promise.all([getDictionary(lang), getArcadeRequireLink()]);
+  // 수신 지역(음영 아님)에서만 아케이드 진입(FR-6.6). 게이트를 끄면 항상 열린다(테스트용).
+  const arcadeOpen = !requireLink || !state.inShadow;
 
   return (
     <main
@@ -55,6 +58,23 @@ export default async function MapPage({ params }: PageProps<"/[lang]/joop/map">)
       )}
 
       <OrbitStatus state={state} dict={dict} />
+
+      {arcadeOpen ? (
+        <Link
+          href={`/${lang}/joop/arcade`}
+          className="mt-3 block w-full rounded-md py-3 text-center font-mono text-sm font-semibold uppercase tracking-widest"
+          style={{ background: "var(--color-primary)", color: "var(--color-bg)" }}
+        >
+          {dict.arcade.enter}
+        </Link>
+      ) : (
+        <div
+          className="mt-3 w-full rounded-md border py-3 text-center font-mono text-xs"
+          style={{ borderColor: "var(--color-neutral-600)", color: "var(--color-muted)" }}
+        >
+          {dict.arcade.locked}
+        </div>
+      )}
 
       <p className="mt-3 font-mono text-xs leading-relaxed text-[var(--color-muted)]">
         {dict.space.hint}

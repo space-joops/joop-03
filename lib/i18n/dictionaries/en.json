@@ -128,6 +128,31 @@
       "save": "Booking failed"
     }
   },
+  "arcade": {
+    "title": "Orbit cleanup arcade",
+    "briefTitle": "Downlink established",
+    "briefBody": "You're linked with {name}. Take direct control and clean up orbital debris — every piece counts toward the global cleanup and rankings.",
+    "ruleJoystick": "Touch anywhere to summon the joystick — five rings fine-tune your thrust.",
+    "ruleFuel": "Thrusting burns gas. Run dry and the link ends — grab ⛽ pickups to refuel!",
+    "ruleWorld": "There's inertia and no friction. Fly far and you'll pass the Moon and the Sun.",
+    "start": "Start downlink",
+    "loading": "Loading assets…",
+    "fuel": "Gas",
+    "collected": "Collected",
+    "pieces": "pieces",
+    "eatenUnit": "items",
+    "end": "End",
+    "gameOver": "Link closed",
+    "reasonFuel": "You ran out of thruster gas.",
+    "save": "Apply cleanup",
+    "saving": "Applying…",
+    "saveError": "Couldn't apply. Please try again.",
+    "savedBody": "Added to the global cleanup and rankings. Lifetime total: {total} pieces!",
+    "retry": "Clean again",
+    "toMap": "← Space map",
+    "enter": "Enter arcade — clean together",
+    "locked": "Passing through shadow — the arcade opens when you're back in the link zone"
+  },
   "space": {
     "title": "Space map",
     "altitude": "Altitude",
