@@ -27,7 +27,40 @@ export const metadata: Metadata = {
   title: "JOOPS — 함께 우주를 청소합니다",
   description: "지구 궤도의 우주 쓰레기를 청소하는 반려형 우주 로봇 게임",
   applicationName: "JOOPS",
-  appleWebApp: { capable: true, title: "JOOPS", statusBarStyle: "black-translucent" },
+  appleWebApp: {
+    capable: true,
+    title: "JOOPS",
+    statusBarStyle: "black-translucent",
+    // iOS 스플래시 — 해상도가 기기와 정확히 일치할 때만 적용되므로 기기별 5종
+    // (docs/design/handoff-m1.md §3-2, 에셋 출처 PR #19). Android 는 매니페스트로 자동 생성.
+    startupImage: [
+      {
+        url: "/brand/splash-1179x2556.png",
+        media:
+          "(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)",
+      },
+      {
+        url: "/brand/splash-1206x2622.png",
+        media:
+          "(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)",
+      },
+      {
+        url: "/brand/splash-1290x2796.png",
+        media:
+          "(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)",
+      },
+      {
+        url: "/brand/splash-1320x2868.png",
+        media:
+          "(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)",
+      },
+      {
+        url: "/brand/splash-1170x2532.png",
+        media:
+          "(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)",
+      },
+    ],
+  },
   formatDetection: { telephone: false, email: false, address: false },
 };
 
