@@ -15,7 +15,7 @@
    - `display: 'standalone'`, `orientation: 'portrait'`, `start_url: '/'`, `theme_color`/`background_color`(카세트퓨처리즘 다크), `icons`(192/512, maskable).
 2. **뷰포트**: 루트 레이아웃에서 `export const viewport: Viewport`.
    - `width: 'device-width'`, `initialScale: 1`, `maximumScale: 1`, `userScalable: false`(게임 중 핀치줌 차단), `themeColor`(라이트/다크 media 배열), `colorScheme: 'dark'`.
-3. **아이콘/스플래시**: 파일 기반 API(`app/icon.png`, `app/apple-icon.png`, `app/favicon.ico`) + `public/`. iOS 홈 화면용 `appleWebApp`(title, statusBarStyle, startupImage).
+3. **아이콘/스플래시**: 파일 기반 API(`app/icon.png`, `app/apple-icon.png`, `app/favicon.ico`) + `public/`. iOS 홈 화면용 `appleWebApp`(title, statusBarStyle, startupImage — 2026-07-27 기기별 5종 연결, `public/brand/splash-*.png`).
 4. **버전업 대응**: 배포마다 `package.json` 버전 범프 → 화면 버전 뱃지([infra.md](../infra.md) 정책)와 연동. 사용자 업데이트 알림은 아래 "버전업 대응 구현" 절 참조(2026-07-27 구현).
 
 ## 오프라인 캐싱 (주의)

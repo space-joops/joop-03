@@ -151,3 +151,65 @@ body {
   background: repeating-linear-gradient(to bottom, currentColor 0 1px, transparent 1px 4px);
   opacity: 0.7;
 }
+
+/* 인앱 스플래시 (components/splash-screen.tsx) — 매 방문 부팅 화면.
+ * z-index 는 스캔라인(40)·VersionBadge(50)·PWA 배너(50)보다 위. */
+.splash-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  background: var(--color-bg);
+  transition: opacity 300ms ease-out;
+}
+.splash-leaving {
+  opacity: 0;
+  pointer-events: none;
+}
+.splash-boot-fill {
+  width: 100%;
+  transform-origin: left;
+  animation-name: splash-boot;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+@keyframes splash-boot {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .splash-screen {
+    transition: none;
+  }
+  .splash-boot-fill {
+    animation: none; /* 정지: 가득 찬 바 */
+  }
+}
+
+/* 줍스 캐릭터 스프라이트 (DOM) — 시트의 idle 2프레임(0,1)을 2fps 로 루프.
+ * 프레임 폭은 사용처에서 --joop-frame 으로 주입 (components/joop-sprite.tsx). */
+.joop-sprite {
+  background-repeat: no-repeat;
+  background-position: 0 0;
+}
+.joop-sprite-idle {
+  animation: joop-sprite-idle 1s steps(2) infinite;
+}
+@keyframes joop-sprite-idle {
+  to {
+    background-position-x: calc(var(--joop-frame, 128px) * -2);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .joop-sprite-idle {
+    animation: none; /* meta 규칙: idle 프레임 0 고정 */
+  }
+}

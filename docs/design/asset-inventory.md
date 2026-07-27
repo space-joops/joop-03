@@ -20,7 +20,7 @@
 | 앱 아이콘 | M1 | PNG | **192**, **512** | `public/icon-192.png`, `public/icon-512.png` |
 | 앱 아이콘(maskable) | M1 | PNG | **512**(안전영역 준수) | `public/icon-maskable-512.png` |
 | apple-touch 아이콘 | M1 | PNG | **180** | `app/apple-icon.png` |
-| 스플래시(스타트업) | M1 | PNG | 주요 비율 세트 | `public/brand/splash-*.png` |
+| 스플래시(스타트업) | M1 | PNG | 기기별 5종 | ✅ `public/brand/splash-*.png` (PR #19 반입, `app/[lang]/layout.tsx` startupImage 연결) |
 
 ## B. 첫 화면(M1) UI
 
@@ -46,8 +46,8 @@
 
 | 에셋 | 우선 | 포맷 | Canvas | 상태 / 경로 |
 |---|---|---|---|---|
-| 줍스 캐릭터 | 후속 | SVG(시안) → PNG/WebP(+시트) | ✅ | ✅ **제작됨**: `public/game/joop-{green,amber,cyan}.svg` — 정면 대기 포즈, 몸통색 currentColor 3변형. (이동·수거 프레임은 후속) |
-| 우주 쓰레기 스프라이트 세트 | 후속 | SVG(시안) → PNG/WebP(+시트) | ✅ | ✅ **제작됨**: `public/game/debris-*.svg` — 위성파편·볼트·캔·회로판·패널·안테나 6종 |
+| 줍스 캐릭터 | 후속 | PNG 시트 | ✅ | ✅ **시트 적용됨** (PR #19 반입): `public/game/joop-sheet-{green,amber,cyan,magenta,lime,gold}.png` + `joop-sheet.meta.json` — 6색 × idle/move/collect 각 2프레임(128px). 지상 미니게임·브리핑·대시보드에서 사용(`lib/joop-sprite.ts`). 구 SVG 시안 `joop-{green,amber,cyan}.svg` 는 미사용 보관 |
+| 우주 쓰레기 스프라이트 세트 | 후속 | PNG 시트 | ✅ | ✅ **시트 적용됨** (PR #19 반입): `public/game/debris-sheet.png` + meta — 6종(캔·볼트·너트·패널·구조재·회로). 미니게임에서 사용. 구 SVG `debris-*.svg` 는 미사용 보관 |
 | 배경 천체 — 지구 | 후속 | SVG(시안) → WebP | ✅ | ✅ **제작됨**: `public/game/celestial-earth.svg` — 경위도 그리드 + 형광 대륙 + 터미네이터 |
 | 배경 천체 — 달 | 후속 | SVG(시안) → WebP | ✅ | ✅ **제작됨**: `public/game/celestial-moon.svg` — 크레이터/마리아 |
 | 배경 천체 — 태양 | 후속 | SVG(시안) → WebP/PNG | ✅ | ✅ **제작됨**: `public/game/celestial-sun.svg` — 앰버 광구 + 형광 코로나 발광 |

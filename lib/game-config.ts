@@ -2,6 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { createServerClient } from "@/lib/supabase/server";
 import { DEFAULT_CONFIG, type MinigameConfig } from "@/lib/minigame";
+import { DEFAULT_ARCADE_CONFIG, type ArcadeConfig } from "@/lib/arcade";
 import { CONFIG_SPEC_BY_KEY, coerceConfigNumber } from "@/lib/config-specs";
 
 // joop_03_game_config 조회를 한곳으로 모은다.
@@ -61,6 +62,31 @@ export async function getMinigameConfig(): Promise<MinigameConfig> {
 /** 클라이언트가 보고한 수거 개수의 신뢰 상한(치팅 방어선). */
 export async function getMaxDebrisPerRun(): Promise<number> {
   return num(await getGameConfig(), "minigame_max_debris_per_run");
+}
+
+/** DB 값을 기본값 위에 덮어쓴 아케이드(우주 수거) 설정. */
+export async function getArcadeConfig(): Promise<ArcadeConfig> {
+  const config = await getGameConfig();
+  return {
+    ...DEFAULT_ARCADE_CONFIG,
+    thrust: num(config, "arcade_thrust"),
+    maxSpeed: num(config, "arcade_max_speed"),
+    fuel: num(config, "arcade_fuel"),
+    fuelBurn: num(config, "arcade_fuel_burn"),
+    friction: num(config, "arcade_friction"),
+    spawnInterval: num(config, "arcade_spawn_interval"),
+    fuelItemRatio: num(config, "arcade_fuel_item_ratio"),
+  };
+}
+
+/** 아케이드 한 판 수거 조각 상한 — 초과분은 거부가 아니라 클램핑한다. */
+export async function getArcadeMaxPerRun(): Promise<number> {
+  return num(await getGameConfig(), "arcade_max_debris_per_run");
+}
+
+/** 수신 지역(교신 가능) 게이트 — 1이면 음영에서 아케이드 진입 불가(FR-6.6). */
+export async function getArcadeRequireLink(): Promise<boolean> {
+  return num(await getGameConfig(), "arcade_require_link") === 1;
 }
 
 /** 새 발사체 등록 시 채워질 필요 레벨 기본값. */

@@ -20,7 +20,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-const GROUPS: ConfigGroup[] = ["orbital", "minigame", "space", "launch"];
+const GROUPS: ConfigGroup[] = ["orbital", "minigame", "arcade", "space", "launch"];
 
 export default async function AdminConfigPage() {
   await requireAdmin();
