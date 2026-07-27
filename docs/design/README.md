@@ -31,6 +31,11 @@ app/icon.png  app/apple-icon.png  app/favicon.ico   # Next.js 파일 기반 아�
 ```
 
 > 참고: `app/icon.png` · `app/apple-icon.png` · `app/favicon.ico` 는 커스텀 Next.js의 **파일 기반 아이콘 API**로, 놓으면 자동으로 `<link>`가 생성됩니다. PWA 매니페스트 아이콘(192/512/maskable)은 `public/`에 두고 `app/manifest.ts`가 참조합니다. → [ADR-0002](../architecture/adr/0002-pwa-portrait.md)
+>
+> PNG 4종 + `app/favicon.ico`(16+32 PNG-in-ICO)는 전부 `npm run gen:icons`
+> (`scripts/generate-icons.mjs`)로 `public/design-src/icons/` 마스터 SVG에서 파생합니다 —
+> 마스터를 고친 뒤 재실행하고, 산출물을 손으로 편집하지 마세요. `public/icon.svg`는
+> `icon-master.svg`의 복사본이라 마스터 수정 시 함께 갱신합니다.
 
 ### 네이밍
 

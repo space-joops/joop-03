@@ -16,7 +16,7 @@
 |---|---|---|---|---|
 | 로고(워드마크 가로) | M1 | SVG | 단색/형광 2종 | `public/brand/logo-wordmark.svg` |
 | 심볼(줍스 마크) | M1 | SVG | 정사각 | `public/brand/logo-symbol.svg` |
-| 파비콘 | M1 | ICO/PNG | 32, 16 | `app/favicon.ico` |
+| 파비콘 | M1 | ICO/PNG | 32, 16 | `app/favicon.ico` (`gen:icons`로 파생) |
 | 앱 아이콘 | M1 | PNG | **192**, **512** | `public/icon-192.png`, `public/icon-512.png` |
 | 앱 아이콘(maskable) | M1 | PNG | **512**(안전영역 준수) | `public/icon-maskable-512.png` |
 | apple-touch 아이콘 | M1 | PNG | **180** | `app/apple-icon.png` |
