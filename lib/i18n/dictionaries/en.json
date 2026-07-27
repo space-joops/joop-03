@@ -138,5 +138,32 @@
     "label": "Language",
     "en": "English",
     "ko": "한국어"
+  },
+  "pwa": {
+    "install": {
+      "title": "INSTALL // JOOPS",
+      "body": "Add JOOPS to your home screen and play full-screen, like a real console.",
+      "installButton": "Install app",
+      "dismiss": "Not now",
+      "iosSafari": {
+        "lead": "You can install JOOPS right from Safari:",
+        "step1": "Tap the Share button at the bottom of Safari (the square with an arrow).",
+        "step2": "Scroll down and tap \"Add to Home Screen\".",
+        "step3": "Tap \"Add\" in the top corner — JOOPS will appear on your home screen."
+      },
+      "iosOther": {
+        "lead": "This browser can't add JOOPS to your home screen on iOS. It only takes a moment in Safari:",
+        "step1": "Copy this page's address.",
+        "step2": "Open Safari and paste the address to visit JOOPS.",
+        "step3": "Tap Share, then \"Add to Home Screen\"."
+      },
+      "generic": "Open your browser menu and choose \"Add to Home Screen\" (or \"Install app\") to install JOOPS."
+    },
+    "update": {
+      "title": "UPDATE // READY",
+      "body": "A new version of JOOPS is ready. Update now to get the latest mission data.",
+      "updateButton": "Update",
+      "dismiss": "Later"
+    }
   }
 }

@@ -138,5 +138,32 @@
     "label": "언어",
     "en": "English",
     "ko": "한국어"
+  },
+  "pwa": {
+    "install": {
+      "title": "INSTALL // JOOPS",
+      "body": "JOOPS를 홈 화면에 추가하면 콘솔처럼 전체 화면으로 즐길 수 있어요.",
+      "installButton": "앱 설치",
+      "dismiss": "나중에",
+      "iosSafari": {
+        "lead": "Safari에서 바로 설치할 수 있어요:",
+        "step1": "Safari 하단의 공유 버튼(화살표가 있는 네모)을 눌러 주세요.",
+        "step2": "아래로 내려 \"홈 화면에 추가\"를 눌러 주세요.",
+        "step3": "오른쪽 위 \"추가\"를 누르면 홈 화면에 JOOPS가 생겨요."
+      },
+      "iosOther": {
+        "lead": "이 브라우저에서는 iOS 홈 화면에 추가할 수 없어요. Safari로 열면 금방이에요:",
+        "step1": "이 페이지 주소를 복사해 주세요.",
+        "step2": "Safari를 열고 주소를 붙여넣어 접속해 주세요.",
+        "step3": "공유 버튼 → \"홈 화면에 추가\"를 눌러 주세요."
+      },
+      "generic": "브라우저 메뉴에서 \"홈 화면에 추가\"(또는 \"앱 설치\")를 선택하면 JOOPS를 설치할 수 있어요."
+    },
+    "update": {
+      "title": "UPDATE // READY",
+      "body": "새 버전의 JOOPS가 준비됐어요. 업데이트하면 최신 상태로 플레이할 수 있어요.",
+      "updateButton": "업데이트",
+      "dismiss": "나중에"
+    }
   }
 }
