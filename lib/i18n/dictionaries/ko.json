@@ -2,6 +2,10 @@
   "common": {
     "appName": "줍스"
   },
+  "meta": {
+    "title": "JOOPS — 함께 우주를 청소합니다",
+    "description": "우주 로봇을 분양받아 지구 궤도를 함께 청소해요. 브라우저에서 바로 무료로 플레이할 수 있어요."
+  },
   "firstScreen": {
     "title": "함께 지구 궤도를 청소합니다",
     "totalCollected": "수거한 우주 쓰레기",

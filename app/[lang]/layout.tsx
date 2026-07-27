@@ -23,13 +23,40 @@ export function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
 }
 
-export const metadata: Metadata = {
-  title: "JOOPS — 함께 우주를 청소합니다",
-  description: "지구 궤도의 우주 쓰레기를 청소하는 반려형 우주 로봇 게임",
-  applicationName: "JOOPS",
-  appleWebApp: { capable: true, title: "JOOPS", statusBarStyle: "black-translucent" },
-  formatDetection: { telephone: false, email: false, address: false },
-};
+// OG 프리뷰(카톡/슬랙/트위터 공유)용 이미지는 app/[lang]/opengraph-image.jpg,
+// twitter-image.jpg 파일 기반 컨벤션으로 자동 주입된다(og:image 등).
+// 소스: public/design-src/og/joops-cover-source.jpg → scripts/generate-og-image.mjs.
+export async function generateMetadata({
+  params,
+}: LayoutProps<"/[lang]">): Promise<Metadata> {
+  const { lang } = await params;
+  if (!isLocale(lang)) return {};
+  const dict = await getDictionary(lang);
+  const { title, description } = dict.meta;
+  const url = `https://joop-03.vercel.app/${lang}`;
+
+  return {
+    metadataBase: new URL("https://joop-03.vercel.app"),
+    title,
+    description,
+    applicationName: "JOOPS",
+    appleWebApp: { capable: true, title: "JOOPS", statusBarStyle: "black-translucent" },
+    formatDetection: { telephone: false, email: false, address: false },
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: "JOOPS",
+      locale: lang === "ko" ? "ko_KR" : "en_US",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+  };
+}
 
 // 모바일 세로 PWA (docs/architecture/adr/0002-pwa-portrait.md)
 export const viewport: Viewport = {

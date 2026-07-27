@@ -1,13 +1,14 @@
 {
   "name": "joop-03",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "gen:icons": "node scripts/generate-icons.mjs"
+    "gen:icons": "node scripts/generate-icons.mjs",
+    "gen:og": "node scripts/generate-og-image.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.3",
