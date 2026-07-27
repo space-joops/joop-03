@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { GoogleTagManager } from "@next/third-parties/google";
 import { notFound } from "next/navigation";
 import { VersionBadge } from "../version-badge";
 import { PwaPrompt } from "@/components/pwa-prompt";
@@ -8,6 +9,10 @@ import { locales, isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import packageJson from "../../package.json";
 import "../globals.css";
+
+// Google Tag Manager — 게임 트리 전용(admin 콘솔은 이미 robots noindex라 추적 제외).
+// 동의 배너는 아직 없음(전 지역 즉시 적용으로 결정).
+const GTM_ID = "GTM-NV8BSHG2";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -124,6 +129,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
       lang={lang}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <GoogleTagManager gtmId={GTM_ID} />
       {/* crt-scanlines: 게임 트리 전용 CRT 오버레이 (admin 은 미적용) */}
       <body className="crt-scanlines min-h-full flex flex-col">
         {children}
