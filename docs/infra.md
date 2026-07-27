@@ -34,7 +34,9 @@ vercel deploy --prod
 
 ### 배포 전 버전을 올려주세요 (장애대응 / 고객 응대용)
 
-배포마다 `package.json`의 `version`이 달라야 합니다. 이 값은 화면 우측 하단의 작은 뱃지(`app/version-badge.tsx`, `app/layout.tsx`에 포함되어 모든 페이지에 노출)로 표시됩니다. 고객이 문의할 때 화면에 보이는 버전을 알려주면, 정확히 어떤 배포에서 발생한 문제인지 바로 특정할 수 있어 장애대응과 고객 응대가 빨라집니다.
+배포마다 `package.json`의 `version`이 달라야 합니다. 이 값은 화면 우측 하단의 작은 뱃지(`app/version-badge.tsx`, 다중 루트 레이아웃인 `app/[lang]/layout.tsx`와 `app/admin/layout.tsx` 양쪽에 포함되어 모든 페이지에 노출)로 표시됩니다. 고객이 문의할 때 화면에 보이는 버전을 알려주면, 정확히 어떤 배포에서 발생한 문제인지 바로 특정할 수 있어 장애대응과 고객 응대가 빨라집니다.
+
+**또한 이 버전 범프가 설치형(PWA) 사용자에게 업데이트 안내를 띄우는 트리거입니다.** `components/pwa-prompt.tsx`가 `/api/version`을 폴링해 실행 중 버전과 배포 버전이 다르면 업데이트 창을 띄웁니다 — 버전을 올리지 않고 배포하면 안내가 뜨지 않습니다([ADR-0002](architecture/adr/0002-pwa-portrait.md) "버전업 대응 구현" 참조).
 
 배포 전 체크리스트:
 
