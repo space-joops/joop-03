@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
+import { JoopSprite } from "@/components/joop-sprite";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getMyJoop } from "@/lib/profile";
@@ -37,15 +38,17 @@ export default async function JoopPage({ params }: PageProps<"/[lang]/joop">) {
         style={{ borderColor: "var(--color-neutral-600)", background: "var(--color-surface)" }}
       >
         <div className="flex items-center gap-3">
+          {/* 내 줍스 캐릭터 (idle 애니메이션) — 색 점은 궤도/랭킹 도트와의 인지 연결용으로 유지 */}
+          <JoopSprite color={mine.color} size={64} className="shrink-0" />
           <span
             className="h-4 w-4 rounded-full"
             style={{ background: mine.color, boxShadow: `0 0 8px ${mine.color}` }}
             aria-hidden
           />
-          <span className="font-mono text-lg font-semibold text-[var(--color-fg)]">
+          <span className="min-w-0 truncate font-mono text-lg font-semibold text-[var(--color-fg)]">
             {mine.name}
           </span>
-          <span className="ml-auto font-mono text-xs text-[var(--color-muted)]">
+          <span className="ml-auto shrink-0 font-mono text-xs text-[var(--color-muted)]">
             {statusLabel}
           </span>
         </div>

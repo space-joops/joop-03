@@ -16,6 +16,15 @@ import {
   type MinigameConfig,
 } from "@/lib/minigame";
 import { submitMinigameResult } from "@/app/[lang]/joop/actions";
+import {
+  JOOP_FEET_Y,
+  JOOP_FRAME,
+  joopSheetPath,
+  sheetForColor,
+  spriteFrame,
+  type JoopSpriteState,
+} from "@/lib/joop-sprite";
+import { JoopSprite } from "@/components/joop-sprite";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
 
@@ -59,26 +68,31 @@ export function GroundMinigame({
   // ("설정값은 게임 재시작 시 반영" FR-10.2).
   const [cfg] = useState<MinigameConfig>(() => config ?? DEFAULT_CONFIG);
 
-  // 에셋(SVG) 선로딩 — 첫 물체가 떨어질 때 깜빡이지 않도록 시작 버튼을 이때까지 잠근다.
+  // 에셋 선로딩 — 첫 물체가 떨어질 때 깜빡이지 않도록 시작 버튼을 이때까지 잠근다.
+  // 개별 SVG(위성 등) + 줍스 캐릭터 시트(내 색 1장, PR #19 에셋).
   useEffect(() => {
     let cancelled = false;
     const map = imagesRef.current;
-    let remaining = ALL_ITEMS.length;
+    const sources: [string, string][] = [
+      ...ALL_ITEMS.filter((it) => it.asset).map((it) => [it.id, it.asset!] as [string, string]),
+      ["joop-sheet", joopSheetPath(sheetForColor(color))],
+    ];
+    let remaining = sources.length;
     const done = () => {
       remaining -= 1;
       if (remaining <= 0 && !cancelled) setAssetsReady(true);
     };
-    for (const item of ALL_ITEMS) {
+    for (const [id, src] of sources) {
       const img = new Image();
       img.onload = done;
       img.onerror = done; // 하나 실패해도 훈련은 시작할 수 있어야 한다(대체 도형으로 그린다)
-      img.src = item.asset;
-      map.set(item.id, img);
+      img.src = src;
+      map.set(id, img);
     }
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [color]);
 
   useEffect(() => {
     if (phase !== "playing") return;
@@ -237,8 +251,9 @@ export function GroundMinigame({
       ctx.closePath();
     };
 
-    // 줍스 — 카세트퓨처리즘 청소로봇. 눌린 색(color)이 액센트, 앰버 비콘은 브랜드 고정.
-    const drawJoop = (cx: number, feetY: number, w: number, h: number) => {
+    // 줍스 폴백 — 시트 로드 실패 시 쓰는 도형 렌더(기존 구현 보존).
+    // 눌린 색(color)이 액센트, 앰버 비콘은 브랜드 고정.
+    const drawJoopFallback = (cx: number, feetY: number, w: number, h: number) => {
       const shake = !reduceMotion && joop.hurt > 0 ? Math.sin(joop.hurt * 60) * w * 0.06 : 0;
       const x = cx + shake;
       const bodyH = h * 0.62;
@@ -356,6 +371,50 @@ export function GroundMinigame({
         ctx.arc(x + s * w * 0.3, tY + tH / 2, tH * 0.22, 0, Math.PI * 2);
         ctx.fill();
       }
+    };
+
+    // 줍스 — 캐릭터 스프라이트 시트(6프레임, PR #19). 상태 머신은 기존 값 재사용:
+    // joy>0 → collect(트랙터 빔) / 이동 중 → move(분사) / 그 외 idle(깜빡임).
+    // 피격(hurt)은 시트에 프레임이 없어 기존 연출(셰이크 + danger 글로우)을 유지한다.
+    const drawJoop = (cx: number, feetY: number, w: number, h: number) => {
+      const sheet = imagesRef.current.get("joop-sheet");
+      if (!sheet || !sheet.complete || sheet.naturalWidth === 0) {
+        drawJoopFallback(cx, feetY, w, h);
+        return;
+      }
+      const shake = !reduceMotion && joop.hurt > 0 ? Math.sin(joop.hurt * 60) * w * 0.06 : 0;
+      const x = cx + shake;
+
+      // 접지 글로우(기존 유지) — 캐릭터가 땅에 붙어 있음을 강조
+      ctx.globalAlpha = 0.16;
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.ellipse(x, feetY - 2, w * 0.5, h * 0.05, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      const moving = Math.abs(joop.vx) > 0.05;
+      const state: JoopSpriteState = joop.joy > 0 ? "collect" : moving ? "move" : "idle";
+      const f = spriteFrame(state, elapsed, reduceMotion);
+
+      // 프레임 발 위치(JOOP_FEET_Y)를 땅(feetY)에 맞추고, 캐릭터 실높이 ≈ h 로 스케일
+      const dh = (h * JOOP_FRAME) / JOOP_FEET_Y;
+      const dw = dh; // 프레임은 정사각
+      const dy = feetY - h;
+
+      ctx.save();
+      if (joop.hurt > 0) {
+        ctx.shadowColor = dangerColor;
+        ctx.shadowBlur = 14;
+      }
+      // 왼쪽 이동 시 좌우 반전(시트의 move 프레임은 한 방향)
+      if (state === "move" && joop.vx < 0) {
+        ctx.translate(x, 0);
+        ctx.scale(-1, 1);
+        ctx.translate(-x, 0);
+      }
+      ctx.drawImage(sheet, f * JOOP_FRAME, 0, JOOP_FRAME, JOOP_FRAME, x - dw / 2, dy, dw, dh);
+      ctx.restore();
     };
 
     const drawItem = (f: Falling) => {
@@ -664,6 +723,8 @@ export function GroundMinigame({
 
         {phase === "ready" && (
           <div className={overlayClass}>
+            {/* 훈련 주인공 — 내 줍스 (idle 애니메이션, reduced-motion 시 정지) */}
+            <JoopSprite color={color} size={96} />
             <h2 className="font-mono text-base font-semibold text-[var(--color-primary)]">
               {m.briefTitle}
             </h2>
