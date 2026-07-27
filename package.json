@@ -1,6 +1,6 @@
 {
   "name": "joop-03",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -26,6 +26,8 @@
     "sharp": "^0.34.5",
     "supabase": "^2.109.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "topojson-client": "^3.1.0",
+    "typescript": "^5",
+    "world-atlas": "^2.0.2"
   }
 }

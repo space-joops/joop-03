@@ -13,6 +13,10 @@
     "inOrbit": "joops in orbit",
     "orbitLabelTop": "LOW EARTH ORBIT // LIVE FEED",
     "pointsUnit": "PTS",
+    "speed": "Speed",
+    "viewGlobe": "Globe",
+    "viewTrack": "Ground track",
+    "tracking": "Tracking",
     "cta": {
       "startWithInvite": "Start with an invite code"
     },
