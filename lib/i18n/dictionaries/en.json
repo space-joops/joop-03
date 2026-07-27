@@ -1,6 +1,7 @@
 {
   "common": {
-    "appName": "JOOPS"
+    "appName": "JOOPS",
+    "skip": "Skip"
   },
   "firstScreen": {
     "title": "Cleaning Earth's orbit, together",

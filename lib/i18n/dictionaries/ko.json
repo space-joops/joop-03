@@ -1,6 +1,7 @@
 {
   "common": {
-    "appName": "줍스"
+    "appName": "줍스",
+    "skip": "건너뛰기"
   },
   "firstScreen": {
     "title": "함께 지구 궤도를 청소합니다",

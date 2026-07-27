@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
 import { VersionBadge } from "../version-badge";
 import { PwaPrompt } from "@/components/pwa-prompt";
+import { SplashScreen } from "@/components/splash-screen";
 import { locales, isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import packageJson from "../../package.json";
@@ -87,6 +88,8 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
       {/* crt-scanlines: 게임 트리 전용 CRT 오버레이 (admin 은 미적용) */}
       <body className="crt-scanlines min-h-full flex flex-col">
         {children}
+        {/* 인앱 스플래시 — 매 방문(전체 로드)마다, 스킵 가능 (admin 미적용) */}
+        <SplashScreen appName={dict.common.appName} skipLabel={dict.common.skip} />
         {/* PWA 설치 안내 + 새 배포 업데이트 안내 (게임 트리 전용, admin 미적용) */}
         <PwaPrompt dict={dict.pwa} currentVersion={packageJson.version} />
         <VersionBadge />
