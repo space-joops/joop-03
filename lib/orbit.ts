@@ -61,3 +61,38 @@ export function positionAt(p: OrbitParams, tSeconds: number, t0Seconds: number):
 export function project2D(pos: Vec3): Vec2 {
   return { x: pos.x, y: pos.y };
 }
+
+export const EARTH_RADIUS_KM = 6371;
+
+/** 지구 자전 각속도(rad/s, 항성일 기준). 지상 궤적(ground track)의 서향 드리프트에 쓴다. */
+export const EARTH_ROTATION_RAD_S = 7.2921159e-5;
+
+export type GroundState = {
+  latitude: number; // 도 (+N/−S)
+  longitude: number; // 도 (+E/−W, −180~180) — 지구 자전 보정 후
+  altitudeKm: number;
+  speedKms: number;
+  inShadow: boolean; // 음영(지구 그림자). lib/space.ts와 같은 규약: 태양 = +x → x<0이면 음영
+};
+
+/**
+ * 시각 t의 지상 궤적(ground track) 상태 — 궤도 추적 모니터·계기판용.
+ * positionAt은 관성 좌표(ECI)를 주므로, 경도는 지구 자전만큼 되돌려 지표 기준으로 만든다.
+ * 고도·속도는 시간과 무관한 궤도 상수라 표시 배속의 영향을 받지 않는다.
+ */
+export function groundStateAt(p: OrbitParams, tSeconds: number): GroundState {
+  const pos = positionAt(p, tSeconds, 0);
+  const rMag = Math.hypot(pos.x, pos.y, pos.z) || p.radius;
+
+  const latitude = (Math.asin(pos.z / rMag) * 180) / Math.PI;
+  let longitude = ((Math.atan2(pos.y, pos.x) - EARTH_ROTATION_RAD_S * tSeconds) * 180) / Math.PI;
+  longitude = ((longitude % 360) + 540) % 360 - 180; // −180~180 정규화
+
+  return {
+    latitude,
+    longitude,
+    altitudeKm: Math.round((p.radius - 1) * EARTH_RADIUS_KM),
+    speedKms: Math.round(p.angularVelocity * p.radius * EARTH_RADIUS_KM * 10) / 10,
+    inShadow: pos.x < 0,
+  };
+}

@@ -13,6 +13,10 @@
     "inOrbit": "개의 줍스가 궤도에",
     "orbitLabelTop": "지구 저궤도 // 실시간",
     "pointsUnit": "PTS",
+    "speed": "배속",
+    "viewGlobe": "지구본",
+    "viewTrack": "궤도 추적",
+    "tracking": "관측 대상",
     "cta": {
       "startWithInvite": "초대코드로 시작하기"
     },

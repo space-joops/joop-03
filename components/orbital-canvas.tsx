@@ -2,17 +2,39 @@
 
 import { useEffect, useRef } from "react";
 import { positionAt, project2D } from "@/lib/orbit";
+import { tickOrbitClock, type OrbitClock } from "@/lib/orbit-clock";
 import type { OrbitalSnapshot } from "@/lib/joops";
 
 // 지구 + 궤도 줍스 100개를 Canvas 2D로 렌더 (docs/architecture/adr/0003-rendering-canvas2d.md).
 // 좌표는 lib/orbit 의 순수 함수로 매 프레임 계산(보간). 서버 스냅샷은 줍스 파라미터·집계만 제공.
-export function OrbitalCanvas({ snapshot }: { snapshot: OrbitalSnapshot }) {
+//
+// speed/clock: 표시 배속(가상 시계, lib/orbit-clock.ts). 실제 각속도는 1바퀴 64~131분이라
+// 그대로는 정지로 보인다 — 물리값(ω)을 건드리면 우주 지도 계기까지 오염되므로 표시만 가속한다.
+export function OrbitalCanvas({
+  snapshot,
+  speed = 1,
+  clock,
+}: {
+  snapshot: OrbitalSnapshot;
+  /** 표시 배속(1 = 실속도). 렌더 중에도 바꿀 수 있다. */
+  speed?: number;
+  /** 뷰 간 공유하는 가상 시계. 없으면 실시간(배속 무시). */
+  clock?: OrbitClock;
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  // rAF 콜백이 항상 최신 스냅샷을 참조하도록 ref 로 보관
+  // rAF 콜백이 항상 최신 스냅샷/배속을 참조하도록 ref 로 보관
   const snapshotRef = useRef(snapshot);
+  const speedRef = useRef(speed);
+  const clockRef = useRef(clock);
   useEffect(() => {
     snapshotRef.current = snapshot;
   }, [snapshot]);
+  useEffect(() => {
+    speedRef.current = speed;
+  }, [speed]);
+  useEffect(() => {
+    clockRef.current = clock;
+  }, [clock]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -34,15 +56,23 @@ export function OrbitalCanvas({ snapshot }: { snapshot: OrbitalSnapshot }) {
       canvas.width = Math.round(rect.width * dpr);
       canvas.height = Math.round(rect.height * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      // reduced-motion 은 rAF 루프가 없어 resize 로 지워진 캔버스를 다시 그려야 한다
+      if (reduceMotion) {
+        cancelAnimationFrame(raf);
+        draw();
+      }
     };
-    resize();
-    window.addEventListener("resize", resize);
 
     const draw = () => {
       const snap = snapshotRef.current;
       const rect = canvas.getBoundingClientRect();
       const w = rect.width;
       const h = rect.height;
+      // 레이아웃 확정 전(크기 0)이면 다음 프레임 재시도 — reduced-motion 단발 렌더 포함
+      if (w < 2 || h < 2) {
+        if (running) raf = requestAnimationFrame(draw);
+        return;
+      }
       const cx = w / 2;
       const cy = h / 2;
       const maxR = 1.5; // 최대 궤도 반경 여유
@@ -68,8 +98,9 @@ export function OrbitalCanvas({ snapshot }: { snapshot: OrbitalSnapshot }) {
       }
       ctx.globalAlpha = 1;
 
-      // 줍스 (Unix 초 기준, t0=0 → 스냅샷 갱신과 무관하게 위상 연속)
-      const t = Date.now() / 1000;
+      // 줍스 — 가상 시계(배속) 기준. t0=0 이라 스냅샷 갱신과 무관하게 위상 연속.
+      const clk = clockRef.current;
+      const t = clk ? tickOrbitClock(clk, speedRef.current) : Date.now() / 1000;
       for (const j of snap.joops) {
         const pos = positionAt(j.orbit, t, 0);
         const pt = project2D(pos);
@@ -93,16 +124,17 @@ export function OrbitalCanvas({ snapshot }: { snapshot: OrbitalSnapshot }) {
       if (running && !reduceMotion) raf = requestAnimationFrame(draw);
     };
 
-    draw(); // reduceMotion 이면 1회 정지 렌더
+    resize();
+    window.addEventListener("resize", resize);
+    draw(); // reduceMotion 이면 1회 정지 렌더(크기 0이면 자체 재시도)
 
     const onVisibility = () => {
+      // visible 이벤트가 연속으로 와도 루프가 중복 생기지 않게 항상 기존 프레임을 취소
+      cancelAnimationFrame(raf);
       if (document.hidden) {
         running = false;
-        cancelAnimationFrame(raf);
-      } else if (!reduceMotion) {
-        running = true;
-        draw();
       } else {
+        running = true;
         draw();
       }
     };
