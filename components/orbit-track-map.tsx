@@ -1,8 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { groundStateAt, EARTH_ROTATION_RAD_S, type GroundState } from "@/lib/orbit";
+import {
+  groundStateAt,
+  shadowStateAt,
+  EARTH_ROTATION_RAD_S,
+  type GroundState,
+} from "@/lib/orbit";
 import { tickOrbitClock, type OrbitClock } from "@/lib/orbit-clock";
+import { JOOP_FRAME, joopSheetPath, sheetForColor, spriteFrame } from "@/lib/joop-sprite";
 import { WORLD_GRID_W, WORLD_GRID_H, isLandCell } from "@/lib/world-map-grid";
 import { regionAt } from "@/lib/geo-regions";
 import type { OrbitalSnapshot } from "@/lib/joops";
@@ -18,18 +24,27 @@ const DEG = 180 / Math.PI;
 export function OrbitTrackMap({
   snapshot,
   myJoopId,
+  myColor = null,
   speed,
   clock,
   lang,
   dict,
+  showIndicators = true,
+  shadowFraction = 0.5,
 }: {
   snapshot: OrbitalSnapshot;
   /** 강조할 내 줍스 id (궤도에 없으면 null → 첫 줍스를 관측 대상으로) */
   myJoopId: string | null;
+  /** 내 줍스 색 — 스프라이트 시트 변형 선택에 쓴다 */
+  myColor?: string | null;
   speed: number;
   clock: OrbitClock;
   lang: Locale;
   dict: Dictionary;
+  /** 지표 패널 표시 여부 — 우주 지도는 OrbitStatus/LinkStatus 가 따로 있어 끈다(중복 방지) */
+  showIndicators?: boolean;
+  /** 교신 판정에 쓰는 음영 비율(config shadow_fraction). 서버 판정과 같은 값을 넘겨야 한다. */
+  shadowFraction?: number;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const snapshotRef = useRef(snapshot);
@@ -49,6 +64,19 @@ export function OrbitTrackMap({
   useEffect(() => {
     focusRef.current = focus;
   }, [focus]);
+
+  // 관측 대상 스프라이트 시트 — 내 줍스일 때만 애니메이션으로 그린다(요구: 지도에서 식별).
+  const sheetRef = useRef<HTMLImageElement | null>(null);
+  const isMine = !!(focus && myJoopId && focus.id === myJoopId);
+  useEffect(() => {
+    if (!isMine) {
+      sheetRef.current = null;
+      return;
+    }
+    const img = new Image();
+    img.src = joopSheetPath(sheetForColor(myColor ?? focus?.color ?? "#35e07a"));
+    sheetRef.current = img;
+  }, [isMine, myColor, focus?.color]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -196,16 +224,34 @@ export function OrbitTrackMap({
       }
       ctx.globalAlpha = 1;
 
-      // 관측 대상 — 큰 점 + 조준 링 + 이름
+      // 관측 대상 — 내 줍스면 애니메이션 스프라이트, 아니면 큰 점 + 조준 링 + 이름
       if (fj) {
         const p = toXY(groundStateAt(fj.orbit, vt), w, h);
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 3.4, 0, Math.PI * 2);
-        ctx.fillStyle = fj.color;
-        ctx.shadowColor = fj.color;
-        ctx.shadowBlur = 10;
-        ctx.fill();
-        ctx.shadowBlur = 0;
+        const sheet = sheetRef.current;
+        if (sheet && sheet.complete && sheet.naturalWidth > 0) {
+          const size = Math.max(20, Math.min(w, h) * 0.16);
+          // 프레임 진행은 실시간 기준(게임 배속을 곱하면 깜빡인다)
+          const frame = spriteFrame("move", performance.now() / 1000, reduceMotion);
+          ctx.drawImage(
+            sheet,
+            frame * JOOP_FRAME,
+            0,
+            JOOP_FRAME,
+            JOOP_FRAME,
+            p.x - size / 2,
+            p.y - size / 2,
+            size,
+            size,
+          );
+        } else {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, 3.4, 0, Math.PI * 2);
+          ctx.fillStyle = fj.color;
+          ctx.shadowColor = fj.color;
+          ctx.shadowBlur = 10;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
         ctx.strokeStyle = fj.color;
         ctx.globalAlpha = 0.7;
         ctx.beginPath();
@@ -266,6 +312,9 @@ export function OrbitTrackMap({
     return () => clearInterval(id);
   }, []);
   const ground: GroundState | null = focus ? groundStateAt(focus.orbit, clock.vt) : null;
+  // 교신 여부는 게임 규칙(설정된 음영 비율)을 따른다 — ground.inShadow(물리 x<0)를 쓰면
+  // 서버가 판정한 LinkStatus 와 어긋난다.
+  const linked = focus ? !shadowStateAt(focus.orbit, clock.vt, shadowFraction).inShadow : false;
 
   const t = dict.space;
   const cell = (label: string, value: string, tone?: string) => (
@@ -303,16 +352,18 @@ export function OrbitTrackMap({
         <span style={{ color: focus.color }}>{focus.name}</span>
         {myJoopId && focus.id === myJoopId ? ` · ${dict.home.myJoop}` : ""}
       </p>
-      <div className="mt-1.5 grid grid-cols-2 gap-1.5">
-        {cell(t.overhead, `${region} (${latH} ${lonH})`)}
-        {cell(t.altitude, ground ? `${ground.altitudeKm.toLocaleString()} km` : "—")}
-        {cell(t.speed, ground ? `${ground.speedKms} km/s` : "—")}
-        {cell(
-          t.link,
-          ground ? (ground.inShadow ? t.shadowAuto : t.linkActive) : "—",
-          ground && !ground.inShadow ? "var(--color-primary)" : "var(--color-secondary)",
-        )}
-      </div>
+      {showIndicators && (
+        <div className="mt-1.5 grid grid-cols-2 gap-1.5">
+          {cell(t.overhead, `${region} (${latH} ${lonH})`)}
+          {cell(t.altitude, ground ? `${ground.altitudeKm.toLocaleString()} km` : "—")}
+          {cell(t.speed, ground ? `${ground.speedKms} km/s` : "—")}
+          {cell(
+            t.link,
+            linked ? t.linkActive : t.shadowAuto,
+            linked ? "var(--color-primary)" : "var(--color-secondary)",
+          )}
+        </div>
+      )}
     </div>
   );
 }

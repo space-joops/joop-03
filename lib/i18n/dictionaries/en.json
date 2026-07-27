@@ -132,6 +132,7 @@
   "arcade": {
     "title": "Orbit cleanup arcade",
     "briefTitle": "Downlink established",
+    "shadowTitle": "Passing through shadow",
     "briefBody": "You're linked with {name}. Take direct control and clean up orbital debris — every piece counts toward the global cleanup and rankings.",
     "ruleJoystick": "Touch anywhere to summon the joystick — five rings fine-tune your thrust.",
     "ruleFuel": "Thrusting burns gas. Run dry and the link ends — grab ⛽ pickups to refuel!",
@@ -152,7 +153,14 @@
     "retry": "Clean again",
     "toMap": "← Space map",
     "enter": "Enter arcade — clean together",
-    "locked": "Passing through shadow — the arcade opens when you're back in the link zone"
+    "locked": "Passing through shadow — the arcade opens when you're back in the link zone",
+    "payShadowEnter": "Enter for {cost} XP",
+    "shadowNotice": "You're passing through shadow. Downlink returns in T-{mm}:{ss} — wait it out, or pay {cost} XP to link right now.",
+    "payShadow": "Pay {cost} XP and start",
+    "paying": "Paying…",
+    "payError": "Payment failed. Please try again.",
+    "insufficientXp": "Not enough XP (need {cost}, you have {xp}). Earn more in ground training.",
+    "xpBalance": "XP balance {xp}"
   },
   "space": {
     "title": "Space map",
@@ -163,7 +171,10 @@
     "linkActive": "Downlink OK",
     "shadowAuto": "Shadow · auto-collect",
     "collectedWhileAway": "Collected {n} pieces while you were away.",
-    "hint": "In Earth's shadow your joop auto-collects debris. It counts toward the ranking."
+    "hint": "In Earth's shadow your joop auto-collects debris. It counts toward the ranking.",
+    "linkIn": "Downlink in",
+    "shadowIn": "Shadow in",
+    "passInfo": "Orbital phase runs {speed}× faster than real time (game speed). Altitude and speed are real values."
   },
   "language": {
     "label": "Language",

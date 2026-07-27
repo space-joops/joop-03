@@ -2,7 +2,68 @@
 
 import { createSessionClient } from "@/lib/supabase/session";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getArcadeMaxPerRun } from "@/lib/game-config";
+import { getArcadeMaxPerRun, getArcadeShadowXpCost } from "@/lib/game-config";
+import { getMyOrbitState } from "@/lib/space";
+import { levelFromXp } from "@/lib/minigame";
+
+export type ShadowEntryResult =
+  | { ok: true; charged: number; xpLeft: number }
+  | { ok: false; error: "auth" | "no_joop" | "not_orbit" | "insufficient_xp" | "save" };
+
+// 음영(교신 불가) 중 아케이드 진입 — 초기 개발 단계라 XP 를 소량 지불하면 열어 준다.
+// 수신 지역이면 아무것도 청구하지 않고 통과시킨다(호출자가 상태를 착각해도 안전).
+//
+// ⚠️ 음영 여부는 **서버에서 다시 판정**한다. 클라이언트가 "지금 수신 중"이라고 주장해도
+//    무료 통과되지 않는다. XP 감산은 `.eq("xp", 현재값)` 조건부 갱신 + 갱신 행 확인으로
+//    동시 요청에서 이중 차감되지 않게 한다(PostgREST 는 조건 불일치가 오류가 아니라 0행).
+export async function payShadowEntry(): Promise<ShadowEntryResult> {
+  const supabase = await createSessionClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "auth" };
+
+  const [state, cost] = await Promise.all([getMyOrbitState(), getArcadeShadowXpCost()]);
+  if (!state) return { ok: false, error: "not_orbit" };
+
+  const admin = createAdminClient();
+  const { data: joop } = await admin
+    .from("joop_03_joops")
+    .select("id,status,xp")
+    .eq("owner_id", user.id)
+    .maybeSingle();
+  if (!joop) return { ok: false, error: "no_joop" };
+  if (joop.status !== "orbit") return { ok: false, error: "not_orbit" };
+
+  // 수신 지역이거나 비용이 0이면 무료
+  if (!state.inShadow || cost <= 0) {
+    return { ok: true, charged: 0, xpLeft: Number(joop.xp) };
+  }
+
+  let current = Number(joop.xp);
+  for (let attempt = 0; attempt < 3; attempt++) {
+    if (current < cost) return { ok: false, error: "insufficient_xp" };
+    const next = current - cost;
+    const { data: updated, error } = await admin
+      .from("joop_03_joops")
+      // level 은 xp 의 캐시라 같이 갱신해야 발사 자격 표시와 어긋나지 않는다
+      .update({ xp: next, level: levelFromXp(next) })
+      .eq("id", joop.id)
+      .eq("xp", current)
+      .select("xp");
+    if (error) return { ok: false, error: "save" };
+    if (updated && updated.length > 0) return { ok: true, charged: cost, xpLeft: next };
+
+    const { data: fresh } = await admin
+      .from("joop_03_joops")
+      .select("xp")
+      .eq("id", joop.id)
+      .maybeSingle();
+    if (!fresh) return { ok: false, error: "save" };
+    current = Number(fresh.xp);
+  }
+  return { ok: false, error: "save" };
+}
 
 export type ArcadeResult =
   | { ok: true; collected: number; totalCollected: number }

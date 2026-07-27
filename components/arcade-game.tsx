@@ -17,7 +17,7 @@ import {
 } from "@/lib/arcade";
 import { DEBRIS_SHEET, DEBRIS_FRAME } from "@/lib/minigame";
 import { JOOP_FRAME, joopSheetPath, sheetForColor, spriteFrame } from "@/lib/joop-sprite";
-import { submitArcadeResult } from "@/app/[lang]/joop/arcade/actions";
+import { payShadowEntry, submitArcadeResult } from "@/app/[lang]/joop/arcade/actions";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
 
@@ -29,18 +29,32 @@ type Phase = "ready" | "playing" | "over" | "saving" | "saved";
 // 물리(FR-7.5): 관성 있음 · 마찰 0(lib/arcade.ts, 관리자 설정 주입).
 // 연료(FR-7.6): 분사에만 소모, 소진 후 관성으로 연료 아이템을 주우면 회생.
 // 배경(FR-7.2): 개방 월드 — 카메라가 줍스를 따라가고 별·천체가 패럴랙스로 흐른다.
+export type ShadowGate = {
+  inShadow: boolean;
+  /** 음영 진입에 청구할 XP(0 = 무료) */
+  cost: number;
+  xp: number;
+  /** 수신 복귀 예정 시각(epoch ms) */
+  nextChangeAt: number;
+  /** 서버 렌더 시각(epoch ms) — 첫 렌더를 결정적으로 만들어 하이드레이션 불일치를 막는다 */
+  serverNow: number;
+};
+
 export function ArcadeGame({
   lang,
   dict,
   color,
   name,
   config,
+  shadowGate,
 }: {
   lang: Locale;
   dict: Dictionary;
   color: string;
   name: string;
   config?: ArcadeConfig;
+  /** 음영 게이트 — 없으면 항상 열린 것으로 본다(하네스·테스트용) */
+  shadowGate?: ShadowGate;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
@@ -58,6 +72,44 @@ export function ArcadeGame({
 
   // 게임 루프의 endGame 을 DOM 버튼(조기 종료)에서 부르기 위한 다리
   const endGameRef = useRef<() => void>(() => {});
+
+  // ── 음영 게이트(초기 개발 단계: XP 를 내면 음영에서도 플레이)
+  const needsPay = !!shadowGate && shadowGate.inShadow && shadowGate.cost > 0;
+  const [paid, setPaid] = useState(false);
+  const [paying, setPaying] = useState(false);
+  const [payError, setPayError] = useState<string | null>(null);
+  const [xpLeft, setXpLeft] = useState(shadowGate?.xp ?? 0);
+
+  // 수신 복귀까지 남은 시간(음영일 때만) — 기다릴지 지불할지 판단할 근거를 준다.
+  // 첫 렌더는 서버 시각 기준(결정적), 이후 0.5초마다 실제 시각으로 갱신.
+  const [nowMs, setNowMs] = useState<number | null>(null);
+  useEffect(() => {
+    if (!shadowGate?.inShadow) return;
+    const id = setInterval(() => setNowMs(Date.now()), 500);
+    return () => clearInterval(id);
+  }, [shadowGate?.inShadow]);
+  const waitSec = shadowGate
+    ? Math.max(0, Math.ceil((shadowGate.nextChangeAt - (nowMs ?? shadowGate.serverNow)) / 1000))
+    : 0;
+
+  const payAndStart = useCallback(async () => {
+    setPaying(true);
+    setPayError(null);
+    try {
+      const res = await payShadowEntry();
+      if (res.ok) {
+        setXpLeft(res.xpLeft);
+        setPaid(true);
+        setPhase("playing");
+      } else {
+        setPayError(res.error);
+      }
+    } catch {
+      setPayError("network");
+    } finally {
+      setPaying(false);
+    }
+  }, []);
 
   // 에셋 선로딩 — 쓰레기 시트 + 줍스 시트(내 색) + 연료 + 배경 천체.
   useEffect(() => {
@@ -612,6 +664,10 @@ export function ArcadeGame({
     setSummary(null);
     setResult(null);
     setSaveError(null);
+    // 한 판당 1회 결제 — 다시 하려면 다시 지불한다. 그 사이 수신 지역으로 나왔다면
+    // payShadowEntry 가 서버에서 재판정해 무료로 통과시킨다.
+    setPaid(false);
+    setPayError(null);
     setPhase("ready");
   };
 
@@ -645,25 +701,80 @@ export function ArcadeGame({
 
         {phase === "ready" && (
           <div className={overlayClass}>
-            <h2 className="font-mono text-base font-semibold text-[var(--color-primary)]">
-              {a.briefTitle}
+            <h2
+              className="font-mono text-base font-semibold"
+              style={{
+                color: needsPay && !paid ? "var(--color-secondary)" : "var(--color-primary)",
+              }}
+            >
+              {needsPay && !paid ? a.shadowTitle : a.briefTitle}
             </h2>
-            <p className="max-w-xs font-mono text-xs leading-relaxed text-[var(--color-fg)]">
-              {a.briefBody.replace("{name}", name)}
-            </p>
+            {!(needsPay && !paid) && (
+              <p className="max-w-xs font-mono text-xs leading-relaxed text-[var(--color-fg)]">
+                {a.briefBody.replace("{name}", name)}
+              </p>
+            )}
             <ul className="max-w-xs list-none font-mono text-[11px] leading-relaxed text-[var(--color-muted)]">
               <li>{a.ruleJoystick}</li>
               <li>{a.ruleFuel}</li>
               <li>{a.ruleWorld}</li>
             </ul>
-            <button
-              onClick={() => setPhase("playing")}
-              disabled={!assetsReady}
-              className={buttonClass}
-              style={buttonStyle}
-            >
-              {assetsReady ? a.start : a.loading}
-            </button>
+            {/* 음영 통과 중이면 XP 를 지불하거나 수신 복귀를 기다린다 */}
+            {needsPay && !paid ? (
+              <>
+                <p className="max-w-xs font-mono text-[11px] leading-relaxed text-[var(--color-secondary)]">
+                  {a.shadowNotice
+                    .replace("{cost}", String(shadowGate!.cost))
+                    .replace("{mm}", String(Math.floor(waitSec / 60)).padStart(2, "0"))
+                    .replace("{ss}", String(waitSec % 60).padStart(2, "0"))}
+                </p>
+                {payError && (
+                  <p role="alert" className="font-mono text-xs text-[var(--color-danger)]">
+                    {payError === "insufficient_xp"
+                      ? a.insufficientXp
+                          .replace("{cost}", String(shadowGate!.cost))
+                          .replace("{xp}", String(xpLeft))
+                      : a.payError}{" "}
+                    <span className="opacity-60">({payError})</span>
+                  </p>
+                )}
+                <button
+                  onClick={payAndStart}
+                  disabled={!assetsReady || paying || xpLeft < shadowGate!.cost}
+                  className={buttonClass}
+                  style={buttonStyle}
+                >
+                  {!assetsReady
+                    ? a.loading
+                    : paying
+                      ? a.paying
+                      : a.payShadow.replace("{cost}", String(shadowGate!.cost))}
+                </button>
+                {/* 왜 버튼이 눌리지 않는지 클릭 전에 알려 준다 */}
+                <p
+                  className="max-w-xs font-mono text-[10px] leading-relaxed"
+                  style={{
+                    color:
+                      xpLeft < shadowGate!.cost ? "var(--color-danger)" : "var(--color-muted)",
+                  }}
+                >
+                  {xpLeft < shadowGate!.cost
+                    ? a.insufficientXp
+                        .replace("{cost}", String(shadowGate!.cost))
+                        .replace("{xp}", String(xpLeft))
+                    : a.xpBalance.replace("{xp}", String(xpLeft))}
+                </p>
+              </>
+            ) : (
+              <button
+                onClick={() => setPhase("playing")}
+                disabled={!assetsReady}
+                className={buttonClass}
+                style={buttonStyle}
+              >
+                {assetsReady ? a.start : a.loading}
+              </button>
+            )}
           </div>
         )}
 
