@@ -43,24 +43,34 @@ export const DEFAULT_CONFIG: MinigameConfig = {
   xpPerDebris: 25,
 };
 
-/** 떨어지는 물체 한 종류. asset 은 public/game 아래의 SVG(디자인 2순위 에셋 재사용). */
+/** 떨어지는 물체 한 종류 — 단일 SVG(asset) 또는 스프라이트 시트 프레임(sheetFrame) 중 하나. */
 export type FallingItem = {
   id: string;
-  asset: string;
+  /** 단일 이미지 에셋(위성 등). sheetFrame 이 없을 때 사용 */
+  asset?: string;
+  /** debris-sheet.png(64px 프레임 6장, PR #19) 안의 프레임 인덱스 */
+  sheetFrame?: number;
   /** true = 충돌하면 안 되는 것(작동 중인 위성) */
   hazard: boolean;
   /** 화면 최소변(min(W,H)) 대비 높이 비율 */
   scale: number;
 };
 
-/** 받아내야 하는 것 — 궤도를 떠도는 폐기물. */
+/** 우주 쓰레기 스프라이트 시트 (public/game/debris-sheet.meta.json 계약). */
+export const DEBRIS_SHEET = "/game/debris-sheet.png";
+export const DEBRIS_FRAME = 64;
+
+// sizeClass(S/M/L) → scale: meta 의 0.6/0.85/1.1 을 기존 크기감(기준 0.085)에 맞춰 환산.
+const DEBRIS_SCALE = { S: 0.055, M: 0.072, L: 0.094 } as const;
+
+/** 받아내야 하는 것 — 궤도를 떠도는 폐기물 (debris-sheet 프레임 순서 = meta types). */
 export const SAFE_ITEMS: readonly FallingItem[] = [
-  { id: "can", asset: "/game/debris-can.svg", hazard: false, scale: 0.075 },
-  { id: "bolt", asset: "/game/debris-bolt.svg", hazard: false, scale: 0.06 },
-  { id: "panel", asset: "/game/debris-panel.svg", hazard: false, scale: 0.08 },
-  { id: "circuit", asset: "/game/debris-circuit.svg", hazard: false, scale: 0.075 },
-  { id: "antenna", asset: "/game/debris-antenna.svg", hazard: false, scale: 0.08 },
-  { id: "fragment", asset: "/game/debris-satellite-fragment.svg", hazard: false, scale: 0.085 },
+  { id: "can", sheetFrame: 0, hazard: false, scale: DEBRIS_SCALE.M },
+  { id: "bolt", sheetFrame: 1, hazard: false, scale: DEBRIS_SCALE.S },
+  { id: "nut", sheetFrame: 2, hazard: false, scale: DEBRIS_SCALE.S },
+  { id: "panel", sheetFrame: 3, hazard: false, scale: DEBRIS_SCALE.L },
+  { id: "strut", sheetFrame: 4, hazard: false, scale: DEBRIS_SCALE.M },
+  { id: "chip", sheetFrame: 5, hazard: false, scale: DEBRIS_SCALE.S },
 ];
 
 /** 피해야 하는 것 — 아직 임무 중인 위성. 부딪히면 줍스도, 위성도 손상된다. */
