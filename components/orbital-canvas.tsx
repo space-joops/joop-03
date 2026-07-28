@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { positionAt, project2D } from "@/lib/orbit";
+import { starHash } from "@/lib/arcade";
 import { tickOrbitClock, type OrbitClock } from "@/lib/orbit-clock";
 import { JOOP_FRAME, joopSheetPath, sheetForColor, spriteFrame } from "@/lib/joop-sprite";
 import type { OrbitalSnapshot } from "@/lib/joops";
@@ -68,9 +69,54 @@ export function OrbitalCanvas({
     const styles = getComputedStyle(document.documentElement);
     const gridColor = styles.getPropertyValue("--color-grid").trim() || "#1e5a46";
     const earthColor = styles.getPropertyValue("--color-surface").trim() || "#0a1c10";
+    const amberColor = styles.getPropertyValue("--color-secondary").trim() || "#ffb23e";
+    const accentColor = styles.getPropertyValue("--color-accent").trim() || "#38e0f0";
+    const fgColor = styles.getPropertyValue("--color-fg").trim() || "#e4f2e9";
+    const mutedColor = styles.getPropertyValue("--color-muted").trim() || "#8a9e92";
 
     let raf = 0;
     let running = true;
+
+    // 실사 지구(아케이드와 같은 bg-earth.webp) — 와이어프레임 "안"에 깔린다(UX 리뷰:
+    // "오염된 지구가 와닿지 않는다"). 2048² 원본을 매 프레임 그리면 비싸므로 resize 때
+    // 표시 크기로 1회 축소해 오프스크린에 캐시한다. 미로드 시 기존 단색 폴백.
+    const earthImg = new Image();
+    earthImg.src = "/game/bg-earth.webp";
+    let earthCache: HTMLCanvasElement | null = null;
+    let earthCacheSize = 0;
+    const buildEarthCache = () => {
+      if (!earthImg.complete || earthImg.naturalWidth === 0) return;
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      const maxR = 1.5;
+      const scale = ((Math.min(rect.width, rect.height) / 2) * 0.92) / maxR;
+      const px = Math.max(2, Math.round(2 * scale * dpr));
+      if (px === earthCacheSize && earthCache) return;
+      const off = document.createElement("canvas");
+      off.width = px;
+      off.height = px;
+      const octx = off.getContext("2d");
+      if (!octx) return;
+      octx.drawImage(earthImg, 0, 0, px, px);
+      earthCache = off;
+      earthCacheSize = px;
+    };
+    earthImg.onload = () => {
+      buildEarthCache();
+      if (reduceMotion) draw(); // 정지 렌더는 로드 후 1회 다시 그린다
+    };
+
+    // 궤도 쓰레기 입자 링(UX 리뷰: 오염 시각화) — 궤도대(반경 1.05~1.43)에 결정적으로
+    // 뿌린다. starHash 시드 고정이라 프레임마다 반짝이지 않고, 개별 각속도로 천천히 돈다.
+    const DEBRIS_DOT_COLORS = [amberColor, accentColor, fgColor, mutedColor];
+    const debrisDots = Array.from({ length: 110 }, (_, i) => ({
+      a: starHash(i, 1, 0) * Math.PI * 2,
+      r: 1.05 + starHash(i, 2, 1) * 0.38,
+      size: 1 + starHash(i, 3, 2),
+      w: (starHash(i, 4, 3) - 0.5) * 0.06,
+      alpha: 0.5 + starHash(i, 5, 4) * 0.4,
+      color: DEBRIS_DOT_COLORS[Math.min(3, (starHash(i, 6, 5) * 4) | 0)],
+    }));
 
     const resize = () => {
       const dpr = window.devicePixelRatio || 1;
@@ -78,6 +124,7 @@ export function OrbitalCanvas({
       canvas.width = Math.round(rect.width * dpr);
       canvas.height = Math.round(rect.height * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      buildEarthCache();
       // reduced-motion 은 rAF 루프가 없어 resize 로 지워진 캔버스를 다시 그려야 한다
       if (reduceMotion) {
         cancelAnimationFrame(raf);
@@ -102,13 +149,25 @@ export function OrbitalCanvas({
 
       ctx.clearRect(0, 0, w, h);
 
-      // 지구 + 경위도 그리드
+      // 지구 + 경위도 그리드 — 실사 이미지가 있으면 원 안에 클립해 깔고,
+      // 와이어프레임 그리드는 그 위에 얹는다(홀로그램 오버레이 느낌).
       ctx.fillStyle = earthColor;
       ctx.beginPath();
       ctx.arc(cx, cy, scale, 0, Math.PI * 2);
       ctx.fill();
+      const hasEarth = !!earthCache;
+      if (earthCache) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, scale, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(earthCache, cx - scale, cy - scale, scale * 2, scale * 2);
+        ctx.restore();
+      }
+      ctx.beginPath();
+      ctx.arc(cx, cy, scale, 0, Math.PI * 2);
       ctx.strokeStyle = gridColor;
-      ctx.globalAlpha = 0.55;
+      ctx.globalAlpha = hasEarth ? 0.35 : 0.55;
       ctx.stroke();
       for (let k = 1; k <= 3; k++) {
         ctx.beginPath();
@@ -125,6 +184,18 @@ export function OrbitalCanvas({
       const t = clk ? tickOrbitClock(clk, speedRef.current) : Date.now() / 1000;
       const myId = myIdRef.current;
       const mine = myId ? snap.joops.find((j) => j.id === myId) : undefined;
+
+      // 궤도 쓰레기 입자 링 — 줍스 점 아래 레이어. 반경이 항상 지구(1.0) 밖이라
+      // 앞/뒤 컬링이 필요 없다. fillRect(1~2px) + shadowBlur 없음 = 저비용.
+      for (const d of debrisDots) {
+        const ang = d.a + t * d.w;
+        const px = cx + Math.cos(ang) * d.r * scale;
+        const py = cy - Math.sin(ang) * d.r * scale * 0.62; // 살짝 눌러 궤도면 느낌
+        ctx.globalAlpha = d.alpha * 0.75;
+        ctx.fillStyle = d.color;
+        ctx.fillRect(px, py, d.size, d.size);
+      }
+      ctx.globalAlpha = 1;
 
       // 내 궤도 링 — 한 주기를 64등분해 폴리라인으로(예전 space-map 패턴 이식)
       if (mine) {

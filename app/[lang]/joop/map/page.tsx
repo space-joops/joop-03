@@ -87,16 +87,25 @@ export default async function MapPage({ params }: PageProps<"/[lang]/joop/map">)
         myXp={mine?.xp ?? 0}
       />
 
-      <div className="mt-3">
-        <OrbitStatus state={state} dict={dict} />
-      </div>
+      {/* 운용 상태 — 접이식(UX 리뷰: 데이터보다 시각 경로에 집중). 세부 지표·안내문은
+          여기로 흡수해 화면의 동일 무게 패널 반복을 줄인다. JS 없는 details/summary. */}
+      <details className="panel-amber mt-3 px-3 py-2">
+        <summary className="cursor-pointer list-none font-mono text-[10px] uppercase tracking-widest text-[var(--color-secondary)]">
+          {dict.space.operationStatus} ▾
+        </summary>
+        <div className="mt-2">
+          <OrbitStatus state={state} dict={dict} />
+        </div>
+        <p className="mt-2 font-mono text-[10px] leading-relaxed text-[var(--color-muted)]">
+          {dict.space.passInfo.replace("{speed}", String(state.gameSpeed))}
+        </p>
+        <p className="mt-1 font-mono text-[10px] leading-relaxed text-[var(--color-muted)]">
+          {dict.space.hint}
+        </p>
+      </details>
 
       {/* 지구 복귀 — 발사 루프를 처음부터 다시(수거량·XP 유지) */}
       <ReturnEarthButton lang={lang} dict={dict} />
-
-      <p className="mt-3 font-mono text-xs leading-relaxed text-[var(--color-muted)]">
-        {dict.space.hint}
-      </p>
     </main>
   );
 }

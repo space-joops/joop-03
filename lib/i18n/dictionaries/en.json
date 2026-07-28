@@ -13,7 +13,6 @@
     "percentCleaned": "cleaned",
     "pieces": "pieces",
     "ranking": "Ranking",
-    "weeklyChange": "Weekly",
     "myRank": "You",
     "inOrbit": "joops in orbit",
     "orbitLabelTop": "LOW EARTH ORBIT // LIVE FEED",
@@ -147,6 +146,7 @@
     "fuel": "Gas",
     "speed": "SPD",
     "collected": "Collected",
+    "collectedPop": "COLLECTED!",
     "pieces": "pieces",
     "eatenUnit": "items",
     "end": "End",
@@ -161,12 +161,14 @@
     "enter": "Enter arcade — clean together",
     "locked": "Passing through shadow — the arcade opens when you're back in the link zone",
     "payShadowEnter": "Enter for {cost} XP",
-    "shadowNotice": "You're passing through shadow. Downlink returns in T-{mm}:{ss} — wait it out, or pay {cost} XP to link right now.",
+    "shadowNotice": "You're in shadow. Wait for free — or pay {cost} XP to link up right now.",
     "payShadow": "Pay {cost} XP and start",
     "paying": "Paying…",
     "payError": "Payment failed. Please try again.",
     "insufficientXp": "Not enough XP (need {cost}, you have {xp}). Earn more in ground training.",
-    "xpBalance": "XP balance {xp}"
+    "xpBalance": "XP balance {xp}",
+    "returnIn": "RETURN COUNTDOWN",
+    "recycling": "RECYCLING WHILE WAITING…"
   },
   "space": {
     "title": "Space map",
@@ -185,7 +187,8 @@
     "returnEarthConfirm": "Really return? Tap again to confirm",
     "returningEarth": "Returning…",
     "returnEarthNote": "Your pieces, XP and level are kept. To fly again, book a new launch!",
-    "returnEarthError": "Return failed. Please try again."
+    "returnEarthError": "Return failed. Please try again.",
+    "operationStatus": "Operation status"
   },
   "rankings": {
     "title": "Full rankings",

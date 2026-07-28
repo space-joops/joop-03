@@ -13,7 +13,6 @@
     "percentCleaned": "청소 완료",
     "pieces": "조각",
     "ranking": "랭킹",
-    "weeklyChange": "주간",
     "myRank": "나",
     "inOrbit": "개의 줍스가 궤도에",
     "orbitLabelTop": "지구 저궤도 // 실시간",
@@ -147,6 +146,7 @@
     "fuel": "분사가스",
     "speed": "속도",
     "collected": "수거",
+    "collectedPop": "수거!",
     "pieces": "조각",
     "eatenUnit": "개",
     "end": "종료",
@@ -161,12 +161,14 @@
     "enter": "아케이드 진입 — 함께 수거하기",
     "locked": "음영 통과 중 — 수신 지역에 들어오면 아케이드가 열려요",
     "payShadowEnter": "XP {cost} 지불하고 진입",
-    "shadowNotice": "지금은 음영 통과 중이에요. 수신 복귀까지 T-{mm}:{ss} — 기다리거나, XP {cost}를 지불하면 지금 바로 교신할 수 있어요.",
+    "shadowNotice": "음영 통과 중이에요. 기다리면 무료, XP {cost}를 지불하면 지금 바로 교신할 수 있어요.",
     "payShadow": "XP {cost} 지불하고 시작",
     "paying": "지불 중…",
     "payError": "지불에 실패했어요. 다시 시도해 주세요.",
     "insufficientXp": "XP가 부족해요 (필요 {cost} · 보유 {xp}). 지상 훈련으로 XP를 모아 보세요.",
-    "xpBalance": "보유 XP {xp}"
+    "xpBalance": "보유 XP {xp}",
+    "returnIn": "수신 복귀까지",
+    "recycling": "대기 중 재활용…"
   },
   "space": {
     "title": "우주 지도",
@@ -185,7 +187,8 @@
     "returnEarthConfirm": "정말 복귀할까요? 다시 탭하면 실행",
     "returningEarth": "복귀 중…",
     "returnEarthNote": "복귀해도 수거량·XP·레벨은 그대로예요. 다시 발사하려면 청약부터 다시!",
-    "returnEarthError": "복귀에 실패했어요. 다시 시도해 주세요."
+    "returnEarthError": "복귀에 실패했어요. 다시 시도해 주세요.",
+    "operationStatus": "운용 상태"
   },
   "rankings": {
     "title": "전체 랭킹",

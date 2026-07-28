@@ -20,11 +20,12 @@ export function OrbitStatus({ state, dict }: { state: OrbitState; dict: Dictiona
     </div>
   );
 
+  // 라벨 앞 글리프 — 텍스트를 아이콘화(UX 리뷰), 라벨 자체는 유지(접근성)
   return (
     <div className="grid grid-cols-2 gap-2">
-      {cell(t.altitude, `${state.altitudeKm.toLocaleString()} km`)}
-      {cell(t.speed, `${state.speedKms} km/s`)}
-      {cell(t.overhead, `${latH} ${lonH}`)}
+      {cell(`▲ ${t.altitude}`, `${state.altitudeKm.toLocaleString()} km`)}
+      {cell(`➤ ${t.speed}`, `${state.speedKms} km/s`)}
+      {cell(`◎ ${t.overhead}`, `${latH} ${lonH}`)}
       <div
         className="flex flex-col gap-1 rounded-md border p-3"
         style={{
@@ -33,12 +34,13 @@ export function OrbitStatus({ state, dict }: { state: OrbitState; dict: Dictiona
         }}
       >
         <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--color-muted)]">
-          {t.link}
+          ⇄ {t.link}
         </span>
         <span
           className="font-mono text-sm"
           style={{ color: state.inShadow ? "var(--color-secondary)" : "var(--color-primary)" }}
         >
+          {state.inShadow ? "◐ " : "● "}
           {state.inShadow ? t.shadowAuto : t.linkActive}
         </span>
       </div>

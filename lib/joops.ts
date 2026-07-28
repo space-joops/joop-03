@@ -17,7 +17,7 @@ export type JoopSnapshot = {
 export type OrbitalSnapshot = {
   serverTime: number; // ms epoch. 클라가 t0(보간 기준시각)로 사용 + 시계 보정
   tickSeconds: number; // 좌표 스냅샷 주기(초). joop_03_game_config.orbital_tick_seconds
-  totals: { debris: number; percent: number };
+  totals: { debris: number; percent: number; target: number };
   joops: JoopSnapshot[];
 };
 
@@ -75,6 +75,7 @@ export const getOrbitalSnapshot = cache(async (): Promise<OrbitalSnapshot> => {
     totals: {
       debris,
       percent: target > 0 ? (debris / target) * 100 : 0,
+      target, // 게이지에 "N / 목표" 를 보여주기 위해 함께 내린다(UX 리뷰)
     },
     joops: rows.map((j) => ({
       id: j.id,

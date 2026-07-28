@@ -18,6 +18,9 @@ import {
   type Vec,
 } from "@/lib/arcade";
 import { DEBRIS_SHEET, DEBRIS_FRAME } from "@/lib/minigame";
+import { recordCollectedKinds, type DebrisKindId } from "@/lib/debris-kinds";
+import { DebrisIcon } from "@/components/debris-icon";
+import { JoopSprite } from "@/components/joop-sprite";
 import { JOOP_FRAME, joopSheetPath, sheetForColor, spriteFrame } from "@/lib/joop-sprite";
 import { payShadowEntry, submitArcadeResult } from "@/app/[lang]/joop/arcade/actions";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
@@ -36,6 +39,9 @@ const STAR_COLORS = [
   "#cfe0ff", "#cfe0ff",
   "#ffd9a8",
 ] as const;
+
+// 미세 금속 파편 색(장식 입자 레이어) — "화면 가득 미세 쓰레기"(UX 리뷰), 수거 판정 없음.
+const METAL_COLORS = ["#9aa4ab", "#6f7a82", "#c7ccd1"] as const;
 
 // 아케이드(우주 수거, M5 / EPIC 7) — 수신 지역에서 진입하는 본편 게임.
 // 조작(FR-7.4): 화면 아무 곳이나 누르면 그 자리에 5원 반투명 조이스틱.
@@ -105,6 +111,10 @@ export function ArcadeGame({
   const waitSec = shadowGate
     ? Math.max(0, Math.ceil((shadowGate.nextChangeAt - (nowMs ?? shadowGate.serverNow)) / 1000))
     : 0;
+  // 대기 진행 바 기준 — 오버레이 첫 표시 시점의 남은 시간(서버 시각 기준이라 결정적)
+  const initialWaitRef = useRef(
+    shadowGate ? Math.max(0, Math.ceil((shadowGate.nextChangeAt - shadowGate.serverNow) / 1000)) : 0,
+  );
 
   const payAndStart = useCallback(async () => {
     setPaying(true);
@@ -133,6 +143,7 @@ export function ArcadeGame({
       ["debris-sheet", DEBRIS_SHEET],
       ["joop-sheet", joopSheetPath(sheetForColor(color))],
       ["fuel", ARCADE_FUEL_ITEM.asset!],
+      ["magnet", "/game/item-magnet.svg"], // 자석 팔 끝 헤드(실패 시 집게 호 폴백)
       [GALAXY_TILE.asset, GALAXY_TILE.asset],
       ...CELESTIALS.map((c) => [c.asset, c.asset] as [string, string]),
     ]);
@@ -197,12 +208,19 @@ export function ArcadeGame({
     // ── 상태
     const joop = { pos: { x: 0, y: 0 } as Vec, vel: { x: 0, y: 0 } as Vec, collectFx: 0 };
     const JOOP_RADIUS = 0.065; // 월드 단위(수거 판정)
+    // 자석 팔(UX 리뷰: 수거 메커니즘 시각화) — 흡인 반경 안 파편을 끌어당기고 팔을 그린다.
+    // 밸런스는 이 상수 2개로만 튜닝한다.
+    const MAGNET_RADIUS = 0.22;
+    const MAGNET_PULL = 2.5;
     let fuel = cfg.fuel;
     let emptySince: number | null = null; // 연료 0 이 된 경과시각(회생 허용)
     let collected = 0; // 조각(디브리 value 합)
     let eaten = 0; // 개수
     let elapsed = 0;
     let spawnTimer = 0.8;
+    let counterFlash = 0; // 수거 순간 중앙 카운터 앰버 플래시(감쇠)
+    // 종류별 수거 카운트 — 종료 시 1회만 localStorage 누적(lib/debris-kinds.ts)
+    const kindCounts: Partial<Record<DebrisKindId, number>> = {};
 
     // 조이스틱(FR-7.4)
     type Stick = { baseX: number; baseY: number; dx: number; dy: number; pointerId: number };
@@ -211,8 +229,12 @@ export function ArcadeGame({
 
     type Floating = { item: ArcadeItem; pos: Vec; vel: Vec; rot: number; rotV: number };
     const items: Floating[] = [];
-    type Floater = { pos: Vec; text: string; color: string; life: number };
+    type Floater = { pos: Vec; text: string; color: string; life: number; big?: boolean };
     const floaters: Floater[] = [];
+    const pushFloater = (fl: Floater) => {
+      floaters.push(fl);
+      if (floaters.length > 12) floaters.shift(); // 밀도 상향 후 무한 증식 방지
+    };
 
     // 분사가스 파티클(handoff-m5 §3): r5→11px·불투명 .35→.08·수명 600ms·초당 12×세기·상한 60.
     // 색은 분사 세기 따라 시안(저출력) → 앰버(중간) → 백열(풀출력).
@@ -257,6 +279,31 @@ export function ArcadeGame({
         rotV: reduceMotion ? 0 : (Math.random() - 0.5) * 1.05, // meta: -30~+30 deg/s
       });
     };
+
+    // 시작 프리시드 — 첫 프레임부터 "쓰레기밭"이 보이도록 뷰 안쪽에 미리 흩뿌린다(UX 리뷰).
+    const spawnInView = () => {
+      if (W < 2 || H < 2) return; // 레이아웃 확정 전이면 생략(루프 스포너가 곧 채운다)
+      const u = unit();
+      const halfW = W / 2 / u;
+      const halfH = H / 2 / u;
+      const item = pickArcadeItem(cfg, 1, Math.random()); // kindRoll 1 → 연료 제외, 디브리만
+      const pos: Vec = {
+        x: joop.pos.x + (Math.random() * 2 - 1) * halfW * 0.85,
+        y: joop.pos.y + (Math.random() * 2 - 1) * halfH * 0.85,
+      };
+      // 시작 지점 바로 위엔 겹치지 않게
+      if (Math.hypot(pos.x - joop.pos.x, pos.y - joop.pos.y) < JOOP_RADIUS * 3) return;
+      const ang = Math.random() * Math.PI * 2;
+      const speed = 0.03 + Math.random() * 0.08;
+      items.push({
+        item,
+        pos,
+        vel: { x: Math.cos(ang) * speed, y: Math.sin(ang) * speed },
+        rot: Math.random() * Math.PI * 2,
+        rotV: reduceMotion ? 0 : (Math.random() - 0.5) * 1.05,
+      });
+    };
+    for (let i = 0; i < 9; i++) spawnInView();
 
     // ── 입력
     const localXY = (e: PointerEvent) => {
@@ -315,6 +362,7 @@ export function ArcadeGame({
       if (!running) return;
       running = false;
       cancelAnimationFrame(raf);
+      recordCollectedKinds(kindCounts); // 종류별 수거 로컬 누적(랭킹 기여도 아이콘용, 1회)
       setSummary({ collected, eaten });
       setPhase("over");
     };
@@ -339,11 +387,12 @@ export function ArcadeGame({
         ctx.globalAlpha = 1;
       }
 
-      // 별 2겹 패럴랙스 — 섹터 시드 고정(starHash)이라 흐르기만 하고 반짝이지 않는다.
-      // 실사 톤: 정사각 점 대신 원, 색온도 4종(웜화이트/백/청/주황) + 반경 변주.
+      // 별 2겹 + 미세 금속 파편 1겹 패럴랙스 — 섹터 시드 고정(starHash)이라 흐르기만
+      // 하고 반짝이지 않는다. 금속 겹은 근경(0.85)이라 빠르게 흘러 속도감도 만든다.
       for (const layer of [
-        { p: 0.35, density: 5, alpha: 0.4, r: 0.8 },
-        { p: 0.6, density: 3, alpha: 0.8, r: 1.2 },
+        { p: 0.35, density: 5, alpha: 0.4, r: 0.8, metal: false },
+        { p: 0.6, density: 3, alpha: 0.8, r: 1.2, metal: false },
+        { p: 0.85, density: 2, alpha: 0.5, r: 0.55, metal: true },
       ]) {
         const camX = joop.pos.x * layer.p;
         const camY = joop.pos.y * layer.p;
@@ -357,7 +406,9 @@ export function ArcadeGame({
               const sy = H / 2 + (iy + starHash(ix, iy, k * 2 + 1) - camY) * u;
               if (sx < -2 || sx > W + 2 || sy < -2 || sy > H + 2) continue;
               const v = starHash(ix, iy, k * 2 + 2);
-              ctx.fillStyle = STAR_COLORS[Math.min(STAR_COLORS.length - 1, (v * STAR_COLORS.length) | 0)];
+              ctx.fillStyle = layer.metal
+                ? METAL_COLORS[Math.min(METAL_COLORS.length - 1, (v * METAL_COLORS.length) | 0)]
+                : STAR_COLORS[Math.min(STAR_COLORS.length - 1, (v * STAR_COLORS.length) | 0)];
               ctx.beginPath();
               ctx.arc(sx, sy, layer.r * (0.7 + v * 0.6), 0, Math.PI * 2);
               ctx.fill();
@@ -462,6 +513,53 @@ export function ArcadeGame({
         ctx.stroke();
         ctx.globalAlpha = 1;
       }
+    };
+
+    // 자석 팔(UX 리뷰: 수거 메커니즘 시각화) — 흡인 중인 가까운 파편 최대 2개로
+    // 관절 있는 팔을 뻗는다. 끝은 item-magnet.svg(로드 실패 시 집게 호 폴백).
+    const drawMagnetArms = (u: number, targets: { f: Floating; d: number }[]) => {
+      if (targets.length === 0) return;
+      const cx = W / 2;
+      const cy = H / 2;
+      const pulse = reduceMotion ? 0.5 : 0.4 + 0.2 * Math.sin(elapsed * 10);
+      const magnetImg = imagesRef.current.get("magnet");
+      for (const t of targets.slice(0, 2)) {
+        const s = toScreen(t.f.pos);
+        // 중간 관절 — 직선보다 "장비"처럼 보이게 살짝 꺾는다
+        const mx = (cx + s.x) / 2 + (s.y - cy) * 0.08;
+        const my = (cy + s.y) / 2 - (s.x - cx) * 0.08;
+        ctx.strokeStyle = accent;
+        ctx.globalAlpha = pulse;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(mx, my);
+        ctx.lineTo(s.x, s.y);
+        ctx.stroke();
+        ctx.fillStyle = accent;
+        ctx.beginPath();
+        ctx.arc(mx, my, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+        // 팔 끝 — 자석 헤드
+        const es = Math.max(9, u * 0.028);
+        if (magnetImg && magnetImg.complete && magnetImg.naturalWidth > 0) {
+          ctx.save();
+          ctx.translate(s.x, s.y);
+          ctx.rotate(Math.atan2(s.y - cy, s.x - cx) + Math.PI / 2);
+          ctx.globalAlpha = Math.min(1, pulse + 0.3);
+          ctx.drawImage(magnetImg, -es / 2, -es / 2, es, es);
+          ctx.restore();
+        } else {
+          ctx.globalAlpha = Math.min(1, pulse + 0.3);
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, es * 0.45, Math.PI * 0.15, Math.PI * 0.85);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, es * 0.45, Math.PI * 1.15, Math.PI * 1.85);
+          ctx.stroke();
+        }
+      }
+      ctx.globalAlpha = 1;
     };
 
     const drawItem = (f: Floating, u: number) => {
@@ -622,13 +720,33 @@ export function ArcadeGame({
 
       // ── 생성·이동·수거
       spawnTimer -= dt;
-      if (spawnTimer <= 0 && items.length < 40) {
+      if (spawnTimer <= 0 && items.length < 60) {
         spawn();
         spawnTimer = cfg.spawnInterval;
       }
       const despawnR = Math.max(W, H) / u; // 뷰 대각선 밖 멀리
+      // 자석 팔 대상(흡인 중 가까운 순 최대 2개) — 이번 프레임 드로잉용.
+      // splice 로 인덱스가 밀리므로 객체 참조로 든다(방금 수거된 파편에 1프레임 팔이
+      // 남는 것은 "집게가 잡는 순간"으로 보여 오히려 자연스럽다).
+      const magnetTargets: { f: Floating; d: number }[] = [];
       for (let i = items.length - 1; i >= 0; i--) {
         const f = items[i];
+        // 자석 흡인 — 반경 안 파편을 줍스 쪽으로 끌어당긴다(수거의 "행동"이 보이게).
+        // 게임플레이 물리라 reduced-motion 에서도 유지한다.
+        const ddx = joop.pos.x - f.pos.x;
+        const ddy = joop.pos.y - f.pos.y;
+        const dd = Math.hypot(ddx, ddy);
+        if (dd < MAGNET_RADIUS && dd > 1e-6) {
+          const pull = MAGNET_PULL * (1 - dd / MAGNET_RADIUS) * dt;
+          f.vel.x += (ddx / dd) * pull;
+          f.vel.y += (ddy / dd) * pull;
+          const vmag = Math.hypot(f.vel.x, f.vel.y);
+          if (vmag > 0.5) {
+            f.vel.x = (f.vel.x / vmag) * 0.5;
+            f.vel.y = (f.vel.y / vmag) * 0.5;
+          }
+          magnetTargets.push({ f, d: dd });
+        }
         f.pos.x += f.vel.x * dt;
         f.pos.y += f.vel.y * dt;
         f.rot += f.rotV * dt;
@@ -636,12 +754,21 @@ export function ArcadeGame({
         if (collides(joop.pos, JOOP_RADIUS, f.pos, f.item.size / 2)) {
           if (f.item.kind === "fuel") {
             fuel = Math.min(cfg.fuel, fuel + f.item.value);
-            floaters.push({ pos: { ...f.pos }, text: `⛽+${f.item.value}`, color: amber, life: 0.9 });
+            pushFloater({ pos: { ...f.pos }, text: `⛽+${f.item.value}`, color: amber, life: 0.9 });
           } else {
             collected += f.item.value;
             eaten += 1;
             joop.collectFx = 0.35;
-            floaters.push({ pos: { ...f.pos }, text: `+${f.item.value}`, color, life: 0.9 });
+            counterFlash = 0.25;
+            const kid = f.item.id as DebrisKindId;
+            kindCounts[kid] = (kindCounts[kid] ?? 0) + 1;
+            pushFloater({
+              pos: { ...f.pos },
+              text: `${a.collectedPop} +${f.item.value}`,
+              color,
+              life: 0.9,
+              big: true,
+            });
           }
           items.splice(i, 1);
           continue;
@@ -650,9 +777,35 @@ export function ArcadeGame({
           items.splice(i, 1);
         }
       }
+      magnetTargets.sort((p, q) => p.d - q.d);
+      counterFlash = Math.max(0, counterFlash - dt);
 
       // ── 렌더
       drawBackground(u);
+
+      // 스피드 라인(UX 리뷰: 속도감) — 속도 방향 반대로 흐르는 짧은 선.
+      // 위치는 시드 해시(프레임 Math.random 금지)로 8fps 스텝마다 갱신.
+      const spdNow = Math.hypot(joop.vel.x, joop.vel.y);
+      if (!reduceMotion && spdNow > cfg.maxSpeed * 0.35) {
+        const inten = Math.min(1, spdNow / cfg.maxSpeed);
+        const nvx = joop.vel.x / spdNow;
+        const nvy = joop.vel.y / spdNow;
+        const step = Math.floor(elapsed * 8);
+        ctx.strokeStyle = fgColor;
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 7; i++) {
+          const rx = starHash(i, step, 0) * W;
+          const ry = starHash(i, step, 1) * H;
+          const len = (14 + 22 * inten) * (u / 390);
+          ctx.globalAlpha = (0.08 + 0.2 * inten) * (0.5 + starHash(i, step, 2) * 0.5);
+          ctx.beginPath();
+          ctx.moveTo(rx, ry);
+          ctx.lineTo(rx - nvx * len, ry - nvy * len);
+          ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+      }
+
       for (const f of items) drawItem(f, u);
 
       // 분사가스 파티클(줍스 뒤에 깔린다)
@@ -668,6 +821,7 @@ export function ArcadeGame({
       ctx.globalAlpha = 1;
 
       drawJoop(u, dir, strength);
+      drawMagnetArms(u, magnetTargets);
 
       for (let i = floaters.length - 1; i >= 0; i--) {
         const fl = floaters[i];
@@ -678,9 +832,12 @@ export function ArcadeGame({
           continue;
         }
         const s = toScreen(fl.pos);
+        // big("수거!") 팝업은 크게 + 등장 0.15초 스케일 팝(reduce 는 고정 크기)
+        const base = fl.big ? 0.055 : 0.045;
+        const pop = fl.big && !reduceMotion && fl.life > 0.75 ? 1 + (fl.life - 0.75) * 1.6 : 1;
         ctx.globalAlpha = Math.min(1, fl.life * 1.6);
         ctx.fillStyle = fl.color;
-        ctx.font = `600 ${Math.round(u * 0.045)}px ui-monospace, monospace`;
+        ctx.font = `${fl.big ? 700 : 600} ${Math.round(u * base * pop)}px ui-monospace, monospace`;
         ctx.textAlign = "center";
         ctx.fillText(fl.text, s.x, s.y);
         ctx.textAlign = "left";
@@ -689,33 +846,64 @@ export function ArcadeGame({
 
       drawStick(u);
 
-      // ── HUD
+      // ── HUD (UX 리뷰: 카운터를 크고 눈에 띄게, 다이얼·바로 "게임"답게)
       const pad = 12;
       const fs = Math.max(11, Math.round(u * 0.036));
-      ctx.font = `${fs}px ui-monospace, monospace`;
+      const micro = Math.max(9, Math.round(fs * 0.75));
       ctx.textBaseline = "top";
-      // 연료 바
-      const barW = W * 0.34;
+
+      // 상단 중앙 — 큰 수거 카운터(자릿수 고정). 수거 순간 앰버 플래시.
+      ctx.textAlign = "center";
       ctx.fillStyle = mutedColor;
-      ctx.font = `${Math.max(9, Math.round(fs * 0.75))}px ui-monospace, monospace`;
-      ctx.fillText(a.fuel, pad, pad);
+      ctx.font = `${micro}px ui-monospace, monospace`;
+      ctx.fillText(a.collected, W / 2, pad);
+      ctx.fillStyle = counterFlash > 0 ? amber : fgColor;
+      ctx.font = `700 ${Math.round(u * 0.072)}px ui-monospace, monospace`;
+      ctx.fillText(String(collected).padStart(4, "0"), W / 2, pad + micro + 2);
+      ctx.textAlign = "left";
+
+      // 우측 — 연료 원형 다이얼(-90°부터 시계 방향). 임계색은 기존 로직 유지.
       const fuelRatio = Math.max(0, fuel / cfg.fuel);
+      const dialR = Math.max(18, u * 0.05);
+      const dialX = W - pad - dialR;
+      const dialY = H * 0.3;
+      ctx.lineWidth = 5;
+      ctx.strokeStyle = gridColor;
+      ctx.globalAlpha = 0.45;
+      ctx.beginPath();
+      ctx.arc(dialX, dialY, dialR, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = fuelRatio < 0.25 ? dangerColor : fuelRatio < 0.5 ? amber : accent;
+      ctx.beginPath();
+      ctx.arc(dialX, dialY, dialR, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * Math.min(1, fuelRatio));
+      ctx.stroke();
+      ctx.lineWidth = 1;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = fgColor;
+      ctx.font = `${micro}px ui-monospace, monospace`;
+      ctx.fillText(`${Math.round(fuelRatio * 100)}%`, dialX, dialY);
+      ctx.textBaseline = "top";
+      ctx.fillStyle = mutedColor;
+      ctx.fillText(a.fuel, dialX, dialY + dialR + 6);
+      ctx.textAlign = "left";
+
+      // 줍스 아래 — 속도 바 + 환산값(실 LEO 7.9km/s 를 게임 최고속에 대응)
+      const spd = (spdNow / cfg.maxSpeed) * 7.9;
+      const sbW = u * 0.22;
+      const sbX = W / 2 - sbW / 2;
+      const sbY = H / 2 + u * 0.14;
       ctx.fillStyle = gridColor;
       ctx.globalAlpha = 0.45;
-      ctx.fillRect(pad, pad + 13, barW, 7);
+      ctx.fillRect(sbX, sbY, sbW, 4);
       ctx.globalAlpha = 1;
-      ctx.fillStyle = fuelRatio < 0.25 ? dangerColor : fuelRatio < 0.5 ? amber : accent;
-      ctx.fillRect(pad, pad + 13, barW * Math.min(1, fuelRatio), 7);
-      // 속도 — 최고속을 궤도 속도(7.9km/s) 스케일로 환산한 게임식 표기
-      const spd = (Math.hypot(joop.vel.x, joop.vel.y) / cfg.maxSpeed) * 7.9;
+      ctx.fillStyle = accent;
+      ctx.fillRect(sbX, sbY, sbW * Math.min(1, spdNow / cfg.maxSpeed), 4);
       ctx.fillStyle = mutedColor;
-      ctx.font = `${Math.max(9, Math.round(fs * 0.75))}px ui-monospace, monospace`;
-      ctx.fillText(`${a.speed} ${spd.toFixed(1)} km/s`, pad, pad + 26);
-      // 수거
-      ctx.fillStyle = fgColor;
-      ctx.font = `${fs}px ui-monospace, monospace`;
-      ctx.textAlign = "right";
-      ctx.fillText(`${a.collected} ${collected}`, W - pad, pad);
+      ctx.font = `${micro}px ui-monospace, monospace`;
+      ctx.textAlign = "center";
+      ctx.fillText(`${a.speed} ${spd.toFixed(1)} km/s`, W / 2, sbY + 8);
       ctx.textAlign = "left";
 
       if (running && !document.hidden) raf = requestAnimationFrame(frame);
@@ -821,35 +1009,85 @@ export function ArcadeGame({
                 {a.briefBody.replace("{name}", name)}
               </p>
             )}
-            <ul className="max-w-xs list-none font-mono text-[11px] leading-relaxed text-[var(--color-muted)]">
-              <li>{a.ruleJoystick}</li>
-              <li>{a.ruleFuel}</li>
-              <li>{a.ruleWorld}</li>
-            </ul>
-            {/* 음영 통과 중이면 XP 를 지불하거나 수신 복귀를 기다린다 */}
+            {/* 규칙 3줄은 일반 진입에만 — 음영 대기 화면은 텍스트 최소화(UX 리뷰) */}
+            {!(needsPay && !paid) && (
+              <ul className="max-w-xs list-none font-mono text-[11px] leading-relaxed text-[var(--color-muted)]">
+                <li>{a.ruleJoystick}</li>
+                <li>{a.ruleFuel}</li>
+                <li>{a.ruleWorld}</li>
+              </ul>
+            )}
+            {/* 음영 통과 중이면 XP 를 지불하거나 수신 복귀를 기다린다.
+                핵심 선택지("기다리기 vs 지불")만 크게: 큰 카운트다운 + 큰 CTA. */}
             {needsPay && !paid ? (
               <>
-                <p className="max-w-xs font-mono text-[11px] leading-relaxed text-[var(--color-secondary)]">
-                  {a.shadowNotice
-                    .replace("{cost}", String(shadowGate!.cost))
-                    .replace("{mm}", String(Math.floor(waitSec / 60)).padStart(2, "0"))
-                    .replace("{ss}", String(waitSec % 60).padStart(2, "0"))}
+                {/* 수신 복귀 카운트다운 — 큰 숫자 + 진행 바 (link-status 패턴) */}
+                <div className="w-full max-w-xs">
+                  <p className="font-mono text-[10px] uppercase tracking-widest text-[var(--color-muted)]">
+                    {a.returnIn}
+                  </p>
+                  <p
+                    className="font-mono font-semibold text-[var(--color-secondary)]"
+                    style={{ fontSize: "var(--text-display-lg)", textShadow: "var(--glow-secondary)" }}
+                  >
+                    T-{String(Math.floor(waitSec / 60)).padStart(2, "0")}:
+                    {String(waitSec % 60).padStart(2, "0")}
+                  </p>
+                  <div
+                    className="mt-1 h-1.5 w-full overflow-hidden rounded-full"
+                    style={{ background: "var(--color-neutral-700)" }}
+                    aria-hidden
+                  >
+                    <div
+                      className="h-full"
+                      style={{
+                        width: `${initialWaitRef.current > 0 ? Math.max(0, Math.min(100, (1 - waitSec / initialWaitRef.current) * 100)) : 0}%`,
+                        background: "var(--color-secondary)",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* 기다리는 동안 재활용 연출 — 줍스가 수거함에 파편을 비운다(절제 버전) */}
+                <div className="flex items-end gap-3" aria-hidden>
+                  <JoopSprite color={color} size={56} />
+                  <div className="relative flex h-14 w-10 items-end justify-center">
+                    <span className="absolute left-1/2 top-0 -translate-x-1/2">
+                      {(["bolt", "chip", "can"] as const).map((k, i) => (
+                        <span
+                          key={k}
+                          className="debris-drop absolute left-1/2 -translate-x-1/2"
+                          style={{ animationDelay: `${i * 0.45}s` }}
+                        >
+                          <DebrisIcon kind={k} size={12} />
+                        </span>
+                      ))}
+                    </span>
+                    {/* 재활용 수거함 — 인라인 SVG (그린 톤) */}
+                    <svg width="34" height="30" viewBox="0 0 34 30" className="relative">
+                      <rect x="3" y="8" width="28" height="20" rx="2" fill="var(--color-surface)" stroke="var(--color-primary)" strokeWidth="1.5" />
+                      <rect x="1" y="5" width="32" height="4" rx="1" fill="var(--color-primary)" opacity="0.85" />
+                      <path d="M13 16l3-4 2 3 3-4" fill="none" stroke="var(--color-primary)" strokeWidth="1.5" />
+                    </svg>
+                  </div>
+                </div>
+                <p className="font-mono text-[10px] uppercase tracking-widest text-[var(--color-muted)]">
+                  {a.recycling}
                 </p>
-                {payError && (
+
+                <p className="max-w-xs font-mono text-[11px] leading-relaxed text-[var(--color-secondary)]">
+                  {a.shadowNotice.replace("{cost}", String(shadowGate!.cost))}
+                </p>
+                {payError && payError !== "insufficient_xp" && (
                   <p role="alert" className="font-mono text-xs text-[var(--color-danger)]">
-                    {payError === "insufficient_xp"
-                      ? a.insufficientXp
-                          .replace("{cost}", String(shadowGate!.cost))
-                          .replace("{xp}", String(xpLeft))
-                      : a.payError}{" "}
-                    <span className="opacity-60">({payError})</span>
+                    {a.payError} <span className="opacity-60">({payError})</span>
                   </p>
                 )}
                 <button
                   onClick={payAndStart}
                   disabled={!assetsReady || paying || xpLeft < shadowGate!.cost}
-                  className={buttonClass}
-                  style={buttonStyle}
+                  className="crt-brackets btn-brackets btn-brackets-lg max-w-xs"
+                  style={{ "--bracket-color": "var(--color-secondary)", color: "var(--color-secondary)" } as React.CSSProperties}
                 >
                   {!assetsReady
                     ? a.loading
@@ -857,7 +1095,7 @@ export function ArcadeGame({
                       ? a.paying
                       : a.payShadow.replace("{cost}", String(shadowGate!.cost))}
                 </button>
-                {/* 왜 버튼이 눌리지 않는지 클릭 전에 알려 준다 */}
+                {/* 왜 버튼이 눌리지 않는지 클릭 전에 알려 준다(잔액 안내는 이 한 곳만) */}
                 <p
                   className="max-w-xs font-mono text-[10px] leading-relaxed"
                   style={{

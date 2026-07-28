@@ -54,16 +54,22 @@ export function LinkStatus({
         <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--color-muted)]">
           {t.link}
         </span>
+        {/* 상태 글리프(◐ 음영 / ● 수신) — 라벨은 유지해 접근성 무손실 */}
         <span className="font-mono text-sm font-semibold" style={{ color: tone }}>
+          {state.inShadow ? "◐ " : "● "}
           {state.inShadow ? t.shadowAuto : t.linkActive}
         </span>
       </div>
 
-      <p className="mt-2 font-mono text-xs text-[var(--color-fg)]">
-        {state.inShadow ? t.linkIn : t.shadowIn}{" "}
-        <span className="text-base font-semibold" style={{ color: tone }}>
-          T-{mm}:{ss}
-        </span>
+      {/* 카운트다운 — 큰 숫자(UX 리뷰: 사용자가 집중할 핵심 정보) */}
+      <p className="mt-2 font-mono text-[10px] uppercase tracking-widest text-[var(--color-muted)]">
+        {state.inShadow ? t.linkIn : t.shadowIn}
+      </p>
+      <p
+        className="font-mono font-semibold leading-tight"
+        style={{ color: tone, fontSize: "var(--text-display-lg)" }}
+      >
+        T-{mm}:{ss}
       </p>
 
       <div
@@ -76,18 +82,16 @@ export function LinkStatus({
         />
       </div>
 
-      <p className="mt-2 font-mono text-[10px] leading-relaxed text-[var(--color-muted)]">
-        {t.passInfo.replace("{speed}", String(state.gameSpeed))}
-      </p>
-
       {/* 초기 개발 단계: 음영이어도 XP 를 지불하면 바로 플레이할 수 있다 */}
       <Link
         href={`/${lang}/joop/arcade`}
-        className="mt-3 block w-full rounded-md py-2.5 text-center font-mono text-xs font-semibold uppercase tracking-widest"
+        className="crt-brackets btn-brackets btn-brackets-lg mt-3"
         style={
-          state.inShadow && !canAfford
-            ? { background: "var(--color-neutral-700)", color: "var(--color-muted)" }
-            : { background: "var(--color-primary)", color: "var(--color-bg)" }
+          {
+            "--bracket-color":
+              state.inShadow && !canAfford ? "var(--color-neutral-600)" : "var(--color-primary)",
+            color: state.inShadow && !canAfford ? "var(--color-muted)" : "var(--color-primary)",
+          } as React.CSSProperties
         }
       >
         {!state.inShadow
