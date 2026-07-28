@@ -22,6 +22,7 @@
     "viewGlobe": "지구본",
     "viewTrack": "궤도 추적",
     "tracking": "관측 대상",
+    "rankingMore": "자세히",
     "cta": {
       "startWithInvite": "초대코드로 시작하기"
     },
@@ -144,6 +145,7 @@
     "start": "교신 시작",
     "loading": "에셋 준비 중…",
     "fuel": "분사가스",
+    "speed": "속도",
     "collected": "수거",
     "pieces": "조각",
     "eatenUnit": "개",
@@ -178,7 +180,17 @@
     "hint": "음영 지역에서는 자동으로 쓰레기를 수거해요. 수거량은 랭킹에 반영됩니다.",
     "linkIn": "수신 복귀까지",
     "shadowIn": "음영 진입까지",
-    "passInfo": "궤도 위상은 실제보다 {speed}배 빠르게 흐릅니다(게임 배속). 고도·속도는 실제 값이에요."
+    "passInfo": "궤도 위상은 실제보다 {speed}배 빠르게 흐릅니다(게임 배속). 고도·속도는 실제 값이에요.",
+    "returnEarth": "지구로 복귀",
+    "returnEarthConfirm": "정말 복귀할까요? 다시 탭하면 실행",
+    "returningEarth": "복귀 중…",
+    "returnEarthNote": "복귀해도 수거량·XP·레벨은 그대로예요. 다시 발사하려면 청약부터 다시!",
+    "returnEarthError": "복귀에 실패했어요. 다시 시도해 주세요."
+  },
+  "rankings": {
+    "title": "전체 랭킹",
+    "mySummary": "내 순위 {rank}위 · 누적 {points} 조각",
+    "hint": "순위는 누적 수거량 기준이에요. 주간 등락은 7일 전 순위와의 비교입니다."
   },
   "language": {
     "label": "언어",

@@ -235,5 +235,5 @@ export function OrbitalCanvas({
     };
   }, []);
 
-  return <canvas ref={canvasRef} className="block w-full aspect-square" />;
+  return <canvas ref={canvasRef} className="block w-full aspect-[7/5]" />;
 }

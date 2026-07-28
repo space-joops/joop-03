@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="256" viewBox="0 0 512 256">
+  <!-- 위성. anchor 중심 [256,128]. 원근(다가옴/멀어짐)은 코드 스케일 0.15~2.4 — handoff-m5.md §4 -->
+  <g stroke="#5c6b5e" stroke-width="3">
+    <!-- 태양전지 날개 -->
+    <g fill="#0e2f38">
+      <rect x="16" y="88" width="150" height="80" rx="4"/>
+      <rect x="346" y="88" width="150" height="80" rx="4"/>
+    </g>
+    <g stroke="#2de2e6" stroke-width="1.5" opacity=".5">
+      <path d="M53 88v80M91 88v80M129 88v80M383 88v80M421 88v80M459 88v80"/>
+      <path d="M16 115h150M16 142h150M346 115h150M346 142h150"/>
+    </g>
+    <!-- 지지대 -->
+    <path d="M166 128h34M312 128h34" stroke="#8ba08c" stroke-width="6"/>
+    <!-- 본체 (금박 = 앰버) -->
+    <rect x="200" y="76" width="112" height="104" rx="8" fill="#8a6100"/>
+    <rect x="200" y="76" width="112" height="30" rx="8" fill="#ffb000" opacity=".85"/>
+    <path d="M200 118h112M200 146h112" stroke="#5c3f00" stroke-width="2"/>
+    <rect x="216" y="90" width="18" height="12" fill="#2a332c" stroke-width="2"/>
+    <!-- 접시 안테나 -->
+    <ellipse cx="256" cy="52" rx="40" ry="16" fill="#c8d2c4"/>
+    <path d="M256 52 V76" stroke="#8ba08c" stroke-width="5"/>
+    <circle cx="256" cy="40" r="5" fill="#ff4545" stroke="none"/>
+    <!-- 하부 스러스터 -->
+    <path d="M240 180 H272 L266 200 H246 Z" fill="#414d43" stroke-width="2"/>
+  </g>
+</svg>

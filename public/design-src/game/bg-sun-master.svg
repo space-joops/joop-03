@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <radialGradient id="sun"><stop offset="0%" stop-color="#fff9e8"/><stop offset="26%" stop-color="#ffe9a8"/><stop offset="44%" stop-color="#ffb000"/><stop offset="62%" stop-color="#ff8a00" stop-opacity=".55"/><stop offset="100%" stop-color="#ff8a00" stop-opacity="0"/></radialGradient>
+  </defs>
+  <path d="M512 512 L1012 582" stroke="#ffdf8a" stroke-width="3" stroke-opacity=".14"/>
+  <path d="M512 512 L910 823" stroke="#ffdf8a" stroke-width="5" stroke-opacity=".14"/>
+  <path d="M512 512 L701 980" stroke="#ffdf8a" stroke-width="7" stroke-opacity=".14"/>
+  <path d="M512 512 L442 1012" stroke="#ffdf8a" stroke-width="3" stroke-opacity=".14"/>
+  <path d="M512 512 L201 910" stroke="#ffdf8a" stroke-width="5" stroke-opacity=".14"/>
+  <path d="M512 512 L44 701" stroke="#ffdf8a" stroke-width="7" stroke-opacity=".14"/>
+  <path d="M512 512 L12 442" stroke="#ffdf8a" stroke-width="3" stroke-opacity=".14"/>
+  <path d="M512 512 L114 201" stroke="#ffdf8a" stroke-width="5" stroke-opacity=".14"/>
+  <path d="M512 512 L323 44" stroke="#ffdf8a" stroke-width="7" stroke-opacity=".14"/>
+  <path d="M512 512 L582 12" stroke="#ffdf8a" stroke-width="3" stroke-opacity=".14"/>
+  <path d="M512 512 L823 114" stroke="#ffdf8a" stroke-width="5" stroke-opacity=".14"/>
+  <path d="M512 512 L980 323" stroke="#ffdf8a" stroke-width="7" stroke-opacity=".14"/>
+  <circle cx="512" cy="512" r="500" fill="url(#sun)"/>
+</svg>

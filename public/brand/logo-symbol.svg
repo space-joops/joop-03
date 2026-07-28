@@ -1,53 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="JOOPS symbol">
-  <title>JOOPS 심볼 — 궤도 위 반려 청소 로봇</title>
-  <!-- Transparent-background brand symbol. Place on dark surfaces.
-       Colors are token-matched: primary #35e07a, amber #ffb23e, grid #1e5a46. -->
-
-  <!-- orbit ring (tilted) with layered glow -->
-  <g transform="rotate(-20 256 262)">
-    <ellipse cx="256" cy="262" rx="180" ry="94" fill="none" stroke="#35e07a" stroke-width="22" opacity="0.10"/>
-    <ellipse cx="256" cy="262" rx="180" ry="94" fill="none" stroke="#1e5a46" stroke-width="7" opacity="0.9"/>
-    <path d="M 436 262 A 180 94 0 0 1 76 262" fill="none" stroke="#35e07a" stroke-width="7" opacity="0.95" stroke-linecap="round"/>
-  </g>
-
-  <!-- debris being collected (amber) -->
-  <g transform="rotate(18 402 150)">
-    <rect x="388" y="136" width="26" height="26" rx="6" fill="#ffb23e" opacity="0.2"/>
-    <rect x="391" y="139" width="20" height="20" rx="5" fill="#ffb23e"/>
-    <rect x="397" y="145" width="8" height="8" rx="2" fill="#3a2a0c" opacity="0.5"/>
-  </g>
-  <rect x="104" y="356" width="16" height="16" rx="4" fill="#1e5a46" transform="rotate(-14 112 364)"/>
-
-  <!-- antenna + amber beacon -->
-  <line x1="256" y1="180" x2="256" y2="142" stroke="#35e07a" stroke-width="8" stroke-linecap="round"/>
-  <circle cx="256" cy="132" r="20" fill="#ffb23e" opacity="0.18"/>
-  <circle cx="256" cy="132" r="11" fill="#ffb23e"/>
-  <circle cx="256" cy="132" r="4" fill="#ffe6b0"/>
-
-  <!-- robot head -->
-  <rect x="150" y="178" width="212" height="196" rx="46" fill="#16202e" stroke="#26374a" stroke-width="4"/>
-  <path d="M 178 190 Q 256 176 334 190" fill="none" stroke="#33475c" stroke-width="4" stroke-linecap="round" opacity="0.85"/>
-  <circle cx="150" cy="276" r="12" fill="#0e1622" stroke="#2a3646" stroke-width="4"/>
-  <circle cx="362" cy="276" r="12" fill="#0e1622" stroke="#2a3646" stroke-width="4"/>
-
-  <rect x="172" y="200" width="168" height="128" rx="26" fill="#0a1018"/>
-  <rect x="172" y="200" width="168" height="128" rx="26" fill="none" stroke="#1e5a46" stroke-width="2" opacity="0.6"/>
-
-  <rect x="192" y="230" width="52" height="44" rx="14" fill="#35e07a" opacity="0.22"/>
-  <rect x="268" y="230" width="52" height="44" rx="14" fill="#35e07a" opacity="0.22"/>
-  <rect x="198" y="236" width="40" height="32" rx="10" fill="#35e07a"/>
-  <rect x="274" y="236" width="40" height="32" rx="10" fill="#35e07a"/>
-  <rect x="204" y="240" width="14" height="9" rx="4.5" fill="#c7ffdd" opacity="0.9"/>
-  <rect x="280" y="240" width="14" height="9" rx="4.5" fill="#c7ffdd" opacity="0.9"/>
-  <rect x="192" y="250" width="128" height="3" fill="#0a1018" opacity="0.5"/>
-
-  <g fill="#35e07a">
-    <rect x="206" y="298" width="16" height="8" rx="2"/>
-    <rect x="228" y="298" width="16" height="8" rx="2"/>
-  </g>
-  <g fill="#1e5a46">
-    <rect x="250" y="298" width="16" height="8" rx="2"/>
-    <rect x="272" y="298" width="16" height="8" rx="2"/>
-    <rect x="294" y="298" width="16" height="8" rx="2"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor">
+  <!-- 줍스 심볼: 지구(경위도 그리드) + 궤도 링 + 줍스(발광 점). 정사각 64 그리드 · currentColor 단색 -->
+  <!-- 지구 -->
+  <circle cx="32" cy="32" r="16" stroke-width="3"/>
+  <ellipse cx="32" cy="32" rx="6.5" ry="16" stroke-width="1.5" opacity="0.55"/>
+  <path d="M16 32h32" stroke-width="1.5" opacity="0.55"/>
+  <path d="M17.9 24.5h28.2M17.9 39.5h28.2" stroke-width="1.5" opacity="0.35"/>
+  <!-- 궤도 링 (-24°) -->
+  <ellipse cx="32" cy="32" rx="28.5" ry="10.5" stroke-width="2" opacity="0.9" transform="rotate(-24 32 32)"/>
+  <!-- 줍스 점 (궤도 위, anchor는 점 중심) -->
+  <circle cx="50.8" cy="17" r="6" fill="currentColor" stroke="none" opacity="0.25"/>
+  <circle cx="50.8" cy="17" r="3" fill="currentColor" stroke="none"/>
 </svg>

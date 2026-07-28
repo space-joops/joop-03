@@ -100,7 +100,7 @@ export function OrbitViewer({
       )}
 
       {/* 관측 배속 + (toggle 레이아웃에서만) 뷰 전환 */}
-      <div className="mt-2 flex items-center justify-between gap-2">
+      <div className="mt-1.5 flex items-center justify-between gap-2">
         <div
           className="flex overflow-hidden rounded-md border"
           style={{ borderColor: "var(--color-neutral-600)" }}

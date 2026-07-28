@@ -17,6 +17,7 @@ export function FirstScreen({
   dict,
   initialSnapshot,
   rankings,
+  myRanking = null,
   myJoop,
   gameSpeed,
   shadowFraction,
@@ -25,6 +26,7 @@ export function FirstScreen({
   dict: Dictionary;
   initialSnapshot: OrbitalSnapshot;
   rankings: RankingRow[];
+  myRanking?: RankingRow | null;
   myJoop: MyJoop | null;
   /** 궤도 게임 배속(config orbit_game_speed) — 우주 지도와 같은 속도를 쓰기 위해 서버가 주입 */
   gameSpeed: number;
@@ -41,8 +43,8 @@ export function FirstScreen({
       {/* 장식 상태바 — safe-area 상단 패딩은 여기서 처리 */}
       <StatusBar />
 
-      <header className="px-4 pb-2 pt-2">
-        <div className="panel-amber flex items-center gap-3 px-3 py-2">
+      <header className="px-4 pb-1.5 pt-1.5">
+        <div className="panel-amber flex items-center gap-3 px-3 py-1.5">
           {/* 브랜드 심볼 — 궤도 위 반려 로봇 (public/brand/logo-symbol.svg) */}
           <Image
             src="/brand/logo-symbol.svg"
@@ -68,10 +70,10 @@ export function FirstScreen({
 
       <div className="px-4">
         <div
-          className="crt-brackets px-3 py-2"
+          className="crt-brackets px-3 py-1.5"
           style={{ "--bracket-color": "var(--color-primary)" } as React.CSSProperties}
         >
-          <p className="mb-2 text-center font-mono text-xs uppercase tracking-widest text-[var(--color-primary)]">
+          <p className="mb-1 text-center font-mono text-xs uppercase tracking-widest text-[var(--color-primary)]">
             {dict.firstScreen.orbitLabelTop}
           </p>
 
@@ -86,23 +88,23 @@ export function FirstScreen({
             layout="toggle"
           />
 
-          <p className="mt-2 text-center font-mono text-xs uppercase tracking-widest text-[var(--color-primary)]">
+          <p className="mt-1.5 text-center font-mono text-xs uppercase tracking-widest text-[var(--color-primary)]">
             {snapshot.joops.length} {dict.firstScreen.inOrbit}
+            <span className="ml-2 normal-case tracking-normal text-[var(--color-muted)]">
+              · {dict.firstScreen.title}
+            </span>
           </p>
         </div>
-        <p className="mt-1 text-center font-mono text-xs text-[var(--color-muted)]">
-          {dict.firstScreen.title}
-        </p>
       </div>
 
       <CleanupGauge totals={snapshot.totals} dict={dict} />
-      <RankingList rows={rankings} dict={dict} />
+      <RankingList rows={rankings} dict={dict} lang={lang} myRanking={myRanking} showMore />
 
-      <div className="mt-auto px-4 pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-3">
+      <div className="mt-auto px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-2">
         {myJoop ? (
           <a
             href={`/${lang}/joop`}
-            className="flex w-full items-center justify-center gap-2 rounded-md border py-3 font-mono text-sm"
+            className="flex w-full items-center justify-center gap-2 rounded-md border py-2.5 font-mono text-sm"
             style={{ borderColor: "var(--color-neutral-600)", background: "var(--color-surface)" }}
           >
             <span
