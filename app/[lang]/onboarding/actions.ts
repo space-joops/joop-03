@@ -42,7 +42,7 @@ export async function redeemInvite(
 
   await admin.from("joop_03_profiles").upsert({ id: uid }, { onConflict: "id" });
 
-  redirect(`/${lang}/onboarding/setup`);
+  redirect(`/${lang}/onboarding/setup?src=invite`);
 }
 
 // 초대 코드가 없는 사용자: 이메일 대기리스트 등록.

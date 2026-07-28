@@ -67,5 +67,5 @@ export async function completeSetup(
     if (joopErr) return { error: "name_taken" };
   }
 
-  redirect(`/${lang}`);
+  redirect(`/${lang}?setup=done`);
 }

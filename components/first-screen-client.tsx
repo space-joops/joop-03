@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import type { OrbitalSnapshot } from "@/lib/joops";
 import type { RankingRow } from "@/lib/rankings";
@@ -11,6 +12,7 @@ import { CleanupGauge } from "@/components/cleanup-gauge";
 import { RankingList } from "@/components/ranking-list";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { StatusBar } from "@/components/status-bar";
+import { trackSetupCompleted } from "@/lib/analytics";
 
 export function FirstScreen({
   lang,
@@ -34,6 +36,17 @@ export function FirstScreen({
   shadowFraction: number;
 }) {
   const snapshot = useOrbitalSnapshot(initialSnapshot);
+
+  // 온보딩 설정 완료(completeSetup)의 성공은 서버에서 바로 redirect되어 클라에 성공
+  // 상태가 안 보이므로, 도착한 이 페이지에서 1회성 쿼리 신호(?setup=done)로 대신 잡는다.
+  const trackedSetup = useRef(false);
+  useEffect(() => {
+    if (trackedSetup.current) return;
+    if (new URLSearchParams(window.location.search).get("setup") !== "done") return;
+    trackedSetup.current = true;
+    trackSetupCompleted();
+    window.history.replaceState(null, "", window.location.pathname);
+  }, []);
 
   return (
     <main

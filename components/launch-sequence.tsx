@@ -6,6 +6,7 @@ import { completeLaunch } from "@/app/[lang]/joop/launch/actions";
 import type { MyVehicle } from "@/lib/launch";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
+import { trackLaunchCompleted } from "@/lib/analytics";
 
 type Phase = "countdown" | "ascent" | "saving" | "done";
 
@@ -300,7 +301,10 @@ export function LaunchSequence({
       router.push(path);
     };
     completeLaunch()
-      .then((res) => go(res.ok ? `/${lang}/joop/map` : `/${lang}/joop`))
+      .then((res) => {
+        if (res.ok) trackLaunchCompleted();
+        go(res.ok ? `/${lang}/joop/map` : `/${lang}/joop`);
+      })
       .catch(() => go(`/${lang}/joop/map`));
     // 안전장치: 액션이 응답하지 않아도 결국 우주 지도로(궤도 진입은 서버에서 처리됨).
     const fallback = setTimeout(() => go(`/${lang}/joop/map`), 6000);
