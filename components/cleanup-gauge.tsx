@@ -15,9 +15,9 @@ export function CleanupGauge({
   const milestones = [25, 50, 75];
 
   return (
-    <section className="px-4 py-3">
+    <section className="px-4 py-1.5">
       <div
-        className="crt-brackets px-3 py-3"
+        className="crt-brackets px-3 py-2"
         style={
           {
             "--bracket-color": "color-mix(in srgb, var(--color-secondary) 60%, transparent)",
@@ -32,7 +32,7 @@ export function CleanupGauge({
         </div>
 
         <div
-          className="relative mt-2 h-5 overflow-hidden rounded-[2px]"
+          className="relative mt-1 h-5 overflow-hidden rounded-[2px]"
           style={{
             background: "var(--color-surface)",
             border: "1px solid color-mix(in srgb, var(--color-secondary) 45%, transparent)",
@@ -60,7 +60,7 @@ export function CleanupGauge({
         </div>
 
         {/* 마일스톤 ▲ 틱 마커 (25/50/75%) */}
-        <div className="relative mt-1 h-4" aria-hidden>
+        <div className="relative mt-0.5 h-3.5" aria-hidden>
           {milestones.map((m) => (
             <span
               key={m}
@@ -72,7 +72,7 @@ export function CleanupGauge({
           ))}
         </div>
 
-        <p className="mt-1 font-mono text-2xl text-[var(--color-secondary)]" style={{ textShadow: "var(--glow-secondary)" }}>
+        <p className="font-mono text-lg leading-6 text-[var(--color-secondary)]" style={{ textShadow: "var(--glow-secondary)" }}>
           {totals.debris.toLocaleString()}{" "}
           <span className="text-sm text-[var(--color-muted)]" style={{ textShadow: "none" }}>
             {dict.firstScreen.pieces}

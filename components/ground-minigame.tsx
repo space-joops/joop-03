@@ -732,8 +732,9 @@ export function GroundMinigame({
     <div className="relative flex flex-1 flex-col">
       <div
         ref={boxRef}
-        className="relative mx-3 mb-1 flex-1 overflow-hidden rounded-md border"
+        className="game-surface relative mx-3 mb-1 flex-1 overflow-hidden rounded-md border"
         style={{ borderColor: "var(--color-neutral-600)" }}
+        onContextMenu={(e) => e.preventDefault()}
       >
         {/* absolute + inset-0 + 100% 크기로 컨테이너를 꽉 채운다. 예전처럼 흐름 배치 + h-full
             만 주면 canvas 의 고유 종횡비가 이겨서 화면 위쪽 일부만 게임 화면이 되어 버렸다. */}

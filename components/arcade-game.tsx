@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import {
   ARCADE_FUEL_ITEM,
   CELESTIALS,
+  GALAXY_TILE,
+  sunTintAlpha,
   DEFAULT_ARCADE_CONFIG,
   applyThrust,
   collides,
@@ -22,6 +24,17 @@ import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
 
 type Phase = "ready" | "playing" | "over" | "saving" | "saved";
+
+// 조이스틱 바깥 링 반지름(화면 최소변 비율). 0.17 → 0.24 로 확대해 5단계 미세 조정이 쉽게.
+const JOYSTICK_R = 0.24;
+
+// 별 색온도 팔레트(웜화이트/백/청/주황) — 은하 마스터의 별밭과 같은 분포(가중치 4:3:2:1).
+const STAR_COLORS = [
+  "#fff3e4", "#fff3e4", "#fff3e4", "#fff3e4",
+  "#f4f7ff", "#f4f7ff", "#f4f7ff",
+  "#cfe0ff", "#cfe0ff",
+  "#ffd9a8",
+] as const;
 
 // 아케이드(우주 수거, M5 / EPIC 7) — 수신 지역에서 진입하는 본편 게임.
 // 조작(FR-7.4): 화면 아무 곳이나 누르면 그 자리에 5원 반투명 조이스틱.
@@ -119,6 +132,7 @@ export function ArcadeGame({
       ["debris-sheet", DEBRIS_SHEET],
       ["joop-sheet", joopSheetPath(sheetForColor(color))],
       ["fuel", ARCADE_FUEL_ITEM.asset!],
+      [GALAXY_TILE.asset, GALAXY_TILE.asset],
       ...CELESTIALS.map((c) => [c.asset, c.asset] as [string, string]),
     ]);
     let remaining = sources.size;
@@ -198,6 +212,13 @@ export function ArcadeGame({
     const items: Floating[] = [];
     type Floater = { pos: Vec; text: string; color: string; life: number };
     const floaters: Floater[] = [];
+
+    // 분사가스 파티클(handoff-m5 §3): r5→11px·불투명 .35→.08·수명 600ms·초당 12×세기·상한 60.
+    // 색은 분사 세기 따라 시안(저출력) → 앰버(중간) → 백열(풀출력).
+    type Exhaust = { pos: Vec; vel: Vec; age: number; color: string };
+    const exhaust: Exhaust[] = [];
+    let exhaustAcc = 0;
+    const flameColor = (s: number) => (s <= 0.4 ? accent : s <= 0.8 ? amber : "#ffe9c4");
 
     const toScreen = (p: Vec) => ({
       x: W / 2 + (p.x - joop.pos.x) * unit(),
@@ -301,11 +322,24 @@ export function ArcadeGame({
 
     // ── 그리기
     const drawBackground = (u: number) => {
-      // 딥스페이스
-      ctx.fillStyle = "#03060d";
+      // 딥스페이스 — 실사 톤은 칠흑에 가깝다(색감은 은하 타일이 담당)
+      ctx.fillStyle = "#010208";
       ctx.fillRect(0, 0, W, H);
 
-      // 별 2겹 패럴랙스 — 섹터 시드 고정(starHash)이라 흐르기만 하고 반짝이지 않는다
+      // 최원경 은하 타일(handoff-m5 §1) — 수평 반복, 스크롤 계수 0.1
+      const gimg = imagesRef.current.get(GALAXY_TILE.asset);
+      if (gimg && gimg.complete && gimg.naturalWidth > 0) {
+        const th = GALAXY_TILE.height * u;
+        const tw = th * (gimg.naturalWidth / gimg.naturalHeight);
+        const gy = H / 2 - joop.pos.y * GALAXY_TILE.parallax * u - th / 2;
+        let gx = (-(joop.pos.x * GALAXY_TILE.parallax * u) % tw) - tw;
+        ctx.globalAlpha = 0.95;
+        for (; gx < W; gx += tw) ctx.drawImage(gimg, gx, gy, tw, th);
+        ctx.globalAlpha = 1;
+      }
+
+      // 별 2겹 패럴랙스 — 섹터 시드 고정(starHash)이라 흐르기만 하고 반짝이지 않는다.
+      // 실사 톤: 정사각 점 대신 원, 색온도 4종(웜화이트/백/청/주황) + 반경 변주.
       for (const layer of [
         { p: 0.35, density: 5, alpha: 0.4, r: 0.8 },
         { p: 0.6, density: 3, alpha: 0.8, r: 1.2 },
@@ -314,7 +348,6 @@ export function ArcadeGame({
         const camY = joop.pos.y * layer.p;
         const halfW = W / 2 / u;
         const halfH = H / 2 / u;
-        ctx.fillStyle = fgColor;
         ctx.globalAlpha = layer.alpha;
         for (let ix = Math.floor(camX - halfW); ix <= Math.floor(camX + halfW) + 1; ix++) {
           for (let iy = Math.floor(camY - halfH); iy <= Math.floor(camY + halfH) + 1; iy++) {
@@ -322,7 +355,11 @@ export function ArcadeGame({
               const sx = W / 2 + (ix + starHash(ix, iy, k * 2) - camX) * u;
               const sy = H / 2 + (iy + starHash(ix, iy, k * 2 + 1) - camY) * u;
               if (sx < -2 || sx > W + 2 || sy < -2 || sy > H + 2) continue;
-              ctx.fillRect(sx, sy, layer.r, layer.r);
+              const v = starHash(ix, iy, k * 2 + 2);
+              ctx.fillStyle = STAR_COLORS[Math.min(STAR_COLORS.length - 1, (v * STAR_COLORS.length) | 0)];
+              ctx.beginPath();
+              ctx.arc(sx, sy, layer.r * (0.7 + v * 0.6), 0, Math.PI * 2);
+              ctx.fill();
             }
           }
         }
@@ -343,6 +380,15 @@ export function ArcadeGame({
           continue;
         ctx.drawImage(img, px - w / 2, py - h / 2, w, h);
       }
+
+      // 태양 인접 앰버 틴트 ≤8% (handoff-m5 §1 — 뜨거움 연출, 가독성 유지)
+      const tint = sunTintAlpha(joop.pos.x, joop.pos.y);
+      if (tint > 0.005) {
+        ctx.fillStyle = amber;
+        ctx.globalAlpha = tint;
+        ctx.fillRect(0, 0, W, H);
+        ctx.globalAlpha = 1;
+      }
     };
 
     const drawJoop = (u: number, thrustDir: Vec | null, strength: number) => {
@@ -354,22 +400,33 @@ export function ArcadeGame({
       if (thrustDir && strength > 0 && fuel > 0) {
         const fx = cx - thrustDir.x * size * 0.62;
         const fy = cy - thrustDir.y * size * 0.62;
-        const flame = size * (0.28 + strength * 0.5) * (reduceMotion ? 1 : 0.85 + Math.random() * 0.3);
+        const flame = size * (0.24 + strength * 0.75) * (reduceMotion ? 1 : 0.85 + Math.random() * 0.3);
         const ang = Math.atan2(-thrustDir.y, -thrustDir.x);
         ctx.save();
         ctx.translate(fx, fy);
         ctx.rotate(ang);
         const grad = ctx.createLinearGradient(0, 0, flame, 0);
-        grad.addColorStop(0, accent);
+        grad.addColorStop(0, flameColor(strength));
         grad.addColorStop(1, "rgba(56,224,240,0)");
         ctx.fillStyle = grad;
         ctx.globalAlpha = 0.9;
         ctx.beginPath();
-        ctx.moveTo(0, -size * 0.12);
+        ctx.moveTo(0, -size * (0.1 + strength * 0.06));
         ctx.lineTo(flame, 0);
-        ctx.lineTo(0, size * 0.12);
+        ctx.lineTo(0, size * (0.1 + strength * 0.06));
         ctx.closePath();
         ctx.fill();
+        // 풀출력에 가까우면 백열 코어가 안쪽에 겹친다
+        if (strength >= 0.6) {
+          ctx.fillStyle = "#f2f7f0";
+          ctx.globalAlpha = 0.7;
+          ctx.beginPath();
+          ctx.moveTo(0, -size * 0.06);
+          ctx.lineTo(flame * 0.55, 0);
+          ctx.lineTo(0, size * 0.06);
+          ctx.closePath();
+          ctx.fill();
+        }
         ctx.restore();
         ctx.globalAlpha = 1;
       }
@@ -448,7 +505,7 @@ export function ArcadeGame({
 
     const drawStick = (u: number) => {
       if (!stick) return;
-      const R = u * 0.17; // 바깥(5단계) 링 반지름
+      const R = u * JOYSTICK_R; // 바깥(5단계) 링 반지름 — 미세 조정 여유를 위해 확대
       const { dir, strength, ring } = joystickInput(stick.dx, stick.dy, R);
       // 5원 반투명 링 — 현재 분사 단계까지 밝게(디자인 joystick.svg 참조)
       for (let i = 1; i <= 5; i++) {
@@ -465,7 +522,7 @@ export function ArcadeGame({
       const kx = stick.baseX + (len > 0 ? (stick.dx / len) * clamped : 0);
       const ky = stick.baseY + (len > 0 ? (stick.dy / len) * clamped : 0);
       ctx.beginPath();
-      ctx.arc(kx, ky, u * 0.028, 0, Math.PI * 2);
+      ctx.arc(kx, ky, u * 0.038, 0, Math.PI * 2);
       ctx.fillStyle = accent;
       ctx.globalAlpha = 0.75;
       ctx.fill();
@@ -495,7 +552,7 @@ export function ArcadeGame({
       let dir: Vec | null = null;
       let strength = 0;
       if (stick) {
-        const inp = joystickInput(stick.dx, stick.dy, u * 0.17);
+        const inp = joystickInput(stick.dx, stick.dy, u * JOYSTICK_R);
         dir = inp.dir;
         strength = inp.strength;
       } else if (keys.size > 0) {
@@ -520,6 +577,35 @@ export function ArcadeGame({
       // 연료 소모(분사 세기 비례) — FR-7.6
       if (dir && strength > 0 && fuel > 0) {
         fuel = Math.max(0, fuel - cfg.fuelBurn * strength * dt);
+      }
+
+      // 분사가스 파티클 배출(reduced-motion 은 파티클 없이 분사염만 — handoff-m5 §3)
+      if (!reduceMotion && dir && strength > 0 && fuel > 0) {
+        exhaustAcc = Math.min(2, exhaustAcc + dt * 12 * strength);
+        while (exhaustAcc >= 1 && exhaust.length < 60) {
+          exhaustAcc -= 1;
+          const jx = (Math.random() - 0.5) * 0.03;
+          const jy = (Math.random() - 0.5) * 0.03;
+          exhaust.push({
+            pos: { x: joop.pos.x - dir.x * 0.075 + jx, y: joop.pos.y - dir.y * 0.075 + jy },
+            vel: {
+              x: joop.vel.x * 0.3 - dir.x * (0.18 + 0.25 * strength) + jx * 2,
+              y: joop.vel.y * 0.3 - dir.y * (0.18 + 0.25 * strength) + jy * 2,
+            },
+            age: 0,
+            color: flameColor(strength),
+          });
+        }
+      }
+      for (let i = exhaust.length - 1; i >= 0; i--) {
+        const e = exhaust[i];
+        e.age += dt;
+        if (e.age > 0.6) {
+          exhaust.splice(i, 1);
+          continue;
+        }
+        e.pos.x += e.vel.x * dt;
+        e.pos.y += e.vel.y * dt;
       }
       if (fuel <= 0) {
         if (emptySince === null) emptySince = elapsed;
@@ -567,6 +653,19 @@ export function ArcadeGame({
       // ── 렌더
       drawBackground(u);
       for (const f of items) drawItem(f, u);
+
+      // 분사가스 파티클(줍스 뒤에 깔린다)
+      for (const e of exhaust) {
+        const sp = toScreen(e.pos);
+        const t = e.age / 0.6;
+        ctx.beginPath();
+        ctx.arc(sp.x, sp.y, (5 + 6 * t) * (u / 390), 0, Math.PI * 2);
+        ctx.fillStyle = e.color;
+        ctx.globalAlpha = 0.35 - 0.27 * t;
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+
       drawJoop(u, dir, strength);
 
       for (let i = floaters.length - 1; i >= 0; i--) {
@@ -606,6 +705,11 @@ export function ArcadeGame({
       ctx.globalAlpha = 1;
       ctx.fillStyle = fuelRatio < 0.25 ? dangerColor : fuelRatio < 0.5 ? amber : accent;
       ctx.fillRect(pad, pad + 13, barW * Math.min(1, fuelRatio), 7);
+      // 속도 — 최고속을 궤도 속도(7.9km/s) 스케일로 환산한 게임식 표기
+      const spd = (Math.hypot(joop.vel.x, joop.vel.y) / cfg.maxSpeed) * 7.9;
+      ctx.fillStyle = mutedColor;
+      ctx.font = `${Math.max(9, Math.round(fs * 0.75))}px ui-monospace, monospace`;
+      ctx.fillText(`${a.speed} ${spd.toFixed(1)} km/s`, pad, pad + 26);
       // 수거
       ctx.fillStyle = fgColor;
       ctx.font = `${fs}px ui-monospace, monospace`;
@@ -683,8 +787,9 @@ export function ArcadeGame({
     <div className="relative flex flex-1 flex-col">
       <div
         ref={boxRef}
-        className="relative mx-3 mb-1 flex-1 overflow-hidden rounded-md border"
+        className="game-surface relative mx-3 mb-1 flex-1 overflow-hidden rounded-md border"
         style={{ borderColor: "var(--color-neutral-600)" }}
+        onContextMenu={(e) => e.preventDefault()}
       >
         <canvas ref={canvasRef} className="absolute inset-0 block h-full w-full touch-none" />
 

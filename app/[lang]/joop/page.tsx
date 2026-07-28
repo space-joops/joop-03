@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { JoopSprite } from "@/components/joop-sprite";
+import { ReturnEarthButton } from "@/components/return-earth-button";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getMyJoop } from "@/lib/profile";
@@ -74,13 +75,16 @@ export default async function JoopPage({ params }: PageProps<"/[lang]/joop">) {
       {/* 액션 — 줍스 상태별 분기 */}
       <div className="mt-5 flex flex-col gap-3">
         {mine.status === "orbit" ? (
-          <Link
-            href={`/${lang}/joop/map`}
-            className="rounded-md py-3.5 text-center font-mono text-sm font-semibold uppercase tracking-widest"
-            style={{ background: "var(--color-primary)", color: "var(--color-bg)" }}
-          >
-            {j.openMap}
-          </Link>
+          <>
+            <Link
+              href={`/${lang}/joop/map`}
+              className="rounded-md py-3.5 text-center font-mono text-sm font-semibold uppercase tracking-widest"
+              style={{ background: "var(--color-primary)", color: "var(--color-bg)" }}
+            >
+              {j.openMap}
+            </Link>
+            <ReturnEarthButton lang={lang} dict={dict} />
+          </>
         ) : mine.status === "queued" ? (
           <Link
             href={`/${lang}/joop/launch`}

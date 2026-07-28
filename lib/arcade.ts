@@ -138,16 +138,27 @@ export type Celestial = {
 
 // 화면 오프셋 = (x − cam) × parallax × unit. 시작(cam=0)에는 지구만 아래에 보이고,
 // 오른쪽으로 2~3유닛 날면 달, 5유닛쯤에서 태양, 왼쪽으로 가면 은하수가 나타나도록 배치.
+// 에셋은 design/m5-arcade 의 사실풍 webp(대기광·터미네이터 포함) — handoff-m5 §1:
+// 천체는 화면의 30~60% 를 차지하는 대형 오브젝트(웅장함), 패럴랙스 원경 0.3 대역.
 export const CELESTIALS: readonly Celestial[] = [
-  { asset: "/game/celestial-earth.svg", x: 0, y: 1.55, size: 1.9, parallax: 0.35 },
-  { asset: "/game/celestial-milkyway.svg", x: -3.6, y: -1.0, size: 2.2, parallax: 0.28 },
-  { asset: "/game/celestial-moon.svg", x: 2.8, y: -0.7, size: 0.5, parallax: 0.4 },
-  { asset: "/game/celestial-sun.svg", x: 5.6, y: 0.3, size: 1.1, parallax: 0.32 },
-  // 장식 위성(원경, 상호작용 없음 — FR-7.7 원근 연출은 후속)
-  { asset: "/game/satellite-comm.svg", x: 1.9, y: 0.75, size: 0.26, parallax: 0.6 },
-  { asset: "/game/satellite-probe.svg", x: -2.1, y: 1.0, size: 0.22, parallax: 0.65 },
-  { asset: "/game/satellite-comm.svg", x: 4.4, y: -1.1, size: 0.24, parallax: 0.55 },
+  { asset: "/game/bg-earth.webp", x: 0, y: 1.7, size: 2.6, parallax: 0.35 },
+  { asset: "/game/bg-moon.webp", x: 2.9, y: -0.8, size: 1.0, parallax: 0.4 },
+  { asset: "/game/bg-sun.webp", x: 5.6, y: 0.3, size: 1.8, parallax: 0.32 },
+  // 장식 위성(중경 0.6, 상호작용 없음 — FR-7.7 원근 연출은 후속)
+  { asset: "/game/satellite.png", x: 1.9, y: 0.75, size: 0.34, parallax: 0.6 },
+  { asset: "/game/satellite.png", x: -2.1, y: 1.0, size: 0.26, parallax: 0.65 },
+  { asset: "/game/satellite.png", x: 4.4, y: -1.1, size: 0.3, parallax: 0.55 },
 ];
+
+/** 최원경 은하 타일(handoff-m5 §1) — 2048×1024, 수평 반복, 스크롤 계수 0.1. */
+export const GALAXY_TILE = { asset: "/game/bg-galaxy.webp", parallax: 0.1, height: 1.6 } as const;
+
+/** 태양 인접 앰버 틴트(≤8%, handoff-m5 §1) — 태양과의 월드 거리로 0~0.08 보간. */
+const SUN = CELESTIALS.find((c) => c.asset.includes("bg-sun"))!;
+export function sunTintAlpha(camX: number, camY: number): number {
+  const d = Math.hypot(camX - SUN.x, camY - SUN.y);
+  return Math.max(0, Math.min(0.08, (1 - d / 3.5) * 0.08));
+}
 
 /**
  * 별 패럴랙스용 결정적 의사난수 — 섹터(정수 좌표)에서 항상 같은 별 배치가 나온다.

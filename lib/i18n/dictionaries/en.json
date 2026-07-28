@@ -22,6 +22,7 @@
     "viewGlobe": "Globe",
     "viewTrack": "Ground track",
     "tracking": "Tracking",
+    "rankingMore": "Details",
     "cta": {
       "startWithInvite": "Start with an invite code"
     },
@@ -144,6 +145,7 @@
     "start": "Start downlink",
     "loading": "Loading assets…",
     "fuel": "Gas",
+    "speed": "SPD",
     "collected": "Collected",
     "pieces": "pieces",
     "eatenUnit": "items",
@@ -178,7 +180,17 @@
     "hint": "In Earth's shadow your joop auto-collects debris. It counts toward the ranking.",
     "linkIn": "Downlink in",
     "shadowIn": "Shadow in",
-    "passInfo": "Orbital phase runs {speed}× faster than real time (game speed). Altitude and speed are real values."
+    "passInfo": "Orbital phase runs {speed}× faster than real time (game speed). Altitude and speed are real values.",
+    "returnEarth": "Return to Earth",
+    "returnEarthConfirm": "Really return? Tap again to confirm",
+    "returningEarth": "Returning…",
+    "returnEarthNote": "Your pieces, XP and level are kept. To fly again, book a new launch!",
+    "returnEarthError": "Return failed. Please try again."
+  },
+  "rankings": {
+    "title": "Full rankings",
+    "mySummary": "You are #{rank} · {points} pieces lifetime",
+    "hint": "Ranked by lifetime pieces collected. Weekly change compares with 7 days ago."
   },
   "language": {
     "label": "Language",

@@ -9,10 +9,11 @@
 //   public/icon-512.png            512x512  (manifest, purpose "any")
 //   public/icon-maskable-512.png   512x512  (manifest, purpose "maskable" — 안전영역 준수)
 //   app/apple-icon.png             180x180  (Next.js 파일기반 apple-touch)
-//   app/favicon.ico                16+32    (PNG-in-ICO — 모던 브라우저 대상)
+//   app/favicon.ico                16+32    (PNG-in-ICO — 모던 브라우저 대상, favicon-master 소스)
+//   public/icon.svg                벡터     (manifest "any" — icon-master 사본)
 
 import sharp from "sharp";
-import { writeFile } from "node:fs/promises";
+import { copyFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
@@ -76,13 +77,21 @@ async function run() {
     console.log(`  ✓ ${t.label.padEnd(20)} → ${t.out} (${info.width}x${info.height})`);
   }
 
-  // favicon: icon-master 를 16/32 로 래스터해 ICO 로 패킹
+  // manifest 의 벡터 아이콘 — icon-master 사본 (파생물이므로 마스터와 함께만 갱신)
+  await copyFile(join(SRC, "icon-master.svg"), join(root, "public/icon.svg"));
+  console.log(`  ✓ ${"icon.svg (vector)".padEnd(20)} → public/icon.svg`);
+
+  // favicon: 초소형(16/32) 전용으로 단순화된 favicon-master 를 ICO 로 패킹
+  // (icon-master 는 디테일이 많아 16px 에서 뭉개진다 — design/m5-arcade 에서 전용 마스터 추가)
   const faviconSizes = [16, 32];
   const pngs = [];
   for (const size of faviconSizes) {
-    const buf = await sharp(join(SRC, "icon-master.svg"), { density: DENSITY })
+    // ensureAlpha + palette:false — Next(Turbopack)가 ICO 내부 PNG 를 RGBA 로 요구한다.
+    // 단순한 마스터는 sharp 가 팔레트/그레이스케일 PNG 로 압축해 버려 빌드가 깨진다.
+    const buf = await sharp(join(SRC, "favicon-master.svg"), { density: DENSITY })
       .resize(size, size, { fit: "cover" })
-      .png({ compressionLevel: 9, effort: 10 })
+      .ensureAlpha()
+      .png({ compressionLevel: 9, effort: 10, palette: false })
       .toBuffer();
     pngs.push({ size, buf });
   }

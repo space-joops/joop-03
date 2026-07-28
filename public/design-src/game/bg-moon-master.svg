@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1536" height="1536" viewBox="0 0 1536 1536">
+  <!-- 달 마스터 (실사풍) — 파생: public/game/bg-moon.webp
+       재생성: npm run gen:game (Chromium 렌더). 디스크 r=620.
+       대기가 없으므로 림 글로우 없이 경계를 또렷하게 둔다. -->
+  <defs>
+    <clipPath id="disk"><circle cx="768" cy="768" r="620"/></clipPath>
+
+    <!-- 좌상 광원 회색 + 림 다크닝 -->
+    <radialGradient id="surface" cx="40%" cy="35%" r="82%">
+      <stop offset="0%" stop-color="#dad9d3"/>
+      <stop offset="55%" stop-color="#a8a7a1"/>
+      <stop offset="88%" stop-color="#6f6f6c"/>
+      <stop offset="100%" stop-color="#4a4a4e"/>
+    </radialGradient>
+
+    <!-- 레골리스 미세 질감: 명도 노이즈 → 어두운 회색 알파 (거칠고 촘촘하게) -->
+    <filter id="regolith" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.022" numOctaves="5" seed="11"/>
+      <feColorMatrix values="0 0 0 0 0.16  0 0 0 0 0.16  0 0 0 0 0.18  0.7 0.7 0.7 0 -0.58"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+
+    <!-- 마리아(어두운 바다)용 블러 -->
+    <filter id="soft14"><feGaussianBlur stdDeviation="14"/></filter>
+    <filter id="soft2"><feGaussianBlur stdDeviation="2"/></filter>
+  </defs>
+
+  <circle cx="768" cy="768" r="620" fill="url(#surface)"/>
+  <g clip-path="url(#disk)">
+    <!-- 마리아 — 실제 배치(북동 편중) 흉내, multiply 로 표면 톤을 가라앉힌다 -->
+    <g filter="url(#soft14)" style="mix-blend-mode:multiply" opacity="0.72">
+      <ellipse cx="905" cy="500" rx="200" ry="150" fill="#84837f"/>
+      <ellipse cx="1065" cy="640" rx="140" ry="115" fill="#8a8985"/>
+      <ellipse cx="700" cy="430" rx="120" ry="90" fill="#8d8c88"/>
+      <ellipse cx="560" cy="600" rx="95" ry="75" fill="#8a8985"/>
+      <ellipse cx="850" cy="800" rx="110" ry="80" fill="#918f8b"/>
+    </g>
+    <!-- 레골리스 질감 -->
+    <circle cx="768" cy="768" r="620" fill="#ffffff" filter="url(#regolith)" opacity="0.45"/>
+    <!-- 크레이터: 좌상 광원 기준 밝은 림 + 오프셋 그림자 -->
+    <g filter="url(#soft2)">
+      <g opacity="0.75">
+        <circle cx="520" cy="905" r="58" fill="none" stroke="#c9c8c2" stroke-width="7"/>
+        <circle cx="527" cy="913" r="49" fill="#6d6d6a"/>
+        <circle cx="980" cy="950" r="40" fill="none" stroke="#c4c3bd" stroke-width="5"/>
+        <circle cx="985" cy="956" r="33" fill="#71716e"/>
+        <circle cx="405" cy="680" r="30" fill="none" stroke="#c9c8c2" stroke-width="4"/>
+        <circle cx="409" cy="685" r="24" fill="#74746f"/>
+        <circle cx="705" cy="1055" r="47" fill="none" stroke="#bdbcb6" stroke-width="6"/>
+        <circle cx="711" cy="1062" r="39" fill="#686865"/>
+        <circle cx="1105" cy="810" r="26" fill="none" stroke="#c4c3bd" stroke-width="4"/>
+        <circle cx="1108" cy="814" r="21" fill="#74746f"/>
+        <circle cx="620" cy="335" r="22" fill="none" stroke="#cfceca" stroke-width="3"/>
+        <circle cx="623" cy="338" r="17" fill="#7a7a76"/>
+        <circle cx="885" cy="1120" r="30" fill="none" stroke="#b8b7b1" stroke-width="4"/>
+        <circle cx="889" cy="1125" r="24" fill="#666663"/>
+      </g>
+      <!-- 티코풍 광조(레이) — 아주 희미하게 -->
+      <g opacity="0.16" stroke="#d6d5cf" stroke-width="3">
+        <line x1="705" y1="1055" x2="560" y2="880"/>
+        <line x1="705" y1="1055" x2="880" y2="920"/>
+        <line x1="705" y1="1055" x2="705" y2="840"/>
+      </g>
+    </g>
+    <!-- 터미네이터: 우측 야면 살짝 -->
+    <rect x="148" y="148" width="1240" height="1240" fill="url(#term)"/>
+  </g>
+  <defs>
+    <linearGradient id="term" x1="0" y1="0" x2="1" y2="0.2">
+      <stop offset="62%" stop-color="#050508" stop-opacity="0"/>
+      <stop offset="92%" stop-color="#050508" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#030306" stop-opacity="0.8"/>
+    </linearGradient>
+  </defs>
+</svg>

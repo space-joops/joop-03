@@ -9,6 +9,7 @@ import { getArcadeShadowXpCost } from "@/lib/game-config";
 import { OrbitViewer } from "@/components/orbit-viewer";
 import { OrbitStatus } from "@/components/orbit-status";
 import { LinkStatus } from "@/components/link-status";
+import { ReturnEarthButton } from "@/components/return-earth-button";
 
 export const dynamic = "force-dynamic";
 
@@ -89,6 +90,9 @@ export default async function MapPage({ params }: PageProps<"/[lang]/joop/map">)
       <div className="mt-3">
         <OrbitStatus state={state} dict={dict} />
       </div>
+
+      {/* 지구 복귀 — 발사 루프를 처음부터 다시(수거량·XP 유지) */}
+      <ReturnEarthButton lang={lang} dict={dict} />
 
       <p className="mt-3 font-mono text-xs leading-relaxed text-[var(--color-muted)]">
         {dict.space.hint}

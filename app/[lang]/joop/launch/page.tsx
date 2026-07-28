@@ -4,6 +4,7 @@ import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getMyJoop } from "@/lib/profile";
 import { getSpaceConfig } from "@/lib/space";
+import { getMyConfirmedVehicle } from "@/lib/launch";
 import { LaunchSequence } from "@/components/launch-sequence";
 
 export const dynamic = "force-dynamic";
@@ -17,7 +18,12 @@ export default async function LaunchSeqPage({ params }: PageProps<"/[lang]/joop/
   if (mine.status === "orbit") redirect(`/${lang}/joop/map`);
   if (mine.status !== "queued") redirect(`/${lang}/joop`); // 발사 자격 없음
 
-  const [dict, cfg] = await Promise.all([getDictionary(lang), getSpaceConfig()]);
+  // 내가 청약해 확정된 발사체 — 미션 행(발사체·발사장)에 표시(핸드오프 m4 §3)
+  const [dict, cfg, vehicle] = await Promise.all([
+    getDictionary(lang),
+    getSpaceConfig(),
+    getMyConfirmedVehicle(),
+  ]);
 
   return (
     <main
@@ -38,6 +44,7 @@ export default async function LaunchSeqPage({ params }: PageProps<"/[lang]/joop/
         dict={dict}
         color={mine.color}
         countdownSeconds={cfg.launchCountdownSeconds}
+        vehicle={vehicle}
       />
     </main>
   );
