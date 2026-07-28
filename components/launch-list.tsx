@@ -6,6 +6,7 @@ import { bookLaunch } from "@/app/[lang]/launch/actions";
 import type { LaunchVehicle } from "@/lib/launch";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
+import { trackLaunchBooked } from "@/lib/analytics";
 
 export function LaunchList({
   lang,
@@ -29,6 +30,7 @@ export function LaunchList({
     startTransition(async () => {
       const res = await bookLaunch(lang, id);
       if (res.ok) {
+        trackLaunchBooked(res.status);
         setLocalStatus((s) => ({ ...s, [id]: res.status }));
         router.refresh();
       } else {

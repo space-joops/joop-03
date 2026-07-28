@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import Link from "next/link";
 import {
   redeemInvite,
@@ -9,6 +9,7 @@ import {
 } from "@/app/[lang]/onboarding/actions";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
+import { trackWaitlistJoined } from "@/lib/analytics";
 
 export function OnboardingForm({ lang, dict }: { lang: Locale; dict: Dictionary }) {
   const t = dict.onboarding;
@@ -25,6 +26,12 @@ export function OnboardingForm({ lang, dict }: { lang: Locale; dict: Dictionary 
 
   const inviteErr = inviteState?.error;
   const waitErr = waitState?.error;
+
+  // joinWaitlist는 redirect 없이 상태를 반환하므로(성공 신호 = error:"joined"),
+  // 렌더 본문이 아니라 waitState 변화에 걸린 effect에서 1회만 발화한다.
+  useEffect(() => {
+    if (waitState?.error === "joined") trackWaitlistJoined();
+  }, [waitState]);
 
   const fieldClass =
     "w-full rounded-md border px-3 py-2.5 font-mono text-sm text-[var(--color-fg)] outline-none";

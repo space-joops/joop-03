@@ -18,6 +18,7 @@ import {
   type MinigameConfig,
 } from "@/lib/minigame";
 import { submitMinigameResult } from "@/app/[lang]/joop/actions";
+import { trackMinigameCompleted } from "@/lib/analytics";
 import {
   JOOP_FEET_Y,
   JOOP_FRAME,
@@ -703,6 +704,7 @@ export function GroundMinigame({
     try {
       const res = await submitMinigameResult(summary.caught);
       if (res.ok) {
+        trackMinigameCompleted(res.xpGained, res.level, res.xp);
         setResult({ xpGained: res.xpGained, level: res.level });
         setPhase("saved");
       } else {

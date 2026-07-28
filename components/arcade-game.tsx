@@ -20,6 +20,7 @@ import { JOOP_FRAME, joopSheetPath, sheetForColor, spriteFrame } from "@/lib/joo
 import { payShadowEntry, submitArcadeResult } from "@/app/[lang]/joop/arcade/actions";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
+import { trackArcadeCompleted } from "@/lib/analytics";
 
 type Phase = "ready" | "playing" | "over" | "saving" | "saved";
 
@@ -648,6 +649,7 @@ export function ArcadeGame({
     try {
       const res = await submitArcadeResult(summary.collected);
       if (res.ok) {
+        trackArcadeCompleted(res.collected, res.totalCollected);
         setResult({ collected: res.collected, total: res.totalCollected });
         setPhase("saved");
       } else {
