@@ -23,7 +23,7 @@ export const DEFAULT_ARCADE_CONFIG: ArcadeConfig = {
   fuel: 100,
   fuelBurn: 12,
   friction: 0,
-  spawnInterval: 1.1,
+  spawnInterval: 0.7, // UX 리뷰: "쓰레기가 안 보인다" — 1.1 → 0.7 로 밀도 상향
   fuelItemRatio: 0.12,
 };
 

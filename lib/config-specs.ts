@@ -269,7 +269,7 @@ export const CONFIG_SPECS: readonly ConfigSpec[] = [
     max: 5,
     step: 0.05,
     unit: "초",
-    fallback: 1.1,
+    fallback: 0.7,
     restartRequired: true,
   },
   {

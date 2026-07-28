@@ -144,6 +144,67 @@ body {
   border-radius: var(--radius-md);
 }
 
+/* SF 프레임 버튼 — 마크업에서 `crt-brackets btn-brackets` 로 합성해 쓴다(브래킷은
+ * .crt-brackets::before 가 그림). 색 변형은 인라인 --bracket-color / color 로.
+ * 사용처: 대시보드·우주 지도 CTA·지구 복귀 버튼 (UX 리뷰 2026-07-28 "SF 와이어프레임 버튼") */
+.btn-brackets {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 0.875rem 1rem;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: color-mix(in srgb, var(--color-surface) 80%, transparent);
+  color: var(--color-fg);
+}
+.btn-brackets:active {
+  background: color-mix(in srgb, var(--color-surface) 100%, transparent);
+}
+.btn-brackets:disabled {
+  opacity: 0.6;
+}
+/* 큰 CTA 변형 (지불 진입 등) */
+.btn-brackets-lg {
+  padding: 1.05rem 1rem;
+  font-size: 1rem;
+}
+
+/* 픽셀 아트 업스케일 — 큰 스프라이트 초상 등 (background-image 에도 적용됨) */
+.pixelated {
+  image-rendering: pixelated;
+}
+
+/* 음영 대기 "재활용 중" 연출 — 쓰레기 아이콘이 수거함으로 떨어지며 사라진다.
+ * 사용처: arcade-game.tsx ready 오버레이. delay 는 인라인 스타일로 스태거. */
+.debris-drop {
+  animation: debris-drop 1.4s ease-in infinite;
+}
+@keyframes debris-drop {
+  0% {
+    transform: translateY(-14px);
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.9;
+  }
+  80% {
+    transform: translateY(10px);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(14px);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .debris-drop {
+    animation: none; /* 정지 배치 */
+  }
+}
+
 /* 스피드라인(≡ 날개) — 워드마크 좌우 장식. color 는 부모 currentColor. */
 .speedlines {
   flex: 1;
@@ -211,6 +272,15 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .joop-sprite-idle {
     animation: none; /* meta 규칙: idle 프레임 0 고정 */
+  }
+}
+
+/* 데스크톱/타블릿 최소 대응 — 세로 모바일 1순위 원칙(ADR 0002)은 유지하되,
+ * 넓은 화면에서 중앙 컬럼(max-w-md)과 빈 좌우가 구분되도록 얇은 경계만 준다.
+ * crt-scanlines 는 게임 트리 전용 body 클래스라 admin 은 영향 없다. */
+@media (min-width: 480px) {
+  body.crt-scanlines main {
+    border-inline: 1px solid var(--color-grid);
   }
 }
 

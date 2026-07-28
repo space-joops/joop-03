@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
 import type { RankingRow } from "@/lib/rankings";
-import { Sparkline } from "@/components/sparkline";
+import { DebrisKindIcons } from "@/components/debris-kind-icons";
 
 // 등락 = prevRank - rank (양수면 상승)
 function ChangeIndicator({ delta }: { delta: number }) {
@@ -54,6 +54,8 @@ function RankRow({
           </span>
         )}
       </span>
+      {/* 수거 종류(기여도) 아이콘 — 내 행은 로컬 실데이터, 타인 행은 결정적 장식 */}
+      <DebrisKindIcons joopId={r.joopId} mine={mine} count={compact ? 2 : 3} size={compact ? 12 : 14} />
       <span className="font-mono text-xs text-[var(--color-secondary)]">
         {r.totalCollected.toLocaleString()} {dict.firstScreen.pointsUnit}
       </span>
@@ -84,8 +86,6 @@ export function RankingList({
   /** 헤더 우측 "자세히 →" 링크(첫 화면 → /rankings) */
   showMore?: boolean;
 }) {
-  // 상위 랭커의 주간 수거량으로 전체 주간 추세 스파크라인
-  const weeklyTrend = rows.map((r) => r.collectedInWeek);
   const myInList = !!myRanking && rows.some((r) => r.joopId === myRanking.joopId);
 
   return (
@@ -100,11 +100,9 @@ export function RankingList({
           <h2 className="font-mono text-xs uppercase tracking-widest text-[var(--color-secondary)]">
             {dict.firstScreen.ranking}
           </h2>
+          {/* 스파크라인 제거(2026-07-28) — 입력이 시계열이 아니라 순위순 나열이라
+              항상 우하향하는 거짓 신호였다. 실제 일별 집계 뷰가 생기면 재도입. */}
           <div className="flex items-center gap-2">
-            <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--color-secondary)]">
-              {dict.firstScreen.weeklyChange}
-            </span>
-            <Sparkline values={weeklyTrend} />
             {showMore && (
               <Link
                 href={`/${lang}/rankings`}

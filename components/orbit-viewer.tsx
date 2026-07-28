@@ -93,8 +93,10 @@ export function OrbitViewer({
             lang={lang}
             dict={dict}
             shadowFraction={shadowFraction}
-            // 스택(우주 지도)에서는 LinkStatus·OrbitStatus 가 지표를 담당한다
+            // 스택(우주 지도)에서는 LinkStatus·OrbitStatus 가 지표를 담당한다.
+            // mini: 지구본이 主, 추적 지도는 축소·톤다운 보조(두 맵의 시각 충돌 완화)
             showIndicators={layout !== "stack"}
+            mini={layout === "stack"}
           />
         </div>
       )}

@@ -31,6 +31,7 @@ export function OrbitTrackMap({
   dict,
   showIndicators = true,
   shadowFraction = 0.5,
+  mini = false,
 }: {
   snapshot: OrbitalSnapshot;
   /** 강조할 내 줍스 id (궤도에 없으면 null → 첫 줍스를 관측 대상으로) */
@@ -45,6 +46,9 @@ export function OrbitTrackMap({
   showIndicators?: boolean;
   /** 교신 판정에 쓰는 음영 비율(config shadow_fraction). 서버 판정과 같은 값을 넘겨야 한다. */
   shadowFraction?: number;
+  /** 축소·톤다운 보조 뷰(우주 지도 stack) — 지구본이 主, 추적 지도는 보조라는 위계.
+   *  ⚠️ CSS transform(perspective 등)은 캔버스 rect·DPR 계산을 어긋내므로 쓰지 않는다. */
+  mini?: boolean;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const snapshotRef = useRef(snapshot);
@@ -332,7 +336,7 @@ export function OrbitTrackMap({
   );
 
   if (!focus) {
-    return <div className="aspect-[2/1] w-full" />;
+    return <div className={`${mini ? "aspect-[3/1]" : "aspect-[2/1]"} w-full`} />;
   }
 
   const latH = ground ? `${Math.abs(ground.latitude).toFixed(0)}°${ground.latitude >= 0 ? "N" : "S"}` : "—";
@@ -343,7 +347,7 @@ export function OrbitTrackMap({
     <div>
       <canvas
         ref={canvasRef}
-        className="block aspect-[2/1] w-full"
+        className={`block w-full ${mini ? "aspect-[3/1] opacity-85" : "aspect-[2/1]"}`}
         role="img"
         aria-label={`${dict.firstScreen.tracking}: ${focus.name} — ${region}`}
       />

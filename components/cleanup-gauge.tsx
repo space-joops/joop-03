@@ -6,7 +6,7 @@ export function CleanupGauge({
   totals,
   dict,
 }: {
-  totals: { debris: number; percent: number };
+  totals: { debris: number; percent: number; target?: number };
   dict: Dictionary;
 }) {
   const percent = Math.min(100, Math.max(0, totals.percent));
@@ -72,12 +72,40 @@ export function CleanupGauge({
           ))}
         </div>
 
-        <p className="font-mono text-lg leading-6 text-[var(--color-secondary)]" style={{ textShadow: "var(--glow-secondary)" }}>
-          {totals.debris.toLocaleString()}{" "}
-          <span className="text-sm text-[var(--color-muted)]" style={{ textShadow: "none" }}>
-            {dict.firstScreen.pieces}
-          </span>
-        </p>
+        {/* 수치 행 — 쓰레기 봉투(채움 = percent, 서버 렌더) + 대형 숫자 + 목표 대비 (UX 리뷰) */}
+        <div className="flex items-center gap-2">
+          <svg width="22" height="26" viewBox="0 0 22 26" aria-hidden className="shrink-0">
+            {/* 봉투 외곽 + percent 만큼 아래에서 차오르는 채움 */}
+            <path
+              d="M7 5 L7 2.5 L15 2.5 L15 5 L19 8 L19 22.5 a1.5 1.5 0 0 1 -1.5 1.5 L4.5 24 A1.5 1.5 0 0 1 3 22.5 L3 8 Z"
+              fill="var(--color-surface)"
+              stroke="var(--color-secondary)"
+              strokeWidth="1.4"
+            />
+            <clipPath id="bagclip">
+              <path d="M7 5 L7 2.5 L15 2.5 L15 5 L19 8 L19 22.5 a1.5 1.5 0 0 1 -1.5 1.5 L4.5 24 A1.5 1.5 0 0 1 3 22.5 L3 8 Z" />
+            </clipPath>
+            <rect
+              x="0"
+              y={24 - (19 * Math.max(4, percent)) / 100}
+              width="22"
+              height={(19 * Math.max(4, percent)) / 100 + 2}
+              fill="var(--color-secondary)"
+              opacity="0.85"
+              clipPath="url(#bagclip)"
+            />
+          </svg>
+          <p
+            className="font-mono font-semibold leading-7 text-[var(--color-secondary)]"
+            style={{ fontSize: "var(--text-display-md)", textShadow: "var(--glow-secondary)" }}
+          >
+            {totals.debris.toLocaleString()}{" "}
+            <span className="text-sm font-normal text-[var(--color-muted)]" style={{ textShadow: "none" }}>
+              {dict.firstScreen.pieces}
+              {totals.target ? ` / ${totals.target.toLocaleString()}` : ""}
+            </span>
+          </p>
+        </div>
       </div>
     </section>
   );

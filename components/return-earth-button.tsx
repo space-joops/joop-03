@@ -43,11 +43,12 @@ export function ReturnEarthButton({ lang, dict }: { lang: Locale; dict: Dictiona
       <button
         onClick={onClick}
         disabled={busy}
-        className="w-full rounded-md border py-2.5 text-center font-mono text-xs font-semibold uppercase tracking-widest disabled:opacity-60"
+        className="crt-brackets btn-brackets text-xs"
         style={
-          arming
-            ? { borderColor: "var(--color-danger)", color: "var(--color-danger)" }
-            : { borderColor: "var(--color-neutral-600)", color: "var(--color-muted)" }
+          {
+            "--bracket-color": arming ? "var(--color-danger)" : "var(--color-neutral-600)",
+            color: arming ? "var(--color-danger)" : "var(--color-muted)",
+          } as React.CSSProperties
         }
       >
         {busy ? t.returningEarth : arming ? t.returnEarthConfirm : t.returnEarth}
