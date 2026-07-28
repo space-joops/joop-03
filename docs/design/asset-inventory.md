@@ -48,10 +48,10 @@
 |---|---|---|---|---|
 | 줍스 캐릭터 | 후속 | PNG 시트 | ✅ | ✅ **시트 적용됨** (PR #19 반입): `public/game/joop-sheet-{green,amber,cyan,magenta,lime,gold}.png` + `joop-sheet.meta.json` — 6색 × idle/move/collect 각 2프레임(128px). 지상 미니게임·브리핑·대시보드에서 사용(`lib/joop-sprite.ts`). 구 SVG 시안 `joop-{green,amber,cyan}.svg` 는 미사용 보관 |
 | 우주 쓰레기 스프라이트 세트 | 후속 | PNG 시트 | ✅ | ✅ **시트 적용됨** (PR #19 반입): `public/game/debris-sheet.png` + meta — 6종(캔·볼트·너트·패널·구조재·회로). 미니게임에서 사용. 구 SVG `debris-*.svg` 는 미사용 보관 |
-| 배경 천체 — 지구 | 후속 | SVG(시안) → WebP | ✅ | ✅ **제작됨**: `public/game/celestial-earth.svg` — 경위도 그리드 + 형광 대륙 + 터미네이터 |
-| 배경 천체 — 달 | 후속 | SVG(시안) → WebP | ✅ | ✅ **제작됨**: `public/game/celestial-moon.svg` — 크레이터/마리아 |
-| 배경 천체 — 태양 | 후속 | SVG(시안) → WebP/PNG | ✅ | ✅ **제작됨**: `public/game/celestial-sun.svg` — 앰버 광구 + 형광 코로나 발광 |
-| 배경 — 은하수/은하 | 후속 | SVG(시안) → WebP | ✅ | ✅ **제작됨**: `public/game/celestial-milkyway.svg` — **가로 심리스 타일** 밴드(512×200) |
+| 배경 천체 — 지구 | 후속 | SVG 마스터 → WebP | ✅ | ✅ **실사풍 적용** (2026-07-28): `public/game/bg-earth.webp` (2048²) — world-atlas 실지형 대륙(`bg-earth-land.png`, 스크립트 산출) + feTurbulence 구름 + 대기 림 + 터미네이터. 마스터 `public/design-src/game/bg-earth-master.svg`, 재생성 `npm run gen:game`. 구 시안 `celestial-earth.svg` 는 미사용 보관 |
+| 배경 천체 — 달 | 후속 | SVG 마스터 → WebP | ✅ | ✅ **실사풍 적용**: `public/game/bg-moon.webp` (1536²) — 레골리스 노이즈 + 마리아 + 저대비 크레이터. 마스터 `bg-moon-master.svg`, `gen:game`. 구 시안 `celestial-moon.svg` 미사용 보관 |
+| 배경 천체 — 태양 | 후속 | SVG 마스터 → WebP | ✅ | ✅ **실사풍 적용**: `public/game/bg-sun.webp` (1792²) — 순백 코어 + 과다노출 글로우(만화 광선 제거). 마스터 `bg-sun-master.svg`, `gen:game`. 구 시안 `celestial-sun.svg` 미사용 보관 |
+| 배경 — 은하수/은하 | 후속 | SVG 마스터 → WebP | ✅ | ✅ **실사풍 적용**: `public/game/bg-galaxy.webp` — **가로 심리스 타일**(3072×1536, stitchTiles) 밴드 + 더스트 레인 + 시드 별밭(gen:game 이 주입). 마스터 `bg-galaxy-master.svg`. 구 시안 `celestial-milkyway.svg` 미사용 보관 |
 | 위성 스프라이트 | 후속 | SVG(시안) → PNG/WebP(+시트) | ✅ | ✅ **제작됨**: `public/game/satellite-{comm,probe}.svg` — 근경/원경 2종(원근 스케일용) |
 | 5원 반투명 조이스틱 | 후속 | SVG | ✅ | ✅ **제작됨**: `public/game/joystick.svg` — 원 5개·반투명·분사량(라디얼 게이지) 상태 |
 | 분사가스/이펙트 | 후속 | PNG(+시트) | ✅ | ⏳ 미제작 — 정지 표현은 조이스틱/캐릭터에 포함. 파티클 프레임 시트는 후속 |

@@ -28,6 +28,14 @@ type Phase = "ready" | "playing" | "over" | "saving" | "saved";
 // 조이스틱 바깥 링 반지름(화면 최소변 비율). 0.17 → 0.24 로 확대해 5단계 미세 조정이 쉽게.
 const JOYSTICK_R = 0.24;
 
+// 별 색온도 팔레트(웜화이트/백/청/주황) — 은하 마스터의 별밭과 같은 분포(가중치 4:3:2:1).
+const STAR_COLORS = [
+  "#fff3e4", "#fff3e4", "#fff3e4", "#fff3e4",
+  "#f4f7ff", "#f4f7ff", "#f4f7ff",
+  "#cfe0ff", "#cfe0ff",
+  "#ffd9a8",
+] as const;
+
 // 아케이드(우주 수거, M5 / EPIC 7) — 수신 지역에서 진입하는 본편 게임.
 // 조작(FR-7.4): 화면 아무 곳이나 누르면 그 자리에 5원 반투명 조이스틱.
 //   드래그 방향 = 분사 방향, 링 단계(1~5) = 분사량 0.2~1.0 미세 조정.
@@ -314,8 +322,8 @@ export function ArcadeGame({
 
     // ── 그리기
     const drawBackground = (u: number) => {
-      // 딥스페이스
-      ctx.fillStyle = "#03060d";
+      // 딥스페이스 — 실사 톤은 칠흑에 가깝다(색감은 은하 타일이 담당)
+      ctx.fillStyle = "#010208";
       ctx.fillRect(0, 0, W, H);
 
       // 최원경 은하 타일(handoff-m5 §1) — 수평 반복, 스크롤 계수 0.1
@@ -325,12 +333,13 @@ export function ArcadeGame({
         const tw = th * (gimg.naturalWidth / gimg.naturalHeight);
         const gy = H / 2 - joop.pos.y * GALAXY_TILE.parallax * u - th / 2;
         let gx = (-(joop.pos.x * GALAXY_TILE.parallax * u) % tw) - tw;
-        ctx.globalAlpha = 0.9;
+        ctx.globalAlpha = 0.95;
         for (; gx < W; gx += tw) ctx.drawImage(gimg, gx, gy, tw, th);
         ctx.globalAlpha = 1;
       }
 
-      // 별 2겹 패럴랙스 — 섹터 시드 고정(starHash)이라 흐르기만 하고 반짝이지 않는다
+      // 별 2겹 패럴랙스 — 섹터 시드 고정(starHash)이라 흐르기만 하고 반짝이지 않는다.
+      // 실사 톤: 정사각 점 대신 원, 색온도 4종(웜화이트/백/청/주황) + 반경 변주.
       for (const layer of [
         { p: 0.35, density: 5, alpha: 0.4, r: 0.8 },
         { p: 0.6, density: 3, alpha: 0.8, r: 1.2 },
@@ -339,7 +348,6 @@ export function ArcadeGame({
         const camY = joop.pos.y * layer.p;
         const halfW = W / 2 / u;
         const halfH = H / 2 / u;
-        ctx.fillStyle = fgColor;
         ctx.globalAlpha = layer.alpha;
         for (let ix = Math.floor(camX - halfW); ix <= Math.floor(camX + halfW) + 1; ix++) {
           for (let iy = Math.floor(camY - halfH); iy <= Math.floor(camY + halfH) + 1; iy++) {
@@ -347,7 +355,11 @@ export function ArcadeGame({
               const sx = W / 2 + (ix + starHash(ix, iy, k * 2) - camX) * u;
               const sy = H / 2 + (iy + starHash(ix, iy, k * 2 + 1) - camY) * u;
               if (sx < -2 || sx > W + 2 || sy < -2 || sy > H + 2) continue;
-              ctx.fillRect(sx, sy, layer.r, layer.r);
+              const v = starHash(ix, iy, k * 2 + 2);
+              ctx.fillStyle = STAR_COLORS[Math.min(STAR_COLORS.length - 1, (v * STAR_COLORS.length) | 0)];
+              ctx.beginPath();
+              ctx.arc(sx, sy, layer.r * (0.7 + v * 0.6), 0, Math.PI * 2);
+              ctx.fill();
             }
           }
         }
