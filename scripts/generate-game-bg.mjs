@@ -122,9 +122,9 @@ async function renderLandLayer(browser) {
       const ctx = cv.getContext("2d");
       const img = ctx.createImageData(size, size);
       const px = img.data;
-      // 팔레트: 채도 억제한 초록 2 + 사막 갈색 (네온 금지)
-      const GREEN_A = [63, 90, 52], GREEN_B = [89, 104, 59], DESERT = [138, 122, 85];
-      const OCEAN = [23, 80, 126]; // 림 근처 대기 산란 톤다운용
+      // 팔레트: 밝은 행성 톤(레퍼런스 2026-07-28)에 맞춘 파스텔 초록 2 + 사막 (네온 금지)
+      const GREEN_A = [92, 130, 105], GREEN_B = [122, 138, 96], DESERT = [172, 155, 116];
+      const OCEAN = [58, 135, 190]; // 대기 산란 톤다운용 — 마스터 ocean 그라데이션 중간톤
       for (let y = 0; y < size; y++) {
         for (let x = 0; x < size; x++) {
           const nx = (x - R) / R;
@@ -143,14 +143,14 @@ async function renderLandLayer(browser) {
           if (n < 0.42) c = GREEN_A;
           else if (n < 0.62) c = GREEN_B;
           else c = DESERT;
-          // 림 근처는 대기 산란으로 바다색에 20~35% 흡수
+          // 전면 22% + 림 근처 추가 산란 — 대륙이 배경 블루에 스며들어 밝은 행성 톤 유지
           const rho = Math.sqrt(rho2);
-          const mix = rho > 0.82 ? 0.2 + ((rho - 0.82) / 0.18) * 0.15 : 0;
+          const mix = 0.22 + (rho > 0.82 ? ((rho - 0.82) / 0.18) * 0.15 : 0);
           const i = (y * size + x) * 4;
           px[i] = c[0] + (OCEAN[0] - c[0]) * mix;
           px[i + 1] = c[1] + (OCEAN[1] - c[1]) * mix;
           px[i + 2] = c[2] + (OCEAN[2] - c[2]) * mix;
-          px[i + 3] = 235; // 살짝 투명 — 해양 그라데이션과 어우러지게
+          px[i + 3] = 210; // 살짝 투명 — 해양 그라데이션과 어우러지게
         }
       }
       ctx.putImageData(img, 0, 0);

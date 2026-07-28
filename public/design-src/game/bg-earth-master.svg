@@ -6,27 +6,34 @@
   <defs>
     <clipPath id="globe"><circle cx="1024" cy="1024" r="830"/></clipPath>
 
-    <!-- 해양: 좌상 광원 딥블루 -->
+    <!-- 해양: 밝은 하늘색 계열(디자인 레퍼런스 2026-07-28 — 빛나는 라이트블루 행성) -->
     <radialGradient id="ocean" cx="40%" cy="34%" r="88%">
-      <stop offset="0%" stop-color="#2e6da4"/>
-      <stop offset="45%" stop-color="#17507e"/>
-      <stop offset="80%" stop-color="#0b2f52"/>
-      <stop offset="100%" stop-color="#061b33"/>
+      <stop offset="0%" stop-color="#8fd0f2"/>
+      <stop offset="45%" stop-color="#4a9fd8"/>
+      <stop offset="80%" stop-color="#1d6bab"/>
+      <stop offset="100%" stop-color="#11487d"/>
     </radialGradient>
 
-    <!-- 터미네이터: 우하단 야면 -->
+    <!-- 터미네이터: 우하단 야면 — 레퍼런스는 전체적으로 밝아 얕게만 -->
     <linearGradient id="term" x1="0" y1="0" x2="0.85" y2="0.62">
-      <stop offset="52%" stop-color="#000410" stop-opacity="0"/>
-      <stop offset="80%" stop-color="#000410" stop-opacity="0.55"/>
-      <stop offset="100%" stop-color="#000208" stop-opacity="0.93"/>
+      <stop offset="55%" stop-color="#02142c" stop-opacity="0"/>
+      <stop offset="82%" stop-color="#02142c" stop-opacity="0.32"/>
+      <stop offset="100%" stop-color="#010c1e" stop-opacity="0.66"/>
     </linearGradient>
 
-    <!-- 얇은 대기 림: 디스크 반경의 96~103% 대역, 안쪽 흰색→바깥 청색 페이드 -->
+    <!-- 대기 림: 레퍼런스처럼 두껍고 하얗게 빛나는 띠(디스크 94~103%) -->
     <radialGradient id="rim">
-      <stop offset="90%" stop-color="#9fd4ff" stop-opacity="0"/>
-      <stop offset="95.5%" stop-color="#bfe4ff" stop-opacity="0.5"/>
-      <stop offset="97.5%" stop-color="#eef8ff" stop-opacity="0.85"/>
-      <stop offset="100%" stop-color="#4fa8e8" stop-opacity="0"/>
+      <stop offset="86%" stop-color="#bfe4ff" stop-opacity="0"/>
+      <stop offset="93%" stop-color="#dff2ff" stop-opacity="0.55"/>
+      <stop offset="97%" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#7fc4f2" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- 림 안쪽으로 번지는 백색 대기 헤이즈 — 레퍼런스의 발광하는 지평선 -->
+    <radialGradient id="haze">
+      <stop offset="74%" stop-color="#eaf7ff" stop-opacity="0"/>
+      <stop offset="92%" stop-color="#eaf7ff" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#f6fbff" stop-opacity="0.6"/>
     </radialGradient>
 
     <!-- 구름: fractalNoise 를 소용돌이(warp)로 변형 → 밝은 부분만 흰 알파로 -->
@@ -34,7 +41,7 @@
       <feTurbulence type="fractalNoise" baseFrequency="0.006 0.011" numOctaves="5" seed="7" result="n"/>
       <feTurbulence type="turbulence" baseFrequency="0.0028" numOctaves="2" seed="31" result="warp"/>
       <feDisplacementMap in="n" in2="warp" scale="140" xChannelSelector="R" yChannelSelector="G"/>
-      <feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.9 0.9 0.9 0 -0.9"/>
+      <feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.9 0.9 0.9 0 -0.84"/>
       <feGaussianBlur stdDeviation="1.4"/>
       <feComposite in2="SourceGraphic" operator="in"/>
     </filter>
@@ -44,6 +51,7 @@
   <g clip-path="url(#globe)">
     <image href="bg-earth-land.png" x="194" y="194" width="1660" height="1660"/>
     <circle cx="1024" cy="1024" r="830" fill="#ffffff" filter="url(#clouds)"/>
+    <circle cx="1024" cy="1024" r="830" fill="url(#haze)"/>
     <rect x="194" y="194" width="1660" height="1660" fill="url(#term)"/>
   </g>
   <!-- 림은 클립 밖 — 디스크를 살짝 초과해 우주로 번진다 -->

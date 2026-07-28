@@ -138,12 +138,12 @@ export type Celestial = {
 
 // 화면 오프셋 = (x − cam) × parallax × unit. 시작(cam=0)에는 지구만 아래에 보이고,
 // 오른쪽으로 2~3유닛 날면 달, 5유닛쯤에서 태양, 왼쪽으로 가면 은하수가 나타나도록 배치.
-// 에셋은 design/m5-arcade 의 사실풍 webp(대기광·터미네이터 포함) — handoff-m5 §1:
-// 천체는 화면의 30~60% 를 차지하는 대형 오브젝트(웅장함), 패럴랙스 원경 0.3 대역.
+// 크기는 실제 비율감 기준(디자인 레퍼런스 2026-07-28): 지구는 지평선처럼 화면 하단을
+// 가득 채우는 초대형, 달은 지구보다 확연히 작게, 태양은 원반은 작지만 글로우가 넓게.
 export const CELESTIALS: readonly Celestial[] = [
-  { asset: "/game/bg-earth.webp", x: 0, y: 1.7, size: 2.6, parallax: 0.35 },
-  { asset: "/game/bg-moon.webp", x: 2.9, y: -0.8, size: 1.0, parallax: 0.4 },
-  { asset: "/game/bg-sun.webp", x: 5.6, y: 0.3, size: 1.8, parallax: 0.32 },
+  { asset: "/game/bg-earth.webp", x: 0, y: 2.0, size: 3.2, parallax: 0.35 },
+  { asset: "/game/bg-moon.webp", x: 2.9, y: -0.8, size: 0.55, parallax: 0.4 },
+  { asset: "/game/bg-sun.webp", x: 5.6, y: 0.3, size: 1.1, parallax: 0.32 },
   // 장식 위성(중경 0.6, 상호작용 없음 — FR-7.7 원근 연출은 후속)
   { asset: "/game/satellite.png", x: 1.9, y: 0.75, size: 0.34, parallax: 0.6 },
   { asset: "/game/satellite.png", x: -2.1, y: 1.0, size: 0.26, parallax: 0.65 },
