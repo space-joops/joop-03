@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
+import { SplashMark } from "@/components/splash-mark";
 
 // 인앱 스플래시 — 매 방문(전체 로드)마다 표시하는 브랜드 부팅 화면.
 // iOS 네이티브 스플래시(appleWebApp.startupImage)는 설치형 + 해상도 일치 기기에서만
@@ -34,49 +34,9 @@ export function SplashScreen({ appName, skipLabel }: { appName: string; skipLabe
       aria-label={appName}
       className={`splash-screen${stage === "leaving" ? " splash-leaving" : ""}`}
     >
-      {/* 브랜드 심볼 + 워드마크 (홈 헤더와 같은 언어) */}
-      <Image
-        src="/brand/logo-symbol.svg"
-        alt=""
-        width={72}
-        height={72}
-        className="block h-18 w-18"
-        aria-hidden
-      />
-      <span
-        className="flex w-56 items-center gap-2 text-[var(--color-primary)]"
-        style={{ textShadow: "var(--glow-primary)" }}
-        aria-hidden
-      >
-        <span className="speedlines" />
-        <span className="font-mono text-2xl font-semibold tracking-[0.2em]">{appName}</span>
-        <span className="speedlines" />
-      </span>
-
-      {/* 부팅 진행 바 — 노출 시간 동안 채워진다 (장식) */}
-      <div
-        className="h-2 w-56 overflow-hidden rounded-[2px]"
-        style={{
-          background: "var(--color-surface)",
-          border: "1px solid color-mix(in srgb, var(--color-secondary) 45%, transparent)",
-        }}
-        aria-hidden
-      >
-        <div
-          className="splash-boot-fill h-full"
-          style={{
-            background: "var(--color-secondary)",
-            boxShadow: "var(--glow-secondary)",
-            animationDuration: `${SPLASH_MS}ms`,
-          }}
-        />
-      </div>
-      <p
-        className="font-mono text-[10px] uppercase tracking-widest text-[var(--color-secondary)]"
-        aria-hidden
-      >
-        BOOT SEQUENCE // {appName}
-      </p>
+      {/* 디자이너 원본 스플래시(네이티브 PNG 와 동일 배치) + 궤도·세그먼트 애니메이션.
+          궤도 점이 한 바퀴 도는 데 걸리는 시간이 SPLASH_MS 와 같아 진행 신호 역할을 한다. */}
+      <SplashMark />
 
       <button
         type="button"

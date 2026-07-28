@@ -213,7 +213,9 @@ body {
   opacity: 0.7;
 }
 
-/* 인앱 스플래시 (components/splash-screen.tsx) — 매 방문 부팅 화면.
+/* 인앱 스플래시 (components/splash-screen.tsx + splash-mark.tsx) — 매 방문 부팅 화면.
+ * 색은 디자이너 원본 팔레트(#05080a/#39ff14/#ffb000)라 앱 토큰과 별개다 —
+ * iOS 네이티브 스플래시 PNG 와 이어붙이기 위한 의도적 선택.
  * z-index 는 스캔라인(40)·VersionBadge(50)·PWA 배너(50)보다 위. */
 .splash-screen {
   position: fixed;
@@ -223,35 +225,98 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
-  background: var(--color-bg);
+  background: #05080a;
   transition: opacity 300ms ease-out;
 }
 .splash-leaving {
   opacity: 0;
   pointer-events: none;
 }
-.splash-boot-fill {
+.splash-mark {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  transform-origin: left;
-  animation-name: splash-boot;
-  animation-timing-function: linear;
-  animation-fill-mode: forwards;
+  height: 100%;
+  /* 궤도 1회전 = 스플래시 최소 노출 시간. 한 바퀴 = 부팅 완료라 진행 바를 대신한다. */
+  --splash-orbit-dur: 2800ms;
 }
-@keyframes splash-boot {
+
+/* 궤도 점 = 시계 바늘.
+ * squash(ry/rx) → spin(t) → 점에서 counter-rotate(-t)·counter-scale(rx/ry) 로 원형을 복원한다.
+ * 결과 위치 = (512+330·cos t, 512+120·sin t) 인 정확한 타원 궤도.
+ * 두 애니메이션은 duration·timing 이 같아 항상 동기. 기본 transform(=애니메이션 없을 때)은
+ * 원본 디자인의 점 위치(로컬 각도 −35°)라 reduced-motion 정지 상태가 곧 원본이다. */
+.splash-orbit-squash {
+  transform: scaleY(0.363636);
+  transform-origin: 512px 512px;
+}
+.splash-orbit-spin {
+  transform: rotate(-35deg);
+  transform-origin: 512px 512px;
+  animation: splash-orbit-spin var(--splash-orbit-dur) linear infinite;
+}
+.splash-orbit-dot {
+  transform: rotate(35deg) scaleY(2.75);
+  transform-origin: 842px 512px;
+  animation: splash-orbit-dot var(--splash-orbit-dur) linear infinite;
+}
+@keyframes splash-orbit-spin {
   from {
-    transform: scaleX(0);
+    transform: rotate(-35deg);
   }
   to {
-    transform: scaleX(1);
+    transform: rotate(325deg);
   }
 }
+@keyframes splash-orbit-dot {
+  from {
+    transform: rotate(35deg) scaleY(2.75);
+  }
+  to {
+    transform: rotate(-325deg) scaleY(2.75);
+  }
+}
+.splash-orbit-glow {
+  animation: splash-orbit-glow 1.6s ease-in-out infinite;
+}
+@keyframes splash-orbit-glow {
+  0%,
+  100% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* 7-세그먼트 워드마크 = 디지털 시계 부팅 — 글자가 순차 점등된다(총 ~0.8초). */
+.splash-seg {
+  opacity: 0;
+  animation: splash-seg-on 180ms ease-out forwards;
+  animation-delay: calc(var(--i) * 130ms);
+}
+@keyframes splash-seg-on {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .splash-screen {
     transition: none;
   }
-  .splash-boot-fill {
-    animation: none; /* 정지: 가득 찬 바 */
+  /* 정지 상태 = 원본 디자인 그대로(점은 우상단, 워드마크 전부 점등) */
+  .splash-orbit-spin,
+  .splash-orbit-dot,
+  .splash-orbit-glow,
+  .splash-seg {
+    animation: none;
+  }
+  .splash-seg {
+    opacity: 1;
   }
 }
 
