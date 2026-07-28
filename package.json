@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "gen:icons": "node scripts/generate-icons.mjs",
+    "gen:splash": "node scripts/generate-splash.mjs",
     "gen:og": "node scripts/generate-og-image.mjs",
     "gen:game": "node scripts/generate-game-bg.mjs"
   },

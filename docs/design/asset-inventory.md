@@ -20,7 +20,7 @@
 | 앱 아이콘 | M1 | PNG | **192**, **512** | `public/icon-192.png`, `public/icon-512.png` |
 | 앱 아이콘(maskable) | M1 | PNG | **512**(안전영역 준수) | `public/icon-maskable-512.png` |
 | apple-touch 아이콘 | M1 | PNG | **180** | `app/apple-icon.png` |
-| 스플래시(스타트업) | M1 | PNG | 기기별 5종 | ✅ `public/brand/splash-*.png` (PR #19 반입, `app/[lang]/layout.tsx` startupImage 연결) |
+| 스플래시(스타트업) | M1 | PNG | 기기별 5종 | ✅ `public/brand/splash-*.png` (`gen:splash`로 파생, `app/[lang]/layout.tsx` startupImage 연결). 마스터 `public/design-src/brand/splash-template.svg` · 인앱 스플래시 `components/splash-mark.tsx`와 기하 공유 |
 
 ## B. 첫 화면(M1) UI
 

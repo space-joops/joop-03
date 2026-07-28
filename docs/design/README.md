@@ -37,6 +37,14 @@ app/icon.png  app/apple-icon.png  app/favicon.ico   # Next.js 파일 기반 아�
 > 마스터를 고친 뒤 재실행하고, 산출물을 손으로 편집하지 마세요. `public/icon.svg`는
 > `icon-master.svg`의 복사본이라 마스터 수정 시 함께 갱신합니다.
 >
+> iOS 스타트업 이미지(`public/brand/splash-*.png` 5종)는 `npm run gen:splash`
+> (`scripts/generate-splash.mjs`)로 파생합니다. iOS는 **기기 해상도가 정확히 일치할 때만**
+> 스플래시를 쓰므로, 한 장을 리사이즈하지 않고 사이즈마다 SVG를 새로 조립해 렌더합니다
+> (배치는 화면 비율 기준: 엠블럼 폭 72%·세로 42%, 워드마크 폭 50%·세로 62%).
+> 기하의 출처는 마스터 `public/design-src/brand/splash-template.svg`이고,
+> 인앱 스플래시 `components/splash-mark.tsx`도 같은 기하를 씁니다 —
+> **셋 중 하나를 고치면 나머지도 함께 고치세요.**
+>
 > 아케이드 배경 천체 WebP(`public/game/bg-*.webp`)는 `npm run gen:game`
 > (`scripts/generate-game-bg.mjs`)로 `public/design-src/game/bg-*-master.svg`에서
 > 파생합니다. 마스터가 feTurbulence 필터를 쓰므로 **Chromium(Playwright)으로
