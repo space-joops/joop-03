@@ -33,7 +33,11 @@ export const getRankings = cache(async (limit = 20): Promise<RankingRow[]> => {
 
   if (error) throw error;
 
-  return ((data ?? []) as WeeklyRow[]).map((r) => ({
+  return ((data ?? []) as WeeklyRow[]).map(toRow);
+});
+
+function toRow(r: WeeklyRow): RankingRow {
+  return {
     joopId: r.joop_id,
     name: r.name,
     color: r.color,
@@ -41,5 +45,21 @@ export const getRankings = cache(async (limit = 20): Promise<RankingRow[]> => {
     rank: Number(r.rank),
     prevRank: Number(r.prev_rank),
     collectedInWeek: Number(r.collected_in_week),
-  }));
+  };
+}
+
+/**
+ * 내 줍스의 현재 순위 — 뷰가 전체 줍스를 담고 joop_id 로 필터 가능하므로
+ * 마이그레이션 없이 한 행만 뽑는다(뷰는 security_invoker + anon 읽기 허용).
+ */
+export const getMyRanking = cache(async (joopId: string): Promise<RankingRow | null> => {
+  const sb = createServerClient();
+  const { data, error } = await sb
+    .from("joop_03_rankings_weekly")
+    .select("joop_id,name,color,total_collected,rank,prev_rank,collected_in_week")
+    .eq("joop_id", joopId)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data ? toRow(data as WeeklyRow) : null;
 });

@@ -1,18 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 740 220" width="740" height="220" role="img" aria-label="JOOPS">
-  <title>JOOPS 워드마크 (단색 · currentColor)</title>
-  <!-- Monochrome wordmark. Inherits `color` via currentColor → drop into any token color.
-       Geometric cassette-futurism caps, uniform 26px stroke, rounded terminals. -->
-  <g fill="none" stroke="currentColor" stroke-width="26" stroke-linecap="round" stroke-linejoin="round">
-    <!-- J -->
-    <path d="M 66 53 L 136 53"/>
-    <path d="M 118 53 L 118 128 Q 118 167 79 167 Q 44 167 44 138"/>
-    <!-- O -->
-    <ellipse cx="228" cy="110" rx="48" ry="57"/>
-    <!-- O -->
-    <ellipse cx="368" cy="110" rx="48" ry="57"/>
-    <!-- P -->
-    <path d="M 460 167 L 460 53 L 520 53 Q 556 53 556 88 Q 556 122 520 122 L 460 122"/>
-    <!-- S -->
-    <path d="M 690 80 Q 690 53 646 53 Q 604 53 604 86 Q 604 108 648 110 Q 692 112 692 138 Q 692 167 646 167 Q 604 167 604 140"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 40">
+  <!-- JOOPS 워드마크 · 세븐세그먼트 디스플레이 · 단색(currentColor) -->
+  <!-- 세그먼트 맵: J=b,c,d,e · O=a,b,c,d,e,f · P=a,b,e,f,g · S=a,c,d,f,g -->
+  <defs>
+    <path id="sa" d="M3 2 5 0 15 0 17 2 15 4 5 4Z"/>
+    <path id="sb" d="M18 3 20 5 20 15 18 17 16 15 16 5Z"/>
+    <path id="sc" d="M18 19 20 21 20 31 18 33 16 31 16 21Z"/>
+    <path id="sd" d="M3 34 5 32 15 32 17 34 15 36 5 36Z"/>
+    <path id="se" d="M2 19 4 21 4 31 2 33 0 31 0 21Z"/>
+    <path id="sf" d="M2 3 4 5 4 15 2 17 0 15 0 5Z"/>
+    <path id="sg" d="M3 18 5 16 15 16 17 18 15 20 5 20Z"/>
+  </defs>
+  <g fill="currentColor" transform="translate(4 2) skewX(-6)">
+    <g><!-- J -->
+      <use href="#sb"/><use href="#sc"/><use href="#sd"/><use href="#se"/>
+    </g>
+    <g transform="translate(28 0)"><!-- O -->
+      <use href="#sa"/><use href="#sb"/><use href="#sc"/><use href="#sd"/><use href="#se"/><use href="#sf"/>
+    </g>
+    <g transform="translate(56 0)"><!-- O -->
+      <use href="#sa"/><use href="#sb"/><use href="#sc"/><use href="#sd"/><use href="#se"/><use href="#sf"/>
+    </g>
+    <g transform="translate(84 0)"><!-- P -->
+      <use href="#sa"/><use href="#sb"/><use href="#se"/><use href="#sf"/><use href="#sg"/>
+    </g>
+    <g transform="translate(112 0)"><!-- S -->
+      <use href="#sa"/><use href="#sc"/><use href="#sd"/><use href="#sf"/><use href="#sg"/>
+    </g>
   </g>
 </svg>

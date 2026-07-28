@@ -36,6 +36,12 @@ app/icon.png  app/apple-icon.png  app/favicon.ico   # Next.js 파일 기반 아�
 > (`scripts/generate-icons.mjs`)로 `public/design-src/icons/` 마스터 SVG에서 파생합니다 —
 > 마스터를 고친 뒤 재실행하고, 산출물을 손으로 편집하지 마세요. `public/icon.svg`는
 > `icon-master.svg`의 복사본이라 마스터 수정 시 함께 갱신합니다.
+>
+> 아케이드 배경 천체 WebP(`public/game/bg-*.webp`)는 `npm run gen:game`
+> (`scripts/generate-game-bg.mjs`)로 `public/design-src/game/bg-*-master.svg`에서
+> 파생합니다. 마스터가 feTurbulence 필터를 쓰므로 **Chromium(Playwright)으로
+> 렌더**합니다 — librsvg(sharp)로 직접 래스터하면 결과가 다릅니다. 지구 대륙층
+> `bg-earth-land.png`와 은하 별밭(@stars 구간)은 스크립트가 결정적으로 생성합니다.
 
 ### 네이밍
 

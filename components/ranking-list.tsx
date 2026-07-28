@@ -1,4 +1,6 @@
+import Link from "next/link";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
+import type { Locale } from "@/lib/i18n/config";
 import type { RankingRow } from "@/lib/rankings";
 import { Sparkline } from "@/components/sparkline";
 
@@ -16,21 +18,79 @@ function ChangeIndicator({ delta }: { delta: number }) {
   );
 }
 
+function RankRow({
+  r,
+  dict,
+  mine,
+  compact,
+}: {
+  r: RankingRow;
+  dict: Dictionary;
+  /** 내 줍스 행 — 액센트 테두리 + "나" 배지로 강조 */
+  mine: boolean;
+  compact: boolean;
+}) {
+  return (
+    <li
+      className={`flex items-center gap-2 ${compact ? "py-0.5" : "py-1.5"} ${
+        mine ? "rounded-sm border px-1" : ""
+      }`}
+      style={mine ? { borderColor: "var(--color-primary)", background: "color-mix(in srgb, var(--color-primary) 8%, transparent)" } : undefined}
+    >
+      <span className="w-6 shrink-0 text-right font-mono text-xs text-[var(--color-muted)]">
+        {r.rank}.
+      </span>
+      <span
+        className="h-2.5 w-2.5 shrink-0 rounded-full"
+        style={{ background: r.color, boxShadow: `0 0 6px ${r.color}` }}
+        aria-hidden
+      />
+      <span className="flex-1 truncate font-mono text-xs text-[var(--color-fg)]">
+        {r.name}
+        {mine && (
+          <span className="ml-1.5 rounded-sm px-1 font-mono text-[9px] uppercase tracking-widest"
+            style={{ background: "var(--color-primary)", color: "var(--color-bg)" }}>
+            {dict.firstScreen.myRank}
+          </span>
+        )}
+      </span>
+      <span className="font-mono text-xs text-[var(--color-secondary)]">
+        {r.totalCollected.toLocaleString()} {dict.firstScreen.pointsUnit}
+      </span>
+      <span className="w-10 shrink-0 text-right font-mono text-xs">
+        <ChangeIndicator delta={r.prevRank - r.rank} />
+      </span>
+    </li>
+  );
+}
+
 // 랭킹 — 이슈 #5 CRT 컨셉의 터미널 테이블: 앰버 헤더/보더, 카드 배경 없는 행,
 // 이름은 fg(그린 위계), 포인트는 앰버.
+// compact(첫 화면): 행 py-0.5·text-xs 로 눌러 하단 CTA까지 한 화면에 들어가게 한다.
+// myRanking: 내 순위 — 목록 안에 있으면 그 행을 강조, 밖이면 "⋯" 아래 고정 행으로 붙인다.
 export function RankingList({
   rows,
   dict,
+  lang,
+  myRanking = null,
+  compact = true,
+  showMore = false,
 }: {
   rows: RankingRow[];
   dict: Dictionary;
+  lang: Locale;
+  myRanking?: RankingRow | null;
+  compact?: boolean;
+  /** 헤더 우측 "자세히 →" 링크(첫 화면 → /rankings) */
+  showMore?: boolean;
 }) {
   // 상위 랭커의 주간 수거량으로 전체 주간 추세 스파크라인
   const weeklyTrend = rows.map((r) => r.collectedInWeek);
+  const myInList = !!myRanking && rows.some((r) => r.joopId === myRanking.joopId);
 
   return (
-    <section className="px-4 py-3">
-      <div className="panel-amber px-3 py-2">
+    <section className={compact ? "px-4 py-1" : ""}>
+      <div className={`panel-amber px-3 ${compact ? "py-1.5" : "py-2"}`}>
         <div
           className="mb-1 flex items-center justify-between pb-1.5"
           style={{
@@ -45,31 +105,36 @@ export function RankingList({
               {dict.firstScreen.weeklyChange}
             </span>
             <Sparkline values={weeklyTrend} />
+            {showMore && (
+              <Link
+                href={`/${lang}/rankings`}
+                className="font-mono text-[10px] uppercase tracking-widest text-[var(--color-fg)] underline underline-offset-2"
+              >
+                {dict.firstScreen.rankingMore} →
+              </Link>
+            )}
           </div>
         </div>
 
         <ol className="flex flex-col">
           {rows.map((r) => (
-            <li key={r.joopId} className="flex items-center gap-2 py-1.5">
-              <span className="w-6 shrink-0 text-right font-mono text-sm text-[var(--color-muted)]">
-                {r.rank}.
-              </span>
-              <span
-                className="h-2.5 w-2.5 shrink-0 rounded-full"
-                style={{ background: r.color, boxShadow: `0 0 6px ${r.color}` }}
-                aria-hidden
-              />
-              <span className="flex-1 truncate font-mono text-sm text-[var(--color-fg)]">
-                {r.name}
-              </span>
-              <span className="font-mono text-xs text-[var(--color-secondary)]">
-                {r.totalCollected.toLocaleString()} {dict.firstScreen.pointsUnit}
-              </span>
-              <span className="w-10 shrink-0 text-right font-mono text-xs">
-                <ChangeIndicator delta={r.prevRank - r.rank} />
-              </span>
-            </li>
+            <RankRow
+              key={r.joopId}
+              r={r}
+              dict={dict}
+              mine={!!myRanking && r.joopId === myRanking.joopId}
+              compact={compact}
+            />
           ))}
+          {/* 내 순위가 표시 범위 밖이면 아래에 고정 행으로 — "첫 화면에서 내 랭킹 확인" */}
+          {myRanking && !myInList && (
+            <>
+              <li aria-hidden className="py-0 text-center font-mono text-[10px] leading-3 text-[var(--color-muted)]">
+                ⋯
+              </li>
+              <RankRow r={myRanking} dict={dict} mine compact={compact} />
+            </>
+          )}
         </ol>
       </div>
     </section>

@@ -213,3 +213,13 @@ body {
     animation: none; /* meta 규칙: idle 프레임 0 고정 */
   }
 }
+
+/* 게임 캔버스 표면 — iOS 롱프레스 확대경/복사 콜아웃·텍스트 선택·탭 하이라이트 차단.
+ * 조이스틱을 꾹 누르는 조작이 브라우저 제스처로 새면 게임이 끊긴다. */
+.game-surface,
+.game-surface * {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}

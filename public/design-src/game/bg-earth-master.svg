@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2048" height="2048" viewBox="0 0 2048 2048">
+  <!-- 지구 마스터 (실사풍, ISS 선외활동 사진 톤) — 파생: public/game/bg-earth.webp
+       재생성: npm run gen:game (Chromium 렌더 — feTurbulence 는 librsvg 로 렌더하지 말 것)
+       디스크 r=830, 대륙층 bg-earth-land.png(스크립트 산출, 역직교투영 실지형)은
+       같은 폴더 상대경로 참조라 이 파일 단독으로 브라우저에서 열린다. -->
+  <defs>
+    <clipPath id="globe"><circle cx="1024" cy="1024" r="830"/></clipPath>
+
+    <!-- 해양: 좌상 광원 딥블루 -->
+    <radialGradient id="ocean" cx="40%" cy="34%" r="88%">
+      <stop offset="0%" stop-color="#2e6da4"/>
+      <stop offset="45%" stop-color="#17507e"/>
+      <stop offset="80%" stop-color="#0b2f52"/>
+      <stop offset="100%" stop-color="#061b33"/>
+    </radialGradient>
+
+    <!-- 터미네이터: 우하단 야면 -->
+    <linearGradient id="term" x1="0" y1="0" x2="0.85" y2="0.62">
+      <stop offset="52%" stop-color="#000410" stop-opacity="0"/>
+      <stop offset="80%" stop-color="#000410" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#000208" stop-opacity="0.93"/>
+    </linearGradient>
+
+    <!-- 얇은 대기 림: 디스크 반경의 96~103% 대역, 안쪽 흰색→바깥 청색 페이드 -->
+    <radialGradient id="rim">
+      <stop offset="90%" stop-color="#9fd4ff" stop-opacity="0"/>
+      <stop offset="95.5%" stop-color="#bfe4ff" stop-opacity="0.5"/>
+      <stop offset="97.5%" stop-color="#eef8ff" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#4fa8e8" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- 구름: fractalNoise 를 소용돌이(warp)로 변형 → 밝은 부분만 흰 알파로 -->
+    <filter id="clouds" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.006 0.011" numOctaves="5" seed="7" result="n"/>
+      <feTurbulence type="turbulence" baseFrequency="0.0028" numOctaves="2" seed="31" result="warp"/>
+      <feDisplacementMap in="n" in2="warp" scale="140" xChannelSelector="R" yChannelSelector="G"/>
+      <feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0.9 0.9 0.9 0 -0.9"/>
+      <feGaussianBlur stdDeviation="1.4"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+  </defs>
+
+  <circle cx="1024" cy="1024" r="830" fill="url(#ocean)"/>
+  <g clip-path="url(#globe)">
+    <image href="bg-earth-land.png" x="194" y="194" width="1660" height="1660"/>
+    <circle cx="1024" cy="1024" r="830" fill="#ffffff" filter="url(#clouds)"/>
+    <rect x="194" y="194" width="1660" height="1660" fill="url(#term)"/>
+  </g>
+  <!-- 림은 클립 밖 — 디스크를 살짝 초과해 우주로 번진다 -->
+  <circle cx="1024" cy="1024" r="856" fill="url(#rim)"/>
+</svg>
