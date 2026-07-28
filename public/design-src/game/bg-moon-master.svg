@@ -6,11 +6,12 @@
     <clipPath id="disk"><circle cx="768" cy="768" r="620"/></clipPath>
 
     <!-- 좌상 광원 회색 + 림 다크닝 -->
+    <!-- 살짝 웜톤(레퍼런스의 황갈색 달) -->
     <radialGradient id="surface" cx="40%" cy="35%" r="82%">
-      <stop offset="0%" stop-color="#dad9d3"/>
-      <stop offset="55%" stop-color="#a8a7a1"/>
-      <stop offset="88%" stop-color="#6f6f6c"/>
-      <stop offset="100%" stop-color="#4a4a4e"/>
+      <stop offset="0%" stop-color="#e0d8c9"/>
+      <stop offset="55%" stop-color="#b0a793"/>
+      <stop offset="88%" stop-color="#78705f"/>
+      <stop offset="100%" stop-color="#4e4840"/>
     </radialGradient>
 
     <!-- 레골리스 미세 질감: 명도 노이즈 → 어두운 회색 알파 (거칠고 촘촘하게) -->
