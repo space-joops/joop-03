@@ -1,9 +1,10 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { completeSetup, type SetupState } from "@/app/[lang]/onboarding/setup/actions";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
+import { trackInviteRedeemed } from "@/lib/analytics";
 
 const COLORS = ["#35e07a", "#ffb23e", "#38e0f0", "#ff5c77", "#c8ff00", "#ff00d4"];
 
@@ -20,6 +21,17 @@ export function SetupForm({ lang, dict }: { lang: Locale; dict: Dictionary }) {
     null,
   );
   const err = state?.error;
+
+  // 초대 코드 소진(redeemInvite)의 성공은 서버에서 바로 redirect되어 클라에 성공 상태가
+  // 안 보이므로, 도착한 이 페이지에서 1회성 쿼리 신호(?src=invite)로 대신 잡는다.
+  const trackedInvite = useRef(false);
+  useEffect(() => {
+    if (trackedInvite.current) return;
+    if (new URLSearchParams(window.location.search).get("src") !== "invite") return;
+    trackedInvite.current = true;
+    trackInviteRedeemed();
+    window.history.replaceState(null, "", window.location.pathname);
+  }, []);
 
   return (
     <form action={action} className="flex flex-col gap-4">
