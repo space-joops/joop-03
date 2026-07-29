@@ -1,5 +1,4 @@
 import { notFound, redirect } from "next/navigation";
-import Link from "next/link";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getMyJoop } from "@/lib/profile";
@@ -11,6 +10,8 @@ export const dynamic = "force-dynamic";
 
 // 아케이드(우주 수거, M5) — 궤도의 줍스가 수신 지역(음영 아님)일 때 진입한다(FR-6.6).
 // 가드는 발사 시퀀스 페이지의 3단 리다이렉트 패턴을 따른다.
+// 풀블리드(UX 라운드 2026-07-29): 헤더 없이 폰 화면을 꽉 채우고, 이동·종료·계기는
+// 게임 하단 텔레메트리 바가 담당한다.
 export default async function ArcadePage({ params }: PageProps<"/[lang]/joop/arcade">) {
   const { lang } = await params;
   if (!isLocale(lang)) notFound();
@@ -31,28 +32,14 @@ export default async function ArcadePage({ params }: PageProps<"/[lang]/joop/arc
   const [dict, config] = await Promise.all([getDictionary(lang), getArcadeConfig()]);
 
   return (
-    <main
-      className="mx-auto flex w-full max-w-md flex-1 flex-col pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-[calc(env(safe-area-inset-top)+0.75rem)]"
-      style={{ background: "var(--color-bg)" }}
-    >
-      <header className="mb-2 flex items-center justify-between px-4">
-        <Link
-          href={`/${lang}/joop/map`}
-          className="font-mono text-xs text-[var(--color-muted)] underline"
-        >
-          {dict.arcade.toMap}
-        </Link>
-        <span className="font-mono text-xs uppercase tracking-widest text-[var(--color-muted)]">
-          {dict.arcade.title}
-        </span>
-      </header>
-
+    <main className="game-fullbleed flex w-full flex-1 flex-col" style={{ background: "var(--color-bg)" }}>
       <ArcadeGame
         lang={lang}
         dict={dict}
         color={mine.color}
         name={mine.name}
         config={config}
+        altitudeKm={state.altitudeKm}
         shadowGate={{
           inShadow: state.inShadow,
           cost: shadowXpCost,

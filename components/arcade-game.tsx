@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ARCADE_FUEL_ITEM,
@@ -66,6 +67,7 @@ export function ArcadeGame({
   color,
   name,
   config,
+  altitudeKm,
   shadowGate,
 }: {
   lang: Locale;
@@ -73,6 +75,8 @@ export function ArcadeGame({
   color: string;
   name: string;
   config?: ArcadeConfig;
+  /** 내 줍스 실제 궤도 고도(km) — 텔레메트리 바 ALT 표기(연출, 정적 값) */
+  altitudeKm?: number;
   /** 음영 게이트 — 없으면 항상 열린 것으로 본다(하네스·테스트용) */
   shadowGate?: ShadowGate;
 }) {
@@ -183,6 +187,18 @@ export function ArcadeGame({
 
     let raf = 0;
     let running = true;
+
+    // 하단 텔레메트리 바 존 — safe-area 는 프로브 엘리먼트로 1회 실측(env() 직접 읽기 불가)
+    const probe = document.createElement("div");
+    probe.style.cssText =
+      "position:fixed;bottom:0;height:env(safe-area-inset-bottom);visibility:hidden;pointer-events:none";
+    document.body.appendChild(probe);
+    const safeBottom = probe.getBoundingClientRect().height || 0;
+    probe.remove();
+    const barH = 96 + safeBottom;
+
+    // 화면 밖 천체 방향 힌트(프레임마다 drawBackground 가 채움 → HUD 단계에서 그림)
+    const edgeHints: { x: number; y: number; color: string; glyph: string }[] = [];
 
     // 크기는 컨테이너에서 잰다(캔버스 자신을 재면 되먹임 — 지상 훈련 워크로그 참고).
     let W = 0;
@@ -312,6 +328,7 @@ export function ArcadeGame({
     };
     const onDown = (e: PointerEvent) => {
       const p = localXY(e);
+      if (p.y > H - barH) return; // 텔레메트리 바 존 터치는 조이스틱을 만들지 않는다
       stick = { baseX: p.x, baseY: p.y, dx: 0, dy: 0, pointerId: e.pointerId };
       canvas.setPointerCapture(e.pointerId);
       e.preventDefault();
@@ -419,18 +436,35 @@ export function ArcadeGame({
       ctx.globalAlpha = 1;
 
       // 천체(FR-7.2) — 월드 고정 좌표 × 패럴랙스. 날아가면 지구 → 달 → 태양이 전환된다.
+      // 배열 순서 = z-order(은하 최후방 → 달(지구 뒤) → 지구 → 태양 → 위성).
+      edgeHints.length = 0;
       for (const c of CELESTIALS) {
         const img = imagesRef.current.get(c.asset);
-        if (!img || !img.complete || img.naturalWidth === 0) continue;
         const px = W / 2 + (c.x - joop.pos.x) * c.parallax * u;
         const py = H / 2 + (c.y - joop.pos.y) * c.parallax * u;
         const size = c.size * u;
-        const ratio = img.naturalWidth / img.naturalHeight;
+        const loaded = !!img && img.complete && img.naturalWidth > 0;
+        const ratio = loaded ? img.naturalWidth / img.naturalHeight : 1;
         const w = size * (ratio >= 1 ? 1 : ratio);
         const h = size * (ratio >= 1 ? 1 / ratio : 1);
-        if (px + w / 2 < -50 || px - w / 2 > W + 50 || py + h / 2 < -50 || py - h / 2 > H + 50)
+        if (px + w / 2 < -50 || px - w / 2 > W + 50 || py + h / 2 < -50 || py - h / 2 > H + 50) {
+          // 화면 밖 — 지구/달/태양이면 에지 방향 힌트를 기록(HUD 단계에서 그림)
+          if (c.hint) {
+            const cx0 = W / 2;
+            const cy0 = (H - barH) / 2;
+            const dx = px - cx0;
+            const dy = py - cy0;
+            const m = 18;
+            // 중심→천체 레이를 게임 뷰 사각형(바 존 제외)에 클램프
+            const k = Math.min(
+              dx > 0 ? (W - m - cx0) / dx : dx < 0 ? (m - cx0) / dx : Infinity,
+              dy > 0 ? (H - barH - m - cy0) / dy : dy < 0 ? (m - cy0) / dy : Infinity,
+            );
+            edgeHints.push({ x: cx0 + dx * k, y: cy0 + dy * k, color: c.hint.color, glyph: c.hint.glyph });
+          }
           continue;
-        ctx.drawImage(img, px - w / 2, py - h / 2, w, h);
+        }
+        if (loaded) ctx.drawImage(img, px - w / 2, py - h / 2, w, h);
       }
 
       // 태양 인접 앰버 틴트 ≤8% (handoff-m5 §1 — 뜨거움 연출, 가독성 유지)
@@ -846,65 +880,112 @@ export function ArcadeGame({
 
       drawStick(u);
 
-      // ── HUD (UX 리뷰: 카운터를 크고 눈에 띄게, 다이얼·바로 "게임"답게)
-      const pad = 12;
+      // ── 에지 방향 힌트(화면 밖 지구/달/태양) — 색 원 + 셰브론 + 글리프
+      for (const hnt of edgeHints) {
+        const cx0 = W / 2;
+        const cy0 = (H - barH) / 2;
+        const ang = Math.atan2(hnt.y - cy0, hnt.x - cx0);
+        ctx.globalAlpha = 0.55;
+        ctx.fillStyle = hnt.color;
+        ctx.beginPath();
+        ctx.arc(hnt.x, hnt.y, 7, 0, Math.PI * 2);
+        ctx.fill();
+        // 바깥쪽 셰브론
+        ctx.beginPath();
+        ctx.moveTo(hnt.x + Math.cos(ang) * 12, hnt.y + Math.sin(ang) * 12);
+        ctx.lineTo(hnt.x + Math.cos(ang + 2.5) * 8, hnt.y + Math.sin(ang + 2.5) * 8);
+        ctx.lineTo(hnt.x + Math.cos(ang - 2.5) * 8, hnt.y + Math.sin(ang - 2.5) * 8);
+        ctx.closePath();
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = "#04100a";
+        ctx.font = `700 9px ui-monospace, monospace`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(hnt.glyph, hnt.x, hnt.y + 0.5);
+        ctx.textAlign = "left";
+        ctx.textBaseline = "alphabetic";
+      }
+
+      // ── 하단 텔레메트리 바(SpaceX 중계풍) — 흩어져 있던 계기를 전부 통합.
+      //    [SPEED 게이지] [수거 0000 + T+ + ALT] [FUEL 게이지]
       const fs = Math.max(11, Math.round(u * 0.036));
       const micro = Math.max(9, Math.round(fs * 0.75));
-      ctx.textBaseline = "top";
-
-      // 상단 중앙 — 큰 수거 카운터(자릿수 고정). 수거 순간 앰버 플래시.
-      ctx.textAlign = "center";
-      ctx.fillStyle = mutedColor;
-      ctx.font = `${micro}px ui-monospace, monospace`;
-      ctx.fillText(a.collected, W / 2, pad);
-      ctx.fillStyle = counterFlash > 0 ? amber : fgColor;
-      ctx.font = `700 ${Math.round(u * 0.072)}px ui-monospace, monospace`;
-      ctx.fillText(String(collected).padStart(4, "0"), W / 2, pad + micro + 2);
-      ctx.textAlign = "left";
-
-      // 우측 — 연료 원형 다이얼(-90°부터 시계 방향). 임계색은 기존 로직 유지.
-      const fuelRatio = Math.max(0, fuel / cfg.fuel);
-      const dialR = Math.max(18, u * 0.05);
-      const dialX = W - pad - dialR;
-      const dialY = H * 0.3;
-      ctx.lineWidth = 5;
+      const barTop = H - barH;
+      ctx.globalAlpha = 0.85;
+      ctx.fillStyle = "#030a05";
+      ctx.fillRect(0, barTop, W, barH);
+      ctx.globalAlpha = 1;
       ctx.strokeStyle = gridColor;
-      ctx.globalAlpha = 0.45;
-      ctx.beginPath();
-      ctx.arc(dialX, dialY, dialR, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.globalAlpha = 1;
-      ctx.strokeStyle = fuelRatio < 0.25 ? dangerColor : fuelRatio < 0.5 ? amber : accent;
-      ctx.beginPath();
-      ctx.arc(dialX, dialY, dialR, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * Math.min(1, fuelRatio));
-      ctx.stroke();
       ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, barTop + 0.5);
+      ctx.lineTo(W, barTop + 0.5);
+      ctx.stroke();
+
+      const gaugeR = 26;
+      const gaugeY = barTop + 40;
+      const drawGauge = (
+        gx: number,
+        frac: number,
+        colorArc: string,
+        valueText: string,
+        label: string,
+      ) => {
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = gridColor;
+        ctx.globalAlpha = 0.45;
+        ctx.beginPath();
+        ctx.arc(gx, gaugeY, gaugeR, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+        ctx.strokeStyle = colorArc;
+        ctx.beginPath();
+        ctx.arc(gx, gaugeY, gaugeR, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * Math.max(0, Math.min(1, frac)));
+        ctx.stroke();
+        ctx.lineWidth = 1;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = fgColor;
+        ctx.font = `600 ${fs}px ui-monospace, monospace`;
+        ctx.fillText(valueText, gx, gaugeY);
+        ctx.textBaseline = "top";
+        ctx.fillStyle = mutedColor;
+        ctx.font = `${micro}px ui-monospace, monospace`;
+        ctx.fillText(label, gx, gaugeY + gaugeR + 5);
+        ctx.textAlign = "left";
+        ctx.textBaseline = "alphabetic";
+      };
+
+      // 좌 — 속도(실 LEO 7.9km/s 를 게임 최고속에 대응시키는 기존 환산)
+      const spd = (spdNow / cfg.maxSpeed) * 7.9;
+      drawGauge(W * 0.18, spdNow / cfg.maxSpeed, accent, spd.toFixed(1), `${a.speed} km/s`);
+
+      // 우 — 연료(기존 임계색 로직)
+      const fuelRatio = Math.max(0, fuel / cfg.fuel);
+      const fuelColor = fuelRatio < 0.25 ? dangerColor : fuelRatio < 0.5 ? amber : accent;
+      drawGauge(W * 0.82, fuelRatio, fuelColor, `${Math.round(fuelRatio * 100)}%`, a.fuel);
+
+      // 중앙 — 수거 카운터(자릿수 고정 + 앰버 플래시) / T+ 시계 / 실궤도 고도
       ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillStyle = fgColor;
-      ctx.font = `${micro}px ui-monospace, monospace`;
-      ctx.fillText(`${Math.round(fuelRatio * 100)}%`, dialX, dialY);
       ctx.textBaseline = "top";
       ctx.fillStyle = mutedColor;
-      ctx.fillText(a.fuel, dialX, dialY + dialR + 6);
-      ctx.textAlign = "left";
-
-      // 줍스 아래 — 속도 바 + 환산값(실 LEO 7.9km/s 를 게임 최고속에 대응)
-      const spd = (spdNow / cfg.maxSpeed) * 7.9;
-      const sbW = u * 0.22;
-      const sbX = W / 2 - sbW / 2;
-      const sbY = H / 2 + u * 0.14;
-      ctx.fillStyle = gridColor;
-      ctx.globalAlpha = 0.45;
-      ctx.fillRect(sbX, sbY, sbW, 4);
-      ctx.globalAlpha = 1;
-      ctx.fillStyle = accent;
-      ctx.fillRect(sbX, sbY, sbW * Math.min(1, spdNow / cfg.maxSpeed), 4);
+      ctx.font = `${micro}px ui-monospace, monospace`;
+      ctx.fillText(a.collected, W / 2, barTop + 8);
+      ctx.fillStyle = counterFlash > 0 ? amber : fgColor;
+      ctx.font = `700 ${Math.round(u * 0.062)}px ui-monospace, monospace`;
+      ctx.fillText(String(collected).padStart(4, "0"), W / 2, barTop + 8 + micro + 2);
+      const tSec = Math.floor(elapsed);
+      const tStr = `T+${String(Math.floor(tSec / 60)).padStart(2, "0")}:${String(tSec % 60).padStart(2, "0")}`;
       ctx.fillStyle = mutedColor;
       ctx.font = `${micro}px ui-monospace, monospace`;
-      ctx.textAlign = "center";
-      ctx.fillText(`${a.speed} ${spd.toFixed(1)} km/s`, W / 2, sbY + 8);
+      ctx.fillText(
+        altitudeKm ? `${tStr} · ALT ${Math.round(altitudeKm)} KM` : tStr,
+        W / 2,
+        barTop + 8 + micro + 2 + Math.round(u * 0.062) + 4,
+      );
       ctx.textAlign = "left";
+      ctx.textBaseline = "alphabetic";
 
       if (running && !document.hidden) raf = requestAnimationFrame(frame);
     };
@@ -932,7 +1013,7 @@ export function ArcadeGame({
       canvas.removeEventListener("pointerup", releaseStick);
       canvas.removeEventListener("pointercancel", releaseStick);
     };
-  }, [phase, cfg, color, a]);
+  }, [phase, cfg, color, a, altitudeKm]);
 
   const saveResult = useCallback(async () => {
     if (!summary || summary.collected <= 0) return;
@@ -975,23 +1056,33 @@ export function ArcadeGame({
 
   return (
     <div className="relative flex flex-1 flex-col">
+      {/* 풀블리드 — 테두리 없이 폰 화면을 꽉 채운다(UX 라운드 2026-07-29).
+          boxRef(크기 측정)·game-surface(iOS 제스처 차단)는 반드시 유지. */}
       <div
         ref={boxRef}
-        className="game-surface relative mx-3 mb-1 flex-1 overflow-hidden rounded-md border"
-        style={{ borderColor: "var(--color-neutral-600)" }}
+        className="game-surface relative flex-1 overflow-hidden"
         onContextMenu={(e) => e.preventDefault()}
       >
         <canvas ref={canvasRef} className="absolute inset-0 block h-full w-full touch-none" />
 
         {phase === "playing" && (
-          // 우상단: 하단은 PWA 설치 배너(PwaPrompt, 전역 fixed)와 겹칠 수 있다
-          <button
-            onClick={() => endGameRef.current()}
-            className="absolute right-2 top-9 rounded-md border px-2.5 py-1 font-mono text-[10px] uppercase tracking-widest"
-            style={{ ...ghostStyle, background: "color-mix(in srgb, var(--color-bg) 70%, transparent)" }}
-          >
-            {a.end}
-          </button>
+          <>
+            {/* 텔레메트리 바 바로 위 좌/우 — 지도 복귀·종료(상단 헤더를 대체) */}
+            <Link
+              href={`/${lang}/joop/map`}
+              className="absolute left-2 bottom-[calc(env(safe-area-inset-bottom)+6.5rem)] rounded-md border px-2.5 py-1 font-mono text-[10px] uppercase tracking-widest"
+              style={{ ...ghostStyle, background: "color-mix(in srgb, var(--color-bg) 70%, transparent)" }}
+            >
+              {a.toMap}
+            </Link>
+            <button
+              onClick={() => endGameRef.current()}
+              className="absolute right-2 bottom-[calc(env(safe-area-inset-bottom)+6.5rem)] rounded-md border px-2.5 py-1 font-mono text-[10px] uppercase tracking-widest"
+              style={{ ...ghostStyle, background: "color-mix(in srgb, var(--color-bg) 70%, transparent)" }}
+            >
+              {a.end}
+            </button>
+          </>
         )}
 
         {phase === "ready" && (

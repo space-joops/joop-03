@@ -113,7 +113,17 @@ export function FirstScreen({
       <CleanupGauge totals={snapshot.totals} dict={dict} />
       <RankingList rows={rankings} dict={dict} lang={lang} myRanking={myRanking} showMore />
 
-      <div className="mt-auto px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-2">
+      <div className="mt-auto flex flex-col gap-2 px-4 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] pt-2">
+        {/* 진입 단축(UX): 궤도에 있으면 첫 화면에서 아케이드로 1탭 직행 */}
+        {myJoop?.status === "orbit" && (
+          <a
+            href={`/${lang}/joop/arcade`}
+            className="block w-full rounded-md py-2.5 text-center font-mono text-sm font-semibold uppercase tracking-widest"
+            style={{ background: "var(--color-primary)", color: "var(--color-bg)" }}
+          >
+            {dict.firstScreen.cta.arcade}
+          </a>
+        )}
         {myJoop ? (
           <a
             href={`/${lang}/joop`}

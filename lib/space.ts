@@ -17,6 +17,7 @@ export const getSpaceConfig = cache(async () => {
     idleCollectRate: num("idle_collect_rate"), // 시간당 조각
     idleCollectCapHours: num("idle_collect_cap_hours"),
     launchCountdownSeconds: num("launch_countdown_seconds"),
+    launchSequenceSeconds: num("launch_sequence_seconds"),
     orbitGameSpeed: num("orbit_game_speed"), // 궤도 위상 진행 배속(클라 렌더와 공유)
     shadowFraction: num("shadow_fraction"), // 한 궤도 중 음영 비율
   };

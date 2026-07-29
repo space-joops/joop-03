@@ -376,6 +376,21 @@ export const CONFIG_SPECS: readonly ConfigSpec[] = [
     restartRequired: true,
   },
   {
+    key: "launch_sequence_seconds",
+    label: "발사 중계 길이",
+    description:
+      "카운트다운 이후 발사 중계(리프트오프~궤도 진입) 총 길이입니다(FR-5.2). " +
+      "단계 비율은 발사체 프로필(lib/vehicle-profiles.ts)이 정합니다. 배속 1×/4×/16× 제공.",
+    group: "launch",
+    type: "int",
+    min: 30,
+    max: 300,
+    step: 5,
+    unit: "초",
+    fallback: 150,
+    restartRequired: true,
+  },
+  {
     key: "launch_required_level",
     label: "기본 발사 자격 레벨",
     description:

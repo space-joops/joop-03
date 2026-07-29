@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { JoopSprite } from "@/components/joop-sprite";
 import { ReturnEarthButton } from "@/components/return-earth-button";
+import { ReplayLaunchButton } from "@/components/replay-launch-button";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getMyJoop } from "@/lib/profile";
@@ -85,14 +86,23 @@ export default async function JoopPage({ params }: PageProps<"/[lang]/joop">) {
         {/* SF 브래킷 프레임 버튼(UX 리뷰) — 주 액션은 primary 브래킷, 보조는 muted */}
         {mine.status === "orbit" ? (
           <>
+            {/* 진입 단축(UX): 지도 경유 없이 아케이드 직행 — 서버 가드가 상태를 재검증한다 */}
+            <Link
+              href={`/${lang}/joop/arcade`}
+              className="crt-brackets btn-brackets"
+              style={{ "--bracket-color": "var(--color-primary)", color: "var(--color-primary)" } as React.CSSProperties}
+            >
+              {j.arcadeNow}
+            </Link>
             <Link
               href={`/${lang}/joop/map`}
               className="crt-brackets btn-brackets"
-              style={{ "--bracket-color": "var(--color-primary)", color: "var(--color-primary)" } as React.CSSProperties}
+              style={{ "--bracket-color": "var(--color-neutral-600)" } as React.CSSProperties}
             >
               {j.openMap}
             </Link>
             <ReturnEarthButton lang={lang} dict={dict} />
+            <ReplayLaunchButton lang={lang} dict={dict} />
           </>
         ) : mine.status === "queued" ? (
           <Link

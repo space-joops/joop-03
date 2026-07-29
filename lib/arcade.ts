@@ -134,16 +134,30 @@ export type Celestial = {
   size: number;
   /** 카메라 대비 이동 비율(0=완전 고정, 1=전경) */
   parallax: number;
+  /** 화면 밖일 때 에지 방향 힌트 — 색 + 글리프(지구/달/태양만 부여) */
+  hint?: { color: string; glyph: string };
 };
 
 // 화면 오프셋 = (x − cam) × parallax × unit. 시작(cam=0)에는 지구만 아래에 보이고,
 // 오른쪽으로 2~3유닛 날면 달, 5유닛쯤에서 태양, 왼쪽으로 가면 은하수가 나타나도록 배치.
-// 크기는 실제 비율감 기준(디자인 레퍼런스 2026-07-28): 지구는 지평선처럼 화면 하단을
-// 가득 채우는 초대형, 달은 지구보다 확연히 작게, 태양은 원반은 작지만 글로우가 넓게.
+//
+// z-order = **배열 순서**(앞 항목이 뒤에 깔린다). 은하(최후방, parallax 0.12~0.18) →
+// 달(지구 뒤·원경) → 지구 → 태양 → 위성(중경). 달은 지구보다 parallax 를 낮춰
+// "더 멀리" 흐르게 했다(겹치면 지구가 위에 그려진다 — UX 라운드 2026-07-29).
+// 새 은하 추가 = 마스터 SVG 1개 + gen:game TARGETS 1행 + 아래 배열 1행.
+export const SUN_POS = { x: 5.6, y: 0.3 } as const;
+
 export const CELESTIALS: readonly Celestial[] = [
-  { asset: "/game/bg-earth.webp", x: 0, y: 2.0, size: 3.2, parallax: 0.35 },
-  { asset: "/game/bg-moon.webp", x: 2.9, y: -0.8, size: 0.55, parallax: 0.4 },
-  { asset: "/game/bg-sun.webp", x: 5.6, y: 0.3, size: 1.1, parallax: 0.32 },
+  // 유명 은하 5종(장식 전용, 상호작용 없음) — 사방에 분산해 어느 방향으로 날아도 만난다
+  { asset: "/game/bg-galaxy-andromeda.webp", x: -4.5, y: -2.2, size: 0.9, parallax: 0.15 },
+  { asset: "/game/bg-galaxy-whirlpool.webp", x: 7.5, y: -1.8, size: 0.7, parallax: 0.14 },
+  { asset: "/game/bg-galaxy-sombrero.webp", x: 3.5, y: 3.0, size: 0.6, parallax: 0.16 },
+  { asset: "/game/bg-galaxy-pinwheel.webp", x: -1.8, y: -3.4, size: 0.65, parallax: 0.13 },
+  { asset: "/game/bg-galaxy-lmc.webp", x: 6.2, y: 2.6, size: 0.8, parallax: 0.18 },
+  // 달 — 지구 뒤(배열 앞) + 더 작게 + 원경 시차
+  { asset: "/game/bg-moon.webp", x: 3.2, y: -1.3, size: 0.42, parallax: 0.26, hint: { color: "#b0a793", glyph: "M" } },
+  { asset: "/game/bg-earth.webp", x: 0, y: 2.0, size: 3.2, parallax: 0.35, hint: { color: "#38e0f0", glyph: "E" } },
+  { asset: "/game/bg-sun.webp", x: SUN_POS.x, y: SUN_POS.y, size: 0.85, parallax: 0.3, hint: { color: "#ffb23e", glyph: "S" } },
   // 장식 위성(중경 0.6, 상호작용 없음 — FR-7.7 원근 연출은 후속)
   { asset: "/game/satellite.png", x: 1.9, y: 0.75, size: 0.34, parallax: 0.6 },
   { asset: "/game/satellite.png", x: -2.1, y: 1.0, size: 0.26, parallax: 0.65 },
@@ -153,10 +167,10 @@ export const CELESTIALS: readonly Celestial[] = [
 /** 최원경 은하 타일(handoff-m5 §1) — 2048×1024, 수평 반복, 스크롤 계수 0.1. */
 export const GALAXY_TILE = { asset: "/game/bg-galaxy.webp", parallax: 0.1, height: 1.6 } as const;
 
-/** 태양 인접 앰버 틴트(≤8%, handoff-m5 §1) — 태양과의 월드 거리로 0~0.08 보간. */
-const SUN = CELESTIALS.find((c) => c.asset.includes("bg-sun"))!;
+/** 태양 인접 앰버 틴트(≤8%, handoff-m5 §1) — 태양과의 월드 거리로 0~0.08 보간.
+ *  배열 검색(find) 대신 SUN_POS 상수를 참조한다 — 배열 재구성에 안전. */
 export function sunTintAlpha(camX: number, camY: number): number {
-  const d = Math.hypot(camX - SUN.x, camY - SUN.y);
+  const d = Math.hypot(camX - SUN_POS.x, camY - SUN_POS.y);
   return Math.max(0, Math.min(0.08, (1 - d / 3.5) * 0.08));
 }
 

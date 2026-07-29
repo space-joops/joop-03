@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!-- 소용돌이 은하(M51) — 정면 2팔 나선 + 동반은하(NGC 5195). 파생: bg-galaxy-whirlpool.webp
+       재생성: npm run gen:game. 채도 억제·최대 α≤0.8. -->
+  <defs>
+    <radialGradient id="wcore">
+      <stop offset="0%" stop-color="#fff2df" stop-opacity="0.8"/>
+      <stop offset="25%" stop-color="#e8ddc9" stop-opacity="0.4"/>
+      <stop offset="60%" stop-color="#aab2be" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#8fa0b8" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="companion">
+      <stop offset="0%" stop-color="#f5e8d2" stop-opacity="0.75"/>
+      <stop offset="60%" stop-color="#c9c2b2" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#9aa3b4" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="wsoft"><feGaussianBlur stdDeviation="7"/></filter>
+    <filter id="wgrain" x="0" y="0" width="1024" height="1024" filterUnits="userSpaceOnUse">
+      <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" seed="17"/>
+      <feColorMatrix values="0 0 0 0 0.8  0 0 0 0 0.78  0 0 0 0 0.72  0.55 0.55 0.55 0 -0.46"/>
+      <feGaussianBlur stdDeviation="1.5"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+  </defs>
+
+  <!-- 헤일로 + 코어 -->
+  <circle cx="470" cy="560" r="330" fill="url(#wcore)"/>
+  <!-- 2팔 로그 나선(스트로크 블러) -->
+  <g filter="url(#wsoft)" fill="none" stroke="#dcd8cc" stroke-opacity="0.5" stroke-linecap="round">
+    <path d="M470 560 C 560 480, 700 500, 720 630 C 735 740, 640 830, 520 830" stroke-width="34"/>
+    <path d="M470 560 C 380 640, 240 620, 220 490 C 205 380, 300 290, 420 290" stroke-width="34"/>
+  </g>
+  <!-- 나선팔 위 입자 질감 -->
+  <circle cx="470" cy="560" r="320" fill="#d8dce2" filter="url(#wgrain)" opacity="0.45"/>
+  <!-- 동반은하 NGC 5195 (우상단, 다리로 연결) -->
+  <path d="M690 400 C 730 340, 770 300, 800 275" stroke="#c9c8bd" stroke-opacity="0.35" stroke-width="22" fill="none" filter="url(#wsoft)"/>
+  <circle cx="812" cy="258" r="86" fill="url(#companion)"/>
+</svg>

@@ -23,7 +23,8 @@
     "tracking": "Tracking",
     "rankingMore": "Details",
     "cta": {
-      "startWithInvite": "Start with an invite code"
+      "startWithInvite": "Start with an invite code",
+      "arcade": "COLLECT NOW — ARCADE"
     },
     "reducedMotion": "Animation paused (reduced motion)."
   },
@@ -73,7 +74,9 @@
     "launchNow": "Launch now",
     "openMap": "Open space map",
     "hintQueued": "Your seat is confirmed. Start the launch sequence.",
-    "hintOrbit": "You're in orbit. Check your status on the space map."
+    "hintOrbit": "You're in orbit. Check your status on the space map.",
+    "replayLaunch": "Replay last launch",
+    "arcadeNow": "Enter arcade now"
   },
   "minigame": {
     "title": "Ground training",
@@ -115,6 +118,19 @@
     "ascent": "Ascent",
     "separation": "Stage separation",
     "orbitInsertion": "Orbit insertion",
+    "liftoff": "Liftoff",
+    "maxQ": "Max-Q",
+    "meco": "MECO",
+    "secondIgnition": "Second engine start",
+    "boosterLanding": "Booster landing",
+    "seco": "SECO",
+    "deploy": "Joops deploy",
+    "speedLabel": "Speed",
+    "altitudeLabel": "Altitude",
+    "playbackSpeed": "Playback speed",
+    "replayTitle": "Replay finished",
+    "replayAgain": "Watch again",
+    "noReplay": "No launch recorded on this device yet. Records are saved after your next launch.",
     "subtitle": "You are level {level}. Meet the required level and your seat is confirmed automatically.",
     "capacity": "Seats",
     "requiredLevel": "Req. Lv.",
