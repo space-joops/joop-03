@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="768" viewBox="0 0 1024 768">
+  <!-- 안드로메다(M31) — 기울어진 나선은하. 파생: public/game/bg-galaxy-andromeda.webp
+       재생성: npm run gen:game (Chromium 렌더). 채도 억제·최대 α≤0.8(게임 팔레트 규칙). -->
+  <defs>
+    <radialGradient id="core">
+      <stop offset="0%" stop-color="#fff4e0" stop-opacity="0.8"/>
+      <stop offset="18%" stop-color="#f0e2c8" stop-opacity="0.55"/>
+      <stop offset="45%" stop-color="#c9c2b2" stop-opacity="0.25"/>
+      <stop offset="75%" stop-color="#9aa3b4" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#8fa0b8" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="arms" x="0" y="0" width="1024" height="768" filterUnits="userSpaceOnUse">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012 0.03" numOctaves="3" seed="41"/>
+      <feColorMatrix values="0 0 0 0 0.75  0 0 0 0 0.73  0 0 0 0 0.68  0.6 0.6 0.6 0 -0.5"/>
+      <feGaussianBlur stdDeviation="2.5"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+    <filter id="soft8"><feGaussianBlur stdDeviation="8"/></filter>
+  </defs>
+
+  <g transform="rotate(-32 512 384)">
+    <!-- 원반(기울어진 타원) -->
+    <ellipse cx="512" cy="384" rx="440" ry="150" fill="url(#core)"/>
+    <!-- 나선팔 얼룩(노이즈) -->
+    <ellipse cx="512" cy="384" rx="420" ry="140" fill="#cfd4dc" filter="url(#arms)" opacity="0.5"/>
+    <!-- 더스트 레인 -->
+    <g filter="url(#soft8)" opacity="0.4">
+      <ellipse cx="512" cy="352" rx="360" ry="26" fill="none" stroke="#0a0c12" stroke-width="16"/>
+    </g>
+    <!-- 밝은 코어 -->
+    <ellipse cx="512" cy="384" rx="90" ry="46" fill="#fff6e6" opacity="0.7" filter="url(#soft8)"/>
+  </g>
+</svg>

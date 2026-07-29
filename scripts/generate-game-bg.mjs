@@ -42,6 +42,12 @@ const TARGETS = [
   // 태양은 전면 알파 글로우라 webp 압축이 나쁘다 — 소프트 콘텐츠이므로 1792 로 낮춰 상쇄
   { master: "bg-sun-master.svg", out: "bg-sun.webp", srcW: 2048, srcH: 2048, w: 1792, h: 1792, quality: 78, maxKB: 280, alpha: true },
   { master: "bg-galaxy-master.svg", out: "bg-galaxy.webp", srcW: 3072, srcH: 1536, w: 3072, h: 1536, quality: 72, maxKB: 400, alpha: false },
+  // 유명 은하 5종(장식 오브젝트, 알파) — 새 은하 추가는 마스터 1개 + 이 표 1행 + lib/arcade.ts CELESTIALS 1행
+  { master: "bg-galaxy-andromeda-master.svg", out: "bg-galaxy-andromeda.webp", srcW: 1024, srcH: 768, w: 1024, h: 768, quality: 75, maxKB: 120, alpha: true },
+  { master: "bg-galaxy-sombrero-master.svg", out: "bg-galaxy-sombrero.webp", srcW: 1024, srcH: 512, w: 1024, h: 512, quality: 75, maxKB: 100, alpha: true },
+  { master: "bg-galaxy-whirlpool-master.svg", out: "bg-galaxy-whirlpool.webp", srcW: 1024, srcH: 1024, w: 1024, h: 1024, quality: 75, maxKB: 120, alpha: true },
+  { master: "bg-galaxy-pinwheel-master.svg", out: "bg-galaxy-pinwheel.webp", srcW: 1024, srcH: 1024, w: 1024, h: 1024, quality: 75, maxKB: 120, alpha: true },
+  { master: "bg-galaxy-lmc-master.svg", out: "bg-galaxy-lmc.webp", srcW: 1024, srcH: 768, w: 1024, h: 768, quality: 75, maxKB: 120, alpha: true },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────

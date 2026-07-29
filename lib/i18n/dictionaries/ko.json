@@ -23,7 +23,8 @@
     "tracking": "관측 대상",
     "rankingMore": "자세히",
     "cta": {
-      "startWithInvite": "초대코드로 시작하기"
+      "startWithInvite": "초대코드로 시작하기",
+      "arcade": "지금 수거하러 가기 — 아케이드"
     },
     "reducedMotion": "애니메이션이 정지되었습니다 (모션 최소화)."
   },
@@ -73,7 +74,9 @@
     "launchNow": "발사하기",
     "openMap": "우주 지도 열기",
     "hintQueued": "탑승이 확정됐어요. 발사 시퀀스를 시작하세요.",
-    "hintOrbit": "궤도에 진입했어요. 우주 지도에서 상태를 확인하세요."
+    "hintOrbit": "궤도에 진입했어요. 우주 지도에서 상태를 확인하세요.",
+    "replayLaunch": "발사 다시 보기",
+    "arcadeNow": "아케이드 바로 가기"
   },
   "minigame": {
     "title": "지상 훈련",
@@ -115,6 +118,19 @@
     "ascent": "상승",
     "separation": "단 분리",
     "orbitInsertion": "궤도 진입",
+    "liftoff": "리프트오프",
+    "maxQ": "Max-Q",
+    "meco": "1단 엔진 정지",
+    "secondIgnition": "2단 엔진 점화",
+    "boosterLanding": "부스터 착륙",
+    "seco": "2단 엔진 정지",
+    "deploy": "줍스 사출",
+    "speedLabel": "속도",
+    "altitudeLabel": "고도",
+    "playbackSpeed": "재생 배속",
+    "replayTitle": "다시 보기 종료",
+    "replayAgain": "한 번 더 보기",
+    "noReplay": "이 기기에 저장된 발사 기록이 없어요. 다음 발사부터 기록됩니다.",
     "subtitle": "현재 레벨 {level}. 필요 레벨을 충족하면 청약 시 자동으로 탑승이 확정됩니다.",
     "capacity": "정원",
     "requiredLevel": "필요 Lv.",

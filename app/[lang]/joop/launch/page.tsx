@@ -26,8 +26,9 @@ export default async function LaunchSeqPage({ params }: PageProps<"/[lang]/joop/
   ]);
 
   return (
+    // 풀블리드 중계 화면 — 텔레메트리 바가 safe-area 하단을 자체 처리한다
     <main
-      className="mx-auto flex w-full max-w-md flex-1 flex-col pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-[calc(env(safe-area-inset-top)+1rem)]"
+      className="game-fullbleed mx-auto flex w-full max-w-md flex-1 flex-col pt-[calc(env(safe-area-inset-top)+1rem)]"
       style={{ background: "var(--color-bg)" }}
     >
       <header className="mb-2 flex items-center justify-between px-4">
@@ -44,6 +45,7 @@ export default async function LaunchSeqPage({ params }: PageProps<"/[lang]/joop/
         dict={dict}
         color={mine.color}
         countdownSeconds={cfg.launchCountdownSeconds}
+        sequenceSeconds={cfg.launchSequenceSeconds}
         vehicle={vehicle}
       />
     </main>

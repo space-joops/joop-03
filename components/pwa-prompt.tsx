@@ -249,7 +249,7 @@ function BannerShell({
     <div
       role={role}
       aria-label={ariaLabel}
-      className="fixed inset-x-0 bottom-0 z-50 px-4 pb-[calc(env(safe-area-inset-bottom)+0.5rem)]"
+      className="pwa-prompt fixed inset-x-0 bottom-0 z-50 px-4 pb-[calc(env(safe-area-inset-bottom)+0.5rem)]"
     >
       <div
         className="panel-amber mx-auto w-full max-w-md px-4 py-3"

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!-- 바람개비 은하(M101) — 정면 다팔 나선 + 청백 HII 매듭. 파생: bg-galaxy-pinwheel.webp
+       재생성: npm run gen:game. 채도 억제·최대 α≤0.8. -->
+  <defs>
+    <radialGradient id="pcore">
+      <stop offset="0%" stop-color="#fdf3e2" stop-opacity="0.75"/>
+      <stop offset="22%" stop-color="#e4dbc9" stop-opacity="0.35"/>
+      <stop offset="58%" stop-color="#a8b0bd" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#8fa0b8" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="psoft"><feGaussianBlur stdDeviation="9"/></filter>
+    <filter id="pknot"><feGaussianBlur stdDeviation="3"/></filter>
+  </defs>
+
+  <circle cx="512" cy="512" r="360" fill="url(#pcore)"/>
+  <!-- 느슨한 다팔(4개) 나선 -->
+  <g filter="url(#psoft)" fill="none" stroke="#d5d3c8" stroke-opacity="0.42" stroke-linecap="round">
+    <path d="M512 512 C 640 430, 780 470, 800 610 C 812 700, 740 790, 630 810" stroke-width="26"/>
+    <path d="M512 512 C 384 594, 244 554, 224 414 C 212 324, 284 234, 394 214" stroke-width="26"/>
+    <path d="M512 512 C 594 640, 554 780, 414 800 C 324 812, 234 740, 214 630" stroke-width="24"/>
+    <path d="M512 512 C 430 384, 470 244, 610 224 C 700 212, 790 284, 810 394" stroke-width="24"/>
+  </g>
+  <!-- 청백 HII 매듭(팔 위 별생성 영역) — 채도 낮은 시안 화이트 -->
+  <g fill="#dfeef2" opacity="0.55" filter="url(#pknot)">
+    <circle cx="742" cy="560" r="9"/>
+    <circle cx="662" cy="770" r="7"/>
+    <circle cx="282" cy="464" r="8"/>
+    <circle cx="368" cy="252" r="6"/>
+    <circle cx="452" cy="762" r="7"/>
+    <circle cx="252" cy="646" r="6"/>
+    <circle cx="622" cy="262" r="8"/>
+  </g>
+</svg>

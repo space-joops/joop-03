@@ -340,12 +340,23 @@ body {
   }
 }
 
+/* 풀블리드 게임 화면(아케이드·발사 중계) — 하단 고정 요소(버전 배지·PWA 배너)가
+ * 텔레메트리 바를 덮지 않게 숨긴다. 다른 화면에서는 정상 노출. */
+body:has(main.game-fullbleed) .version-badge,
+body:has(main.game-fullbleed) .pwa-prompt {
+  display: none;
+}
+
 /* 데스크톱/타블릿 최소 대응 — 세로 모바일 1순위 원칙(ADR 0002)은 유지하되,
  * 넓은 화면에서 중앙 컬럼(max-w-md)과 빈 좌우가 구분되도록 얇은 경계만 준다.
- * crt-scanlines 는 게임 트리 전용 body 클래스라 admin 은 영향 없다. */
+ * crt-scanlines 는 게임 트리 전용 body 클래스라 admin 은 영향 없다.
+ * 풀블리드 게임 화면은 예외(폰 화면 꽉 차게). */
 @media (min-width: 480px) {
   body.crt-scanlines main {
     border-inline: 1px solid var(--color-grid);
+  }
+  body.crt-scanlines main.game-fullbleed {
+    border-inline: 0;
   }
 }
 

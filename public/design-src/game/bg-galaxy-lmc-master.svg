@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="768" viewBox="0 0 1024 768">
+  <!-- 대마젤란운(LMC) — 불규칙 은하: 막대 + 패치 구름 + 타란툴라 성운 매듭.
+       파생: bg-galaxy-lmc.webp · 재생성: npm run gen:game. 채도 억제·최대 α≤0.8. -->
+  <defs>
+    <linearGradient id="lbar" x1="0" y1="0" x2="1" y2="0.25">
+      <stop offset="0%" stop-color="#e9e0cd" stop-opacity="0"/>
+      <stop offset="35%" stop-color="#efe6d2" stop-opacity="0.55"/>
+      <stop offset="65%" stop-color="#e9ddc6" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#e9e0cd" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="lpatch" x="0" y="0" width="1024" height="768" filterUnits="userSpaceOnUse">
+      <feTurbulence type="fractalNoise" baseFrequency="0.009 0.014" numOctaves="4" seed="29"/>
+      <feColorMatrix values="0 0 0 0 0.82  0 0 0 0 0.79  0 0 0 0 0.72  0.6 0.6 0.6 0 -0.48"/>
+      <feGaussianBlur stdDeviation="3"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+    <filter id="lsoft"><feGaussianBlur stdDeviation="10"/></filter>
+    <radialGradient id="tarantula">
+      <stop offset="0%" stop-color="#e8b8b2" stop-opacity="0.5"/>
+      <stop offset="55%" stop-color="#c98f8c" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#a87b7c" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 불규칙 헤일로 -->
+  <ellipse cx="512" cy="400" rx="380" ry="250" fill="#b9c0cb" opacity="0.12" filter="url(#lsoft)"/>
+  <!-- 중앙 막대 -->
+  <g transform="rotate(-14 512 390)">
+    <ellipse cx="512" cy="390" rx="300" ry="70" fill="url(#lbar)" filter="url(#lsoft)"/>
+  </g>
+  <!-- 패치 구름(불규칙 얼룩) -->
+  <ellipse cx="512" cy="390" rx="360" ry="230" fill="#ddd8ca" filter="url(#lpatch)" opacity="0.5"/>
+  <!-- 타란툴라 성운(붉은 매듭, 채도 억제) -->
+  <circle cx="770" cy="300" r="70" fill="url(#tarantula)"/>
+</svg>
