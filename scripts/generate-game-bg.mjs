@@ -270,6 +270,12 @@ const encode = (png, t, quality) =>
 const SVG_COPIES = [
   ["rocket-master.svg", "rocket.svg"],
   ["cubesat-master.svg", "cubesat.svg"],
+  ["ad-sat-vrerv-master.svg", "ad-sat-vrerv.svg"],
+  ["ad-sat-diginori-master.svg", "ad-sat-diginori.svg"],
+  ["ad-sat-spacex-master.svg", "ad-sat-spacex.svg"],
+  ["ad-sat-obital-radar-master.svg", "ad-sat-obital-radar.svg"],
+  ["ad-sat-uzuro-tech-master.svg", "ad-sat-uzuro-tech.svg"],
+  ["ad-sat-spacemap-master.svg", "ad-sat-spacemap.svg"],
 ];
 
 function copySvgMasters() {

@@ -45,19 +45,29 @@ export function getMyTopKinds(n = 3): DebrisKindId[] {
   return parseTopKinds(readKindStoreSnapshot(), n);
 }
 
-/** 저장 원문(JSON 문자열)에서 상위 n개 종류를 파생 — 렌더 중 호출해도 순수. */
-export function parseTopKinds(raw: string, n = 3): DebrisKindId[] {
-  if (!raw) return [];
+/** 저장 원문 → 종류별 전체 카운트(순수) — 인벤토리 그리드용. 미지 종류는 걸러낸다. */
+export function parseKindCounts(raw: string): Partial<Record<DebrisKindId, number>> {
+  if (!raw) return {};
   try {
     const acc = JSON.parse(raw) as Record<string, number>;
-    return (Object.entries(acc) as [DebrisKindId, number][])
-      .filter(([k]) => (DEBRIS_KIND_IDS as string[]).includes(k))
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, n)
-      .map(([k]) => k);
+    const out: Partial<Record<DebrisKindId, number>> = {};
+    for (const [k, n] of Object.entries(acc)) {
+      if ((DEBRIS_KIND_IDS as string[]).includes(k) && typeof n === "number" && n > 0) {
+        out[k as DebrisKindId] = n;
+      }
+    }
+    return out;
   } catch {
-    return [];
+    return {};
   }
+}
+
+/** 저장 원문(JSON 문자열)에서 상위 n개 종류를 파생 — 렌더 중 호출해도 순수. */
+export function parseTopKinds(raw: string, n = 3): DebrisKindId[] {
+  return (Object.entries(parseKindCounts(raw)) as [DebrisKindId, number][])
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, n)
+    .map(([k]) => k);
 }
 
 // ── useSyncExternalStore 어댑터 (react-hooks/set-state-in-effect 회피 관용구)

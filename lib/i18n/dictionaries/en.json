@@ -78,7 +78,8 @@
     "hintQueued": "Your seat is confirmed. Start the launch sequence.",
     "hintOrbit": "You're in orbit. Check your status on the space map.",
     "replayLaunch": "Replay last launch",
-    "arcadeNow": "Enter arcade now"
+    "arcadeNow": "Enter arcade now",
+    "inventory": "Inventory"
   },
   "minigame": {
     "title": "Ground training",
@@ -187,7 +188,16 @@
     "insufficientXp": "Not enough XP (need {cost}, you have {xp}). Earn more in ground training.",
     "xpBalance": "XP balance {xp}",
     "returnIn": "RETURN COUNTDOWN",
-    "recycling": "RECYCLING WHILE WAITING…"
+    "recycling": "RECYCLING WHILE WAITING…",
+    "home": "Home",
+    "rankSection": "Global ranking",
+    "rankShift": "#{before} → #{after}",
+    "rankNew": "First entry in the rankings!",
+    "rankNoChange": "Rank held",
+    "adDocked": "{brand} docked — invite code acquired!",
+    "adDockedAgain": "{brand} — already docked (code in inventory)",
+    "adDockedHint": "Check the inventory",
+    "adDockFail": "Docked, but code issuance failed — try docking again"
   },
   "space": {
     "title": "Space map",
@@ -244,6 +254,32 @@
       "body": "A new version of JOOPS is ready. Update now to get the latest mission data.",
       "updateButton": "Update",
       "dismiss": "Later"
+    }
+  },
+  "inventory": {
+    "title": "Inventory",
+    "debrisTitle": "Collected debris",
+    "debrisHint": "Counted on this device only — kinds are not stored on the server yet.",
+    "debrisEmpty": "Nothing collected yet. Head to the arcade!",
+    "unitSuffix": "pcs",
+    "valueSuffix": "pts each",
+    "satTitle": "Docked ad satellites",
+    "satHint": "Dock with an ad satellite passing through the arcade to earn a real invite code you can share.",
+    "satLocked": "Not docked yet",
+    "dockedAt": "Docked",
+    "code": "Invite code",
+    "copy": "Copy",
+    "copied": "Copied",
+    "share": "Share",
+    "shareText": "Adopt your own space robot on JOOPS! Invite code: {code}",
+    "toArcade": "Go to arcade",
+    "kinds": {
+      "can": "Can",
+      "bolt": "Bolt",
+      "nut": "Nut",
+      "panel": "Panel",
+      "strut": "Strut",
+      "chip": "Chip"
     }
   }
 }

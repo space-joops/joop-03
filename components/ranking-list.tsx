@@ -4,8 +4,8 @@ import type { Locale } from "@/lib/i18n/config";
 import type { RankingRow } from "@/lib/rankings";
 import { DebrisKindIcons } from "@/components/debris-kind-icons";
 
-// 등락 = prevRank - rank (양수면 상승)
-function ChangeIndicator({ delta }: { delta: number }) {
+// 등락 = prevRank - rank (양수면 상승). 아케이드 교신 종료 화면도 재사용(export).
+export function ChangeIndicator({ delta }: { delta: number }) {
   if (delta === 0) {
     return <span className="text-[var(--color-muted)]">–</span>;
   }

@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="512" viewBox="0 0 1024 512">
+  <!-- 광고 위성: VReRV (VR 헤드셋 모티프). anchor 중심 [512,256].
+       1024×512 인 이유: 플라이바이 근접 시 화면폭 ≈1.1u × DPR3 ≈ 1300px — 512 마스터는 흐려진다.
+       워드마크는 코드(캔버스 fillText)가 하단 광고판 위에 그린다 — SVG 텍스트 금지 규약.
+       파생 런타임: ../../game/ad-sat-vrerv.svg (gen:game SVG 패스스루). -->
+  <defs>
+    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3a3145"/>
+      <stop offset=".45" stop-color="#241d2e"/>
+      <stop offset="1" stop-color="#161020"/>
+    </linearGradient>
+    <radialGradient id="lens" cx=".38" cy=".35" r=".8">
+      <stop offset="0" stop-color="#e8ccff"/>
+      <stop offset=".35" stop-color="#c964ff"/>
+      <stop offset="1" stop-color="#3d1a5e"/>
+    </radialGradient>
+  </defs>
+  <g stroke="#5c6b5e" stroke-width="3">
+    <!-- 스터브 날개 -->
+    <g fill="#0e2f38">
+      <rect x="96" y="196" width="180" height="120" rx="6"/>
+      <rect x="748" y="196" width="180" height="120" rx="6"/>
+    </g>
+    <g stroke="#c964ff" stroke-width="1.5" opacity=".45">
+      <path d="M141 196v120M186 196v120M231 196v120M793 196v120M838 196v120M883 196v120"/>
+      <path d="M96 236h180M96 276h180M748 236h180M748 276h180"/>
+    </g>
+    <path d="M276 256h44M704 256h44" stroke="#8ba08c" stroke-width="8"/>
+    <!-- 바이저 본체(곡면) -->
+    <path d="M320 190 Q332 150 380 150 H644 Q692 150 704 190 L712 268 Q714 330 660 336 H364 Q310 330 312 268 Z" fill="url(#body)"/>
+    <!-- 듀얼 렌즈 원창 -->
+    <circle cx="424" cy="244" r="52" fill="url(#lens)"/>
+    <circle cx="600" cy="244" r="52" fill="url(#lens)"/>
+    <circle cx="408" cy="228" r="12" fill="#ffffff" opacity=".55" stroke="none"/>
+    <circle cx="584" cy="228" r="12" fill="#ffffff" opacity=".55" stroke="none"/>
+    <!-- 헤드스트랩 안테나 -->
+    <path d="M380 150 Q512 96 644 150" fill="none" stroke="#8ba08c" stroke-width="6"/>
+    <circle cx="512" cy="118" r="9" fill="#c964ff" stroke="none"/>
+    <!-- 상태등 -->
+    <circle cx="512" cy="316" r="7" fill="#39ff14" stroke="none"/>
+    <!-- 광고판 트러스 + 패널(워드마크 자리 — 코드가 그린다) -->
+    <path d="M448 336 L436 384 M576 336 L588 384" stroke="#8ba08c" stroke-width="5"/>
+    <rect x="332" y="384" width="360" height="72" rx="8" fill="#0b0812" stroke="#c964ff" stroke-width="4"/>
+    <rect x="344" y="394" width="336" height="52" rx="4" fill="none" stroke="#c964ff" stroke-width="1.5" opacity=".35"/>
+  </g>
+  <!-- 좌측 림 라이트 -->
+  <path d="M320 190 Q332 150 380 150 L380 162 Q344 164 334 196 Z" fill="#b98fe0" opacity=".5"/>
+</svg>

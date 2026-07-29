@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="512" viewBox="0 0 1024 512">
+  <!-- 광고 위성: OBITAL RADAR (대형 파라볼라 접시 + 동심 격자 링). anchor 중심 [512,256].
+       워드마크는 코드(캔버스 fillText)가 하단 광고판 위에 그린다 — SVG 텍스트 금지 규약.
+       파생 런타임: ../../game/ad-sat-obital-radar.svg (gen:game SVG 패스스루). -->
+  <defs>
+    <radialGradient id="dish" cx=".5" cy=".42" r=".75">
+      <stop offset="0" stop-color="#123a42"/>
+      <stop offset=".7" stop-color="#0c262e"/>
+      <stop offset="1" stop-color="#071418"/>
+    </radialGradient>
+    <linearGradient id="bus" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#33424a"/>
+      <stop offset="1" stop-color="#162026"/>
+    </linearGradient>
+  </defs>
+  <g stroke="#5c6b5e" stroke-width="3">
+    <!-- 대형 파라볼라(정면 뷰 타원) + 동심 격자 링 -->
+    <ellipse cx="512" cy="208" rx="300" ry="150" fill="url(#dish)"/>
+    <g fill="none" stroke="#38e0f0" stroke-width="2" opacity=".5">
+      <ellipse cx="512" cy="208" rx="240" ry="118"/>
+      <ellipse cx="512" cy="208" rx="176" ry="86"/>
+      <ellipse cx="512" cy="208" rx="112" ry="54"/>
+      <ellipse cx="512" cy="208" rx="52" ry="25"/>
+      <path d="M212 208 H812 M512 58 V358"/>
+    </g>
+    <!-- 피드혼(중앙 수신기) -->
+    <path d="M512 208 L482 130 H542 Z" fill="#8ba08c"/>
+    <circle cx="512" cy="122" r="14" fill="#38e0f0" stroke="none"/>
+    <!-- 버스(접시 뒤 하단) -->
+    <rect x="440" y="330" width="144" height="70" rx="8" fill="url(#bus)"/>
+    <path d="M470 358 h84" stroke="#38e0f0" stroke-width="2" opacity=".6"/>
+    <!-- 소형 태양전지 2장 -->
+    <rect x="300" y="342" width="120" height="52" rx="4" fill="#0e2f38"/>
+    <rect x="604" y="342" width="120" height="52" rx="4" fill="#0e2f38"/>
+    <g stroke="#38e0f0" stroke-width="1.2" opacity=".4">
+      <path d="M330 342v52M360 342v52M390 342v52M634 342v52M664 342v52M694 342v52"/>
+    </g>
+    <path d="M420 368 h20 M584 368 h20" stroke="#8ba08c" stroke-width="6"/>
+    <!-- 상태등 -->
+    <circle cx="568" cy="344" r="6" fill="#39ff14" stroke="none"/>
+    <!-- 광고판 트러스 + 패널(접시 아래) -->
+    <path d="M478 400 L462 416 M546 400 L562 416" stroke="#8ba08c" stroke-width="5"/>
+    <rect x="272" y="416" width="480" height="64" rx="6" fill="#06141a" stroke="#38e0f0" stroke-width="4"/>
+    <rect x="284" y="426" width="456" height="44" rx="3" fill="none" stroke="#38e0f0" stroke-width="1.5" opacity=".35"/>
+  </g>
+  <!-- 접시 상단 림 라이트 -->
+  <path d="M262 138 Q 512 28 762 138" fill="none" stroke="#9be8f2" stroke-width="5" opacity=".5"/>
+</svg>

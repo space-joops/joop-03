@@ -78,7 +78,8 @@
     "hintQueued": "탑승이 확정됐어요. 발사 시퀀스를 시작하세요.",
     "hintOrbit": "궤도에 진입했어요. 우주 지도에서 상태를 확인하세요.",
     "replayLaunch": "발사 다시 보기",
-    "arcadeNow": "아케이드 바로 가기"
+    "arcadeNow": "아케이드 바로 가기",
+    "inventory": "인벤토리"
   },
   "minigame": {
     "title": "지상 훈련",
@@ -187,7 +188,16 @@
     "insufficientXp": "XP가 부족해요 (필요 {cost} · 보유 {xp}). 지상 훈련으로 XP를 모아 보세요.",
     "xpBalance": "보유 XP {xp}",
     "returnIn": "수신 복귀까지",
-    "recycling": "대기 중 재활용…"
+    "recycling": "대기 중 재활용…",
+    "home": "홈으로",
+    "rankSection": "전체 랭킹",
+    "rankShift": "{before}위 → {after}위",
+    "rankNew": "랭킹 첫 진입!",
+    "rankNoChange": "순위 유지",
+    "adDocked": "{brand} 도킹 성공 — 초대코드 획득!",
+    "adDockedAgain": "{brand} — 이미 도킹한 위성이에요 (코드는 인벤토리에)",
+    "adDockedHint": "인벤토리에서 확인하세요",
+    "adDockFail": "도킹했지만 코드 발급에 실패했어요 — 다시 도킹해 보세요"
   },
   "space": {
     "title": "우주 지도",
@@ -244,6 +254,32 @@
       "body": "새 버전의 JOOPS가 준비됐어요. 업데이트하면 최신 상태로 플레이할 수 있어요.",
       "updateButton": "업데이트",
       "dismiss": "나중에"
+    }
+  },
+  "inventory": {
+    "title": "인벤토리",
+    "debrisTitle": "수집한 우주 쓰레기",
+    "debrisHint": "이 기기에서 수거한 기록이에요 — 종류별 기록은 아직 서버에 저장되지 않아요.",
+    "debrisEmpty": "아직 수거한 쓰레기가 없어요. 아케이드로 가볼까요?",
+    "unitSuffix": "개",
+    "valueSuffix": "점짜리",
+    "satTitle": "도킹한 광고 위성",
+    "satHint": "아케이드를 지나가는 광고 위성과 도킹하면 공유 가능한 진짜 초대코드를 받아요.",
+    "satLocked": "아직 도킹 전",
+    "dockedAt": "도킹",
+    "code": "초대코드",
+    "copy": "복사",
+    "copied": "복사됨",
+    "share": "공유",
+    "shareText": "JOOPS에서 나만의 우주 로봇을 입양해 보세요! 초대코드: {code}",
+    "toArcade": "아케이드 가기",
+    "kinds": {
+      "can": "캔",
+      "bolt": "볼트",
+      "nut": "너트",
+      "panel": "패널",
+      "strut": "구조재",
+      "chip": "회로칩"
     }
   }
 }

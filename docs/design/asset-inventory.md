@@ -58,6 +58,7 @@
 | 인벤토리·아이템 아이콘 | 후속 | SVG | | ✅ **제작됨**: `public/game/item-{magnet,health,fuel}.svg` — 자석·체력·연료 |
 | 발사체(로켓) | 후속 | SVG 마스터 → SVG | ✅ | ✅ **실사화 적용** (2026-07-29): `public/game/rocket.svg` — Falcon 9 실루엣 64×**256**(기존 64×160), ogive 페어링 + 인터스테이지 검정 밴드 + 그리드핀 4장 + 수납 착륙다리 + 그을음 + 옥타웹/노즐벨 3. 마스터 `rocket-master.svg`, `npm run gen:game` 이 **그대로 복사**(SVG 패스스루). 코드 앵커: 노즐 [32,250], `NOSE_FRAC`=62/256, `STAGE1_FRAC`=130/256 — 페어링·단 분리를 크롭으로 표현 |
 | 큐브샛(사출체) | 후속 | SVG 마스터 → SVG | ✅ | ✅ **신규** (2026-07-29): `public/game/cubesat.svg` — 3U 큐브샛(금박 MLI + 접힌 태양판 + 휩 안테나 + 스타트래커). viewBox 128 기준 **해치 x48 y28 w32 h8** 위에 코드가 힌지 뚜껑을 그린다(줍스 방출구). 마스터 `cubesat-master.svg`, `gen:game` SVG 패스스루 |
+| 광고 위성 6종 | 후속 | SVG 마스터 → SVG | ✅ | ✅ **신규** (2026-07-29, v0.17.0): `public/game/ad-sat-{vrerv,diginori,spacex,obital-radar,uzuro-tech,spacemap}.svg` — 아케이드 플라이바이(FR-7.7)용 1024×512 앵커 중심. 브랜드별 실루엣 차별화(VR 바이저/큐브 스택/플랫 패널+세로 태양전지/파라볼라/육각+3붐/구체+궤도 링) + 하단 광고판 패널(워드마크는 코드가 캔버스 fillText 로 그림 — SVG 텍스트 금지 규약). 마스터 `ad-sat-*-master.svg`, `gen:game` SVG 패스스루. 데이터는 `lib/ad-satellites.ts` 하드코딩(광고 관리자 DB 연동 TODO) |
 
 ## D. 공통 UI (전 화면, 후속 포함)
 

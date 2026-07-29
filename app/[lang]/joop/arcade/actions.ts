@@ -5,6 +5,9 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { getArcadeMaxPerRun, getArcadeShadowXpCost } from "@/lib/game-config";
 import { getMyOrbitState } from "@/lib/space";
 import { levelFromXp } from "@/lib/minigame";
+import { fetchMyRanking, fetchRankings, type RankingRow } from "@/lib/rankings";
+import { adSatelliteById } from "@/lib/ad-satellites";
+import { CODE_PREFIX, nextInviteCodes, randomLabel } from "@/lib/admin/invite-codes";
 
 export type ShadowEntryResult =
   | { ok: true; charged: number; xpLeft: number }
@@ -65,8 +68,19 @@ export async function payShadowEntry(): Promise<ShadowEntryResult> {
   return { ok: false, error: "save" };
 }
 
+/** 이번 판 저장이 만든 랭킹 변화 — 교신 종료 화면 연출용 */
+export type ArcadeRankingDelta = {
+  /** 갱신 전 내 순위(뷰에 없었으면 null = 첫 진입) */
+  rankBefore: number | null;
+  rankAfter: number | null;
+  /** 갱신 후 상위 5 */
+  top: RankingRow[];
+  /** 갱신 후 내 행 */
+  me: RankingRow | null;
+};
+
 export type ArcadeResult =
-  | { ok: true; collected: number; totalCollected: number }
+  | { ok: true; collected: number; totalCollected: number; ranking: ArcadeRankingDelta | null }
   | { ok: false; error: "invalid" | "auth" | "no_joop" | "not_orbit" | "save" };
 
 // 아케이드 결과 저장 — 궤도 단계의 화폐는 XP가 아니라 "수거 조각"이다.
@@ -99,6 +113,14 @@ export async function submitArcadeResult(collected: number): Promise<ArcadeResul
   // 아케이드는 궤도에서만 성립한다(수신 지역 게임). 지상 줍스의 위조 요청 차단.
   if (joop.status !== "orbit") return { ok: false, error: "not_orbit" };
 
+  // 이번 판이 만든 등락을 보이려면 갱신 **전** 순위가 필요하다(뷰의 prev_rank 는
+  // "7일 전 기준"이라 방금 저장으로는 움직이지 않는다).
+  // ⚠️ cached getMyRanking 은 쓰지 않는다 — react.cache 라 같은 요청에서 갱신 후
+  //    다시 불러도 이 값이 그대로 돌아온다(before==after 함정).
+  const rankBefore = await fetchMyRanking(admin, joop.id)
+    .then((r) => r?.rank ?? null)
+    .catch(() => null);
+
   const now = new Date().toISOString();
   const { error: evErr } = await admin.from("joop_03_debris_events").insert({
     joop_id: joop.id,
@@ -119,7 +141,19 @@ export async function submitArcadeResult(collected: number): Promise<ArcadeResul
       .select("total_collected");
     if (upErr) return { ok: false, error: "save" };
     if (updated && updated.length > 0) {
-      return { ok: true, collected: n, totalCollected: base + n };
+      // 갱신 후 랭킹 — 일반 뷰라 즉시 반영된다. 조회 실패는 null 폴백:
+      // 랭킹은 연출이지 저장 성공의 조건이 아니다.
+      let ranking: ArcadeRankingDelta | null = null;
+      try {
+        const [top, me] = await Promise.all([
+          fetchRankings(admin, 5),
+          fetchMyRanking(admin, joop.id),
+        ]);
+        ranking = { rankBefore, rankAfter: me?.rank ?? null, top, me };
+      } catch {
+        ranking = null;
+      }
+      return { ok: true, collected: n, totalCollected: base + n, ranking };
     }
     const { data: fresh } = await admin
       .from("joop_03_joops")
@@ -128,6 +162,68 @@ export async function submitArcadeResult(collected: number): Promise<ArcadeResul
       .maybeSingle();
     if (!fresh) return { ok: false, error: "save" };
     base = Number(fresh.total_collected);
+  }
+  return { ok: false, error: "save" };
+}
+
+export type DockRewardResult =
+  | { ok: true; code: string; isNew: boolean }
+  | { ok: false; error: "auth" | "invalid" | "save" };
+
+// 광고 위성 도킹 보상 — **실제 초대코드**를 joop_03_invite_codes 에 발급한다
+// (FR-9.1 부분 구현, 마이그레이션 0: 미사용이던 issuer_id 컬럼을 여기서 처음 쓴다).
+//
+// 멱등: 같은 사용자가 같은 브랜드에 다시 도킹하면 새 코드를 만들지 않고 기존 코드를
+// 돌려준다(브랜드당 1코드). 라벨 일련번호(NN≤99)가 소진되면 랜덤 라벨로 폴백
+// (waitlist 발급 액션과 같은 관행).
+export async function claimAdDockReward(brandId: string): Promise<DockRewardResult> {
+  const sat = adSatelliteById(String(brandId));
+  if (!sat) return { ok: false, error: "invalid" };
+
+  const supabase = await createSessionClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "auth" };
+
+  const admin = createAdminClient();
+  const prefix = `${CODE_PREFIX}-${sat.codeLabel}-`;
+
+  // 멱등 조회 — 이 사용자가 이 브랜드로 이미 발급받은 코드
+  const { data: mine, error: mineErr } = await admin
+    .from("joop_03_invite_codes")
+    .select("code")
+    .eq("issuer_id", user.id)
+    .like("code", `${prefix}%`)
+    .limit(1);
+  if (mineErr) return { ok: false, error: "save" };
+  if (mine && mine.length > 0) return { ok: true, code: mine[0].code as string, isNew: false };
+
+  // 발급 — PK 충돌(동시 발급) 시 새 일련번호로 1회 재시도
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const { data: existing, error: exErr } = await admin
+      .from("joop_03_invite_codes")
+      .select("code")
+      .like("code", `${prefix}%`);
+    if (exErr) return { ok: false, error: "save" };
+
+    let codes = nextInviteCodes(
+      sat.codeLabel,
+      (existing ?? []).map((r) => r.code as string),
+      1,
+    );
+    if (!codes) {
+      // 브랜드 라벨 소진(NN>99) — 랜덤 라벨로 폴백. 브랜드 연관은 issuer 기록으로만 남는다.
+      codes = [`${CODE_PREFIX}-${randomLabel()}-01`];
+    }
+
+    const { error: insErr } = await admin.from("joop_03_invite_codes").insert({
+      code: codes[0],
+      issuer_id: user.id,
+      status: "active",
+    });
+    if (!insErr) return { ok: true, code: codes[0], isNew: true };
+    if (insErr.code !== "23505") return { ok: false, error: "save" };
   }
   return { ok: false, error: "save" };
 }

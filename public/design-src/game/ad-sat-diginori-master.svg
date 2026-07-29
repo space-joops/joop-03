@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="512" viewBox="0 0 1024 512">
+  <!-- 광고 위성: digiNORI (게임사 — 큐브 3스택 + 픽셀 계단 안테나). anchor 중심 [512,256].
+       워드마크는 코드(캔버스 fillText)가 하단 광고판 위에 그린다 — SVG 텍스트 금지 규약.
+       파생 런타임: ../../game/ad-sat-diginori.svg (gen:game SVG 패스스루). -->
+  <defs>
+    <linearGradient id="cube" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4a5232"/>
+      <stop offset=".5" stop-color="#2e341e"/>
+      <stop offset="1" stop-color="#1a1e10"/>
+    </linearGradient>
+  </defs>
+  <g stroke="#5c6b5e" stroke-width="3">
+    <!-- 태양전지 날개(비대칭 — 왼쪽만) -->
+    <rect x="92" y="206" width="220" height="100" rx="6" fill="#0e2f38"/>
+    <g stroke="#b8e04a" stroke-width="1.5" opacity=".45">
+      <path d="M147 206v100M202 206v100M257 206v100"/>
+      <path d="M92 240h220M92 273h220"/>
+    </g>
+    <path d="M312 256h56" stroke="#8ba08c" stroke-width="8"/>
+    <!-- 큐브 3스택(계단 오프셋) -->
+    <rect x="368" y="120" width="132" height="92" rx="6" fill="url(#cube)"/>
+    <rect x="404" y="212" width="132" height="92" rx="6" fill="url(#cube)"/>
+    <rect x="440" y="304" width="132" height="46" rx="6" fill="url(#cube)"/>
+    <!-- 큐브 표면 픽셀 창 -->
+    <g fill="#b8e04a" stroke="none">
+      <rect x="388" y="140" width="20" height="20"/>
+      <rect x="416" y="140" width="20" height="20" opacity=".55"/>
+      <rect x="388" y="168" width="20" height="20" opacity=".35"/>
+      <rect x="424" y="232" width="20" height="20"/>
+      <rect x="452" y="232" width="20" height="20" opacity=".55"/>
+      <rect x="424" y="260" width="20" height="20" opacity=".35"/>
+    </g>
+    <!-- 픽셀 계단 안테나(오른쪽 위) -->
+    <g fill="#8ba08c" stroke-width="2">
+      <rect x="560" y="180" width="28" height="28"/>
+      <rect x="588" y="152" width="28" height="28"/>
+      <rect x="616" y="124" width="28" height="28"/>
+    </g>
+    <circle cx="658" cy="110" r="10" fill="#b8e04a" stroke="none"/>
+    <!-- 우측 방열판 -->
+    <path d="M572 240 h96 M572 262 h96 M572 284 h96" stroke="#414d43" stroke-width="10"/>
+    <!-- 상태등 -->
+    <circle cx="484" cy="330" r="7" fill="#39ff14" stroke="none"/>
+    <!-- 광고판 트러스 + 패널 -->
+    <path d="M470 350 L452 394 M560 350 L580 394" stroke="#8ba08c" stroke-width="5"/>
+    <rect x="322" y="394" width="380" height="68" rx="6" fill="#0d1006" stroke="#b8e04a" stroke-width="4"/>
+    <rect x="334" y="404" width="356" height="48" rx="3" fill="none" stroke="#b8e04a" stroke-width="1.5" opacity=".35"/>
+  </g>
+  <!-- 상단 림 라이트 -->
+  <path d="M368 120 h132 v10 h-132 Z" fill="#d7e8a0" opacity=".5"/>
+</svg>
