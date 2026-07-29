@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="512" viewBox="0 0 1024 512">
+  <!-- 광고 위성: SpaceX (스타링크풍 — 플랫 패널 버스 + 한쪽만 대형 세로 태양전지).
+       anchor 중심 [512,256]. 워드마크는 코드(캔버스 fillText)가 광고판 위에 그린다.
+       파생 런타임: ../../game/ad-sat-spacex.svg (gen:game SVG 패스스루). -->
+  <defs>
+    <linearGradient id="flat" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e8ebee"/>
+      <stop offset=".5" stop-color="#aeb6bc"/>
+      <stop offset="1" stop-color="#6f7a82"/>
+    </linearGradient>
+    <linearGradient id="sail" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#12303a"/>
+      <stop offset="1" stop-color="#0a1c24"/>
+    </linearGradient>
+  </defs>
+  <g stroke="#5c6b5e" stroke-width="3">
+    <!-- 대형 세로 태양전지(한쪽) — 스타링크 실루엣의 핵심 -->
+    <rect x="640" y="40" width="150" height="330" rx="6" fill="url(#sail)"/>
+    <g stroke="#cfd8dc" stroke-width="1.5" opacity=".4">
+      <path d="M677 40v330M715 40v330M753 40v330"/>
+      <path d="M640 95h150M640 150h150M640 205h150M640 260h150M640 315h150"/>
+    </g>
+    <!-- 힌지 -->
+    <path d="M596 226 h44 M596 286 h44" stroke="#8ba08c" stroke-width="8"/>
+    <!-- 플랫 패널 버스 -->
+    <rect x="232" y="206" width="364" height="100" rx="10" fill="url(#flat)"/>
+    <path d="M232 240 h364 M232 272 h364" stroke="#8ba08c" stroke-width="2" opacity=".6"/>
+    <!-- 위상배열 안테나 원판 -->
+    <circle cx="316" cy="256" r="30" fill="#dfe5e9"/>
+    <circle cx="316" cy="256" r="18" fill="none" stroke="#8ba08c" stroke-width="2"/>
+    <circle cx="404" cy="256" r="22" fill="#dfe5e9"/>
+    <!-- 스러스터(왼쪽 끝) -->
+    <path d="M232 236 L196 246 V266 L232 276 Z" fill="#414d43"/>
+    <ellipse cx="192" cy="256" rx="8" ry="14" fill="#05080a" stroke="#414d43" stroke-width="2"/>
+    <!-- 상태등 -->
+    <circle cx="560" cy="290" r="7" fill="#39ff14" stroke="none"/>
+    <!-- 광고판 트러스 + 패널 — 워드마크가 앵커 중심(512)에 그려지므로 패널도 중앙 정렬 -->
+    <path d="M420 306 L430 380 M560 306 L556 380" stroke="#8ba08c" stroke-width="5"/>
+    <rect x="342" y="380" width="340" height="66" rx="6" fill="#0c1013" stroke="#cfd8dc" stroke-width="4"/>
+    <rect x="354" y="390" width="316" height="46" rx="3" fill="none" stroke="#cfd8dc" stroke-width="1.5" opacity=".35"/>
+  </g>
+  <!-- 상단 림 라이트 -->
+  <path d="M232 206 h364 v10 h-364 Z" fill="#ffffff" opacity=".55"/>
+</svg>

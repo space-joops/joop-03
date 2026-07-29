@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="512" viewBox="0 0 1024 512">
+  <!-- 광고 위성: SPACEMAP (지도 — 구형 본체 + 노드 점 박힌 궤도 링, 토성형). anchor 중심 [512,256].
+       워드마크는 코드(캔버스 fillText)가 하단 광고판 위에 그린다 — SVG 텍스트 금지 규약.
+       파생 런타임: ../../game/ad-sat-spacemap.svg (gen:game SVG 패스스루). -->
+  <defs>
+    <radialGradient id="globe" cx=".38" cy=".32" r=".85">
+      <stop offset="0" stop-color="#2f4a3a"/>
+      <stop offset=".55" stop-color="#17352a"/>
+      <stop offset="1" stop-color="#081a12"/>
+    </radialGradient>
+  </defs>
+  <g stroke="#5c6b5e" stroke-width="3">
+    <!-- 궤도 링 뒤 반원(본체에 가려짐) -->
+    <path d="M198 216 A 340 118 0 0 1 826 216" fill="none" stroke="#37d67a" stroke-width="4" opacity=".35"/>
+    <!-- 구형 본체(지도 구) -->
+    <circle cx="512" cy="238" r="128" fill="url(#globe)"/>
+    <!-- 위도·경도 그리드 -->
+    <g fill="none" stroke="#37d67a" stroke-width="2" opacity=".5">
+      <ellipse cx="512" cy="238" rx="128" ry="46"/>
+      <ellipse cx="512" cy="238" rx="128" ry="96"/>
+      <ellipse cx="512" cy="238" rx="52" ry="128"/>
+      <ellipse cx="512" cy="238" rx="100" ry="128"/>
+    </g>
+    <!-- 대륙 실루엣(간이) -->
+    <path d="M448 196 q28 -18 56 -6 q20 8 12 26 q-24 12 -48 4 q-28 -6 -20 -24 Z" fill="#37d67a" opacity=".45" stroke="none"/>
+    <path d="M552 268 q24 -10 40 4 q10 12 -6 22 q-22 8 -38 -4 q-10 -12 4 -22 Z" fill="#37d67a" opacity=".35" stroke="none"/>
+    <!-- 궤도 링 앞 반원 + 노드 점 -->
+    <path d="M198 216 A 340 118 0 0 0 826 216" fill="none" stroke="#37d67a" stroke-width="5"/>
+    <g fill="#37d67a" stroke="none">
+      <circle cx="238" cy="266" r="10"/>
+      <circle cx="392" cy="316" r="10"/>
+      <circle cx="632" cy="316" r="10"/>
+      <circle cx="786" cy="266" r="10"/>
+    </g>
+    <circle cx="512" cy="334" r="12" fill="#e4f2e9" stroke-width="2"/>
+    <!-- 상단 수신 안테나 -->
+    <path d="M512 110 V72" stroke="#8ba08c" stroke-width="6"/>
+    <circle cx="512" cy="64" r="9" fill="#37d67a" stroke="none"/>
+    <!-- 상태등 -->
+    <circle cx="600" cy="176" r="6" fill="#39ff14" stroke="none"/>
+    <!-- 광고판 트러스 + 패널 -->
+    <path d="M472 360 L456 402 M552 360 L568 402" stroke="#8ba08c" stroke-width="5"/>
+    <rect x="302" y="402" width="420" height="64" rx="6" fill="#06130c" stroke="#37d67a" stroke-width="4"/>
+    <rect x="314" y="412" width="396" height="44" rx="3" fill="none" stroke="#37d67a" stroke-width="1.5" opacity=".35"/>
+  </g>
+  <!-- 구 좌상단 하이라이트 -->
+  <circle cx="470" cy="196" r="34" fill="#9fe8c0" opacity=".25"/>
+</svg>

@@ -25,7 +25,23 @@ import { SoundToggle } from "@/components/sound-toggle";
 import * as sfx from "@/lib/sound";
 import { JoopSprite } from "@/components/joop-sprite";
 import { JOOP_FRAME, joopSheetPath, sheetForColor, spriteFrame } from "@/lib/joop-sprite";
-import { payShadowEntry, submitArcadeResult } from "@/app/[lang]/joop/arcade/actions";
+import {
+  claimAdDockReward,
+  payShadowEntry,
+  submitArcadeResult,
+  type ArcadeRankingDelta,
+} from "@/app/[lang]/joop/arcade/actions";
+import {
+  AD_DOCK_Z,
+  AD_SATELLITES,
+  adSatelliteById,
+  flybyPose,
+  makeFlyby,
+  type AdFlyby,
+  type FlybyPose,
+} from "@/lib/ad-satellites";
+import { getAdDock, parseAdDocks, readAdDockSnapshot, recordAdDock } from "@/lib/ad-docks";
+import { ChangeIndicator, RankingList } from "@/components/ranking-list";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
 import { trackArcadeCompleted } from "@/lib/analytics";
@@ -99,6 +115,48 @@ export function ArcadeGame({
   // 게임 루프의 endGame 을 DOM 버튼(조기 종료)에서 부르기 위한 다리
   const endGameRef = useRef<() => void>(() => {});
 
+  // ── 광고 위성 도킹(FR-7.7 선행 + FR-9.1) ────────────────────────────────
+  // ⚠️ adToast·ranking 은 루프 effect deps 에 절대 넣지 않는다 — phase 불변 유지가
+  //    "도킹해도 게임이 리셋되지 않는다"의 성립 조건이다.
+  const [adToast, setAdToast] = useState<{
+    brand: string;
+    color: string;
+    text: string;
+    seq: number;
+  } | null>(null);
+  const [ranking, setRanking] = useState<ArcadeRankingDelta | null>(null);
+  // rAF 루프 → React 다리(endGameRef 의 역방향): 도킹 판정은 루프가, 보상 처리는 여기서.
+  const onAdDockRef = useRef<(id: string) => void>(() => {});
+  useEffect(() => {
+    onAdDockRef.current = (id: string) => {
+      const sat = adSatelliteById(id);
+      if (!sat) return;
+      const seq = Date.now();
+      const existing = getAdDock(id);
+      if (existing) {
+        setAdToast({ brand: sat.brand, color: sat.color, text: a.adDockedAgain.replace("{brand}", sat.brand), seq });
+        return;
+      }
+      // 실제 초대코드 발급(서버, 멱등) — 실패하면 기록하지 않아 다음 패스에 재시도된다.
+      claimAdDockReward(id)
+        .then((res) => {
+          if (res.ok) {
+            recordAdDock(id, res.code);
+            setAdToast({ brand: sat.brand, color: sat.color, text: a.adDocked.replace("{brand}", sat.brand), seq });
+          } else {
+            setAdToast({ brand: sat.brand, color: sat.color, text: a.adDockFail, seq });
+          }
+        })
+        .catch(() => setAdToast({ brand: sat.brand, color: sat.color, text: a.adDockFail, seq }));
+    };
+  }, [a]);
+  // 토스트 자동 소거(6초) — seq 로 연속 도킹 시 타이머 리셋
+  useEffect(() => {
+    if (!adToast) return;
+    const id = setTimeout(() => setAdToast(null), 6000);
+    return () => clearTimeout(id);
+  }, [adToast]);
+
   // ── 음영 게이트(초기 개발 단계: XP 를 내면 음영에서도 플레이)
   const needsPay = !!shadowGate && shadowGate.inShadow && shadowGate.cost > 0;
   const [paid, setPaid] = useState(false);
@@ -153,6 +211,7 @@ export function ArcadeGame({
       ["magnet", "/game/item-magnet.svg"], // 자석 팔 끝 헤드(실패 시 집게 호 폴백)
       [GALAXY_TILE.asset, GALAXY_TILE.asset],
       ...CELESTIALS.map((c) => [c.asset, c.asset] as [string, string]),
+      ...AD_SATELLITES.map((sat) => [sat.asset, sat.asset] as [string, string]),
     ]);
     let remaining = sources.size;
     const done = () => {
@@ -245,6 +304,20 @@ export function ArcadeGame({
     let counterFlash = 0; // 수거 순간 중앙 카운터 앰버 플래시(감쇠)
     // 종류별 수거 카운트 — 종료 시 1회만 localStorage 누적(lib/debris-kinds.ts)
     const kindCounts: Partial<Record<DebrisKindId, number>> = {};
+
+    // ── 광고 위성 플라이바이(FR-7.7) — items 와 완전 분리(자석 흡인·despawn·상한 무관)
+    let adFlyby: AdFlyby | null = null;
+    let adPose: FlybyPose | null = null;
+    let nextAdAt = 16 + Math.random() * 10; // 첫 등장은 이르게(발견성), 이후 40~70s
+    let adCamStart: Vec = { x: 0, y: 0 };
+    let adDockedThisPass = false;
+    // 미도킹 브랜드 우선 스폰 — 마운트 시 1회 스냅샷(플레이 중 도킹分은 다음 판에 반영)
+    const dockedBrands = new Set(parseAdDocks(readAdDockSnapshot()).map((r) => r.brandId));
+    const pickAdBrand = () => {
+      const pool = AD_SATELLITES.filter((sat) => !dockedBrands.has(sat.id));
+      const list = pool.length > 0 ? pool : AD_SATELLITES;
+      return list[Math.floor(Math.random() * list.length)].id;
+    };
 
     // 조이스틱(FR-7.4)
     type Stick = { baseX: number; baseY: number; dx: number; dy: number; pointerId: number };
@@ -482,6 +555,53 @@ export function ArcadeGame({
         ctx.fillStyle = amber;
         ctx.globalAlpha = tint;
         ctx.fillRect(0, 0, W, H);
+        ctx.globalAlpha = 1;
+      }
+    };
+
+    // 광고 위성 — 본체는 SVG, 워드마크는 캔버스 fillText(게임 UI 와 같은 ui-monospace).
+    // 원거리(w≤48px)에서는 워드마크를 생략한다 — 읽을 수 없는 글자는 노이즈다.
+    const drawAdSatellite = (f: AdFlyby, pose: FlybyPose, u: number) => {
+      const sat = adSatelliteById(f.satId);
+      if (!sat) return;
+      const w = pose.scale * u;
+      const cx = W / 2 + pose.x * u;
+      const cy = H / 2 + pose.y * u;
+      if (cx + w < -60 || cx - w > W + 60 || cy + w < -60 || cy - w > H + 60) return;
+      const img = imagesRef.current.get(sat.asset);
+      const loaded = img && img.complete && img.naturalWidth > 0;
+      const h = w * (loaded ? img.naturalHeight / img.naturalWidth : 0.5);
+      ctx.save();
+      ctx.globalAlpha = pose.alpha;
+      ctx.translate(cx, cy);
+      // 진행 방향으로 미세 뱅크(고정 각) — 회전 애니메이션은 아니라 reduce 에도 무해하지만
+      // 완전 정적 선호를 존중해 0 으로 둔다.
+      ctx.rotate(reduceMotion ? 0 : Math.atan2(f.dirY, f.dirX) * 0.08);
+      if (loaded) {
+        ctx.drawImage(img, -w / 2, -h / 2, w, h);
+      } else {
+        ctx.fillStyle = sat.color;
+        ctx.globalAlpha = pose.alpha * 0.5;
+        ctx.fillRect(-w * 0.2, -h * 0.1, w * 0.4, h * 0.2);
+      }
+      if (w > 48) {
+        ctx.font = `700 ${Math.max(9, Math.round(w * sat.label.wFrac))}px ui-monospace, monospace`;
+        ctx.fillStyle = sat.color;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(sat.brand, 0, w * sat.label.dy);
+        ctx.textAlign = "left";
+        ctx.textBaseline = "alphabetic";
+      }
+      ctx.restore();
+      // 도킹 링 — 미도킹 브랜드가 판정 구간에 들어왔을 때만(원거리에선 완전 무장식)
+      if (!dockedBrands.has(sat.id) && pose.z < AD_DOCK_Z + 0.4) {
+        ctx.strokeStyle = sat.color;
+        ctx.globalAlpha = 0.3 + (reduceMotion ? 0 : 0.18 * Math.sin(elapsed * 4));
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(cx, cy, (JOOP_RADIUS + pose.scale * 0.35) * u, 0, Math.PI * 2);
+        ctx.stroke();
         ctx.globalAlpha = 1;
       }
     };
@@ -777,6 +897,12 @@ export function ArcadeGame({
         spawn();
         spawnTimer = cfg.spawnInterval;
       }
+      // 광고 위성 스폰 — 동시 1대(!adFlyby 가드), 희귀 등장
+      if (!adFlyby && elapsed >= nextAdAt) {
+        adFlyby = makeFlyby(pickAdBrand(), Math.random, elapsed);
+        adCamStart = { x: joop.pos.x, y: joop.pos.y };
+        adDockedThisPass = false;
+      }
       const despawnR = Math.max(W, H) / u; // 뷰 대각선 밖 멀리
       // 자석 팔 대상(흡인 중 가까운 순 최대 2개) — 이번 프레임 드로잉용.
       // splice 로 인덱스가 밀리므로 객체 참조로 든다(방금 수거된 파편에 1프레임 팔이
@@ -832,6 +958,34 @@ export function ArcadeGame({
           items.splice(i, 1);
         }
       }
+      // 광고 위성 갱신·도킹 판정 — 줍스는 항상 화면 중심 = 포즈 좌표계의 (0,0)
+      if (adFlyby) {
+        adPose = flybyPose(adFlyby, elapsed, joop.pos.x - adCamStart.x, joop.pos.y - adCamStart.y);
+        if (!adPose) {
+          adFlyby = null;
+          nextAdAt = elapsed + 40 + Math.random() * 30;
+        } else if (
+          !adDockedThisPass &&
+          adPose.z < AD_DOCK_Z &&
+          Math.hypot(adPose.x, adPose.y) < JOOP_RADIUS + adPose.scale * 0.35
+        ) {
+          adDockedThisPass = true; // 패스당 1회(연속 프레임 재발화 방지)
+          const sat = adSatelliteById(adFlyby.satId);
+          sfx.arcDock();
+          pushFloater({
+            pos: { ...joop.pos },
+            text: "DOCKED",
+            color: sat?.color ?? accent,
+            life: 1.2,
+            big: true,
+          });
+          dockedBrands.add(adFlyby.satId); // 이번 판 내 재스폰 우선순위에도 반영
+          onAdDockRef.current(adFlyby.satId);
+        }
+      } else {
+        adPose = null;
+      }
+
       // 자석 팔 루프 — 흡인 대상이 있으면 "웅~", 끊기면 0.2초 유예 후 정지
       if (magnetTargets.length > 0) {
         magnetOffFor = 0;
@@ -851,6 +1005,9 @@ export function ArcadeGame({
 
       // ── 렌더
       drawBackground(u);
+      // 광고 위성 — 배경 직후·게임플레이 이전 한 곳 고정: 어떤 z 에서도 쓰레기·줍스·
+      // 조이스틱을 가리지 않는다(집중도 요구). 근접 시에도 "뒤에 깔린 초대형 구조물".
+      if (adFlyby && adPose) drawAdSatellite(adFlyby, adPose, u);
 
       // 스피드 라인(UX 리뷰: 속도감) — 속도 방향 반대로 흐르는 짧은 선.
       // 위치는 시드 해시(프레임 Math.random 금지)로 8fps 스텝마다 갱신.
@@ -1061,6 +1218,7 @@ export function ArcadeGame({
       if (res.ok) {
         trackArcadeCompleted(res.collected, res.totalCollected);
         setResult({ collected: res.collected, total: res.totalCollected });
+        setRanking(res.ranking);
         setPhase("saved");
       } else {
         setSaveError(res.error);
@@ -1076,6 +1234,8 @@ export function ArcadeGame({
     setSummary(null);
     setResult(null);
     setSaveError(null);
+    setRanking(null);
+    setAdToast(null);
     // 한 판당 1회 결제 — 다시 하려면 다시 지불한다. 그 사이 수신 지역으로 나왔다면
     // payShadowEntry 가 서버에서 재판정해 무료로 통과시킨다.
     setPaid(false);
@@ -1104,6 +1264,27 @@ export function ArcadeGame({
 
         {phase === "playing" && (
           <>
+            {/* 도킹 토스트 — phase 를 바꾸지 않는다(루프 리셋 금지). 게임은 계속 흐른다. */}
+            {adToast && (
+              <div
+                key={adToast.seq}
+                className="pointer-events-none absolute inset-x-0 top-[calc(env(safe-area-inset-top)+0.75rem)] flex justify-center"
+                role="status"
+              >
+                <div
+                  className="max-w-[85%] rounded-md border px-3 py-1.5 text-center font-mono text-[11px]"
+                  style={{
+                    borderColor: adToast.color,
+                    color: "var(--color-fg)",
+                    background: "color-mix(in srgb, var(--color-bg) 85%, transparent)",
+                    boxShadow: `0 0 12px color-mix(in srgb, ${adToast.color} 45%, transparent)`,
+                  }}
+                >
+                  <span style={{ color: adToast.color }}>{adToast.text}</span>
+                  <span className="ml-1.5 text-[var(--color-muted)]">{a.adDockedHint}</span>
+                </div>
+              </div>
+            )}
             {/* 텔레메트리 바 바로 위 좌/우 — 지도 복귀·종료(상단 헤더를 대체) */}
             <Link
               href={`/${lang}/joop/map`}
@@ -1268,7 +1449,22 @@ export function ArcadeGame({
         )}
 
         {(phase === "over" || phase === "saving" || phase === "saved") && summary && (
-          <div className={overlayClass}>
+          <div
+            className={
+              phase === "saved"
+                ? "absolute inset-0 flex flex-col overflow-y-auto bg-[color-mix(in_srgb,var(--color-bg)_88%,transparent)] px-6"
+                : overlayClass
+            }
+          >
+            {/* saved: 랭킹 목록까지 담아 길어질 수 있다 — m-auto(짧으면 중앙, 길면 스크롤).
+                다른 phase: display:contents 로 기존 오버레이 레이아웃 그대로. */}
+            <div
+              className={
+                phase === "saved"
+                  ? "m-auto flex w-full max-w-sm flex-col items-center gap-3 py-8 text-center"
+                  : "contents"
+              }
+            >
             <h2 className="font-mono text-lg font-semibold text-[var(--color-primary)]">
               {a.gameOver}
             </h2>
@@ -1287,14 +1483,49 @@ export function ArcadeGame({
                 <p className="max-w-xs font-mono text-xs leading-relaxed text-[var(--color-primary)]">
                   {a.savedBody.replace("{total}", result.total.toLocaleString())}
                 </p>
-                <div className="flex gap-2">
+                {/* 이번 판 랭킹 변화 — 뷰의 prev_rank(주간)와 달리 저장 전/후 순위 비교 */}
+                {ranking && ranking.rankAfter !== null && (
+                  <p className="font-mono text-sm text-[var(--color-fg)]">
+                    {ranking.rankBefore === null ? (
+                      <span className="text-[var(--color-success)]">{a.rankNew}</span>
+                    ) : ranking.rankBefore === ranking.rankAfter ? (
+                      <span className="text-[var(--color-muted)]">{a.rankNoChange}</span>
+                    ) : (
+                      a.rankShift
+                        .replace("{before}", String(ranking.rankBefore))
+                        .replace("{after}", String(ranking.rankAfter))
+                    )}{" "}
+                    <ChangeIndicator
+                      delta={(ranking.rankBefore ?? ranking.rankAfter) - ranking.rankAfter}
+                    />
+                  </p>
+                )}
+                {ranking && ranking.top.length > 0 && (
+                  <div className="w-full text-left">
+                    <RankingList
+                      rows={ranking.top}
+                      dict={dict}
+                      lang={lang}
+                      myRanking={ranking.me}
+                      compact
+                    />
+                  </div>
+                )}
+                <div className="flex flex-wrap justify-center gap-2">
                   <button onClick={retry} className={ghostButtonClass} style={ghostStyle}>
                     {a.retry}
                   </button>
                   <button
-                    onClick={() => router.push(`/${lang}/joop/map`)}
+                    onClick={() => router.push(`/${lang}`)}
                     className={buttonClass}
                     style={buttonStyle}
+                  >
+                    {a.home}
+                  </button>
+                  <button
+                    onClick={() => router.push(`/${lang}/joop/map`)}
+                    className={ghostButtonClass}
+                    style={ghostStyle}
                   >
                     {a.toMap}
                   </button>
@@ -1337,6 +1568,7 @@ export function ArcadeGame({
                 </div>
               </>
             )}
+            </div>
           </div>
         )}
       </div>

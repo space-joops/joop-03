@@ -130,6 +130,14 @@ export default async function JoopPage({ params }: PageProps<"/[lang]/joop">) {
             </Link>
           </>
         )}
+        {/* 인벤토리 — 상태 무관 공통(로컬 기록이라 지상/궤도 어디서든 볼 것이 있다) */}
+        <Link
+          href={`/${lang}/joop/inventory`}
+          className="crt-brackets btn-brackets"
+          style={{ "--bracket-color": "var(--color-neutral-600)" } as React.CSSProperties}
+        >
+          {j.inventory}
+        </Link>
       </div>
 
       <p className="mt-4 font-mono text-xs leading-relaxed text-[var(--color-muted)]">

@@ -355,6 +355,16 @@ export function arcFuelWarn(): void {
   if (!gate("arcFuelWarn", 1.2)) return;
   blip({ f0: 330, f1: 220, dur: 0.2, type: "square", gain: 0.3 });
 }
+/** 광고 위성 도킹 — 낮은 3화음이 위로 벌어지는 "웅장" 차임 + 금속 접촉 노이즈. */
+export function arcDock(): void {
+  if (!gate("arcDock", 1)) return;
+  sweepNoise({ dur: 0.25, f0: 1600, f1: 500, gain: 0.24 });
+  [131, 196, 262].forEach((f, i) =>
+    blip({ f0: f, dur: 0.85 - i * 0.1, type: "triangle", gain: 0.3, attack: 0.12, delay: 0.06 + i * 0.14 }),
+  );
+  blip({ f0: 523, f1: 784, dur: 0.3, type: "sine", gain: 0.22, delay: 0.5 });
+}
+
 export function arcOver(): void {
   stopLoop("thrust");
   stopLoop("magnet");
