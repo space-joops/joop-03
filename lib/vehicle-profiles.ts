@@ -102,6 +102,7 @@ export type LaunchEventId =
   | "secondIgnition"
   | "boosterLanding"
   | "seco"
+  | "fairing"
   | "deploy"
   | "orbitInsertion";
 
@@ -120,10 +121,13 @@ export function buildLaunchTimeline(p: VehicleProfile, totalSec: number): Launch
     { id: "separation", tSec: totalSec * 0.21 },
     { id: "secondIgnition", tSec: totalSec * 0.23 },
   ];
-  if (p.boosterLanding) ev.push({ id: "boosterLanding", tSec: totalSec * 0.66 });
+  if (p.boosterLanding) ev.push({ id: "boosterLanding", tSec: totalSec * 0.55 });
+  // 사출 시퀀스(지구 등장 → 페어링 → 큐브샛 → 줍스 전개 → 궤도 진입)가 뒤 38%를 쓴다.
+  // 180초 기준 사출 창 ≈50초 — 15초였던 이전 배치로는 연출이 압축된다.
   ev.push(
-    { id: "seco", tSec: totalSec * 0.72 },
-    { id: "deploy", tSec: totalSec * 0.9 },
+    { id: "seco", tSec: totalSec * 0.62 },
+    { id: "fairing", tSec: totalSec * 0.66 },
+    { id: "deploy", tSec: totalSec * 0.72 },
     { id: "orbitInsertion", tSec: totalSec },
   );
   return ev;

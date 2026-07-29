@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 128 128">
+  <!-- 3U 큐브샛 마스터 — 파생: ../../game/cubesat.svg (npm run gen:game 이 복사)
+       사출 연출용(launch-sequence.tsx). anchor 중심 [64,64].
+       해치(줍스 방출구) 좌표: x 48, y 28, w 32, h 8 — 코드가 이 위치에 lid 를
+       힌지 회전 오버레이로 그린다. 규칙: 텍스트·외부 폰트 금지. -->
+  <defs>
+    <linearGradient id="foil" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#8a6100"/>
+      <stop offset="35%" stop-color="#e8c368"/>
+      <stop offset="55%" stop-color="#f4dc9b"/>
+      <stop offset="100%" stop-color="#a37a26"/>
+    </linearGradient>
+    <linearGradient id="side" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#5c4718"/>
+      <stop offset="100%" stop-color="#3a2c0e"/>
+    </linearGradient>
+    <linearGradient id="panelG" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0e2f38"/>
+      <stop offset="100%" stop-color="#123f4a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 휩 안테나 -->
+  <path d="M64 20 V4" stroke="#cfd6db" stroke-width="1.6"/>
+  <path d="M78 24 L94 8" stroke="#cfd6db" stroke-width="1.2"/>
+
+  <!-- 우측면(원근) + 상면 -->
+  <path d="M84 28 L96 36 L96 92 L84 100 Z" fill="url(#side)" stroke="#5c6b5e" stroke-width="1.5"/>
+  <path d="M44 28 L56 20 L96 20 L84 28 Z" fill="#d9b463" stroke="#5c6b5e" stroke-width="1.5"/>
+
+  <!-- 태양판(접힌 상태) -->
+  <rect x="33" y="36" width="11" height="56" rx="1" fill="url(#panelG)" stroke="#5c6b5e" stroke-width="1.5"/>
+  <path d="M33 50h11M33 64h11M33 78h11" stroke="#2de2e6" stroke-width="0.7" opacity="0.5"/>
+
+  <!-- 본체 정면(금박 MLI) -->
+  <rect x="44" y="28" width="40" height="72" rx="1.5" fill="url(#foil)" stroke="#5c6b5e" stroke-width="2"/>
+  <path d="M44 44h40M44 60h40M44 76h40" stroke="#7a5a14" stroke-width="0.8" opacity="0.55"/>
+  <rect x="44" y="50" width="40" height="6" fill="#ffb000" opacity="0.85"/>
+
+  <!-- 해치(줍스 방출구) — 코드가 여기에 lid 를 회전 오버레이로 그린다 -->
+  <rect x="48" y="28" width="32" height="8" fill="#2a332c" stroke="#cfd6db" stroke-width="1.2"/>
+
+  <!-- 스타트래커 렌즈 + 상태등 -->
+  <circle cx="74" cy="88" r="4" fill="#0a0d10" stroke="#cfd6db" stroke-width="1"/>
+  <circle cx="54" cy="88" r="2.4" fill="#39ff14"/>
+
+  <!-- 림 라이팅 -->
+  <rect x="45" y="28" width="1.6" height="72" fill="#ffffff" opacity="0.3"/>
+  <rect x="80" y="28" width="4" height="72" fill="#000000" opacity="0.22"/>
+</svg>

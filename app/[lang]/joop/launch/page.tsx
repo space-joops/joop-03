@@ -6,6 +6,7 @@ import { getMyJoop } from "@/lib/profile";
 import { getSpaceConfig } from "@/lib/space";
 import { getMyConfirmedVehicle } from "@/lib/launch";
 import { LaunchSequence } from "@/components/launch-sequence";
+import { SoundToggle } from "@/components/sound-toggle";
 
 export const dynamic = "force-dynamic";
 
@@ -35,9 +36,12 @@ export default async function LaunchSeqPage({ params }: PageProps<"/[lang]/joop/
         <Link href={`/${lang}/joop`} className="font-mono text-xs text-[var(--color-muted)] underline">
           {dict.joop.back}
         </Link>
-        <span className="font-mono text-xs uppercase tracking-widest text-[var(--color-muted)]">
-          {dict.launch.launchTitle}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-xs uppercase tracking-widest text-[var(--color-muted)]">
+            {dict.launch.launchTitle}
+          </span>
+          <SoundToggle dict={dict} />
+        </div>
       </header>
 
       <LaunchSequence

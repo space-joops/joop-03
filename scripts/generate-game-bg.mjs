@@ -264,11 +264,28 @@ const encode = (png, t, quality) =>
     .toBuffer();
 
 // ─────────────────────────────────────────────────────────────────────────────
+// 벡터 그대로 쓰는 마스터는 래스터하지 않고 원문을 복사한다(브라우저가 직접 그린다).
+// 손으로 복사하던 관행이 언젠가 어긋나므로 파이프라인에 넣어 단일 진실을 보장.
+
+const SVG_COPIES = [
+  ["rocket-master.svg", "rocket.svg"],
+  ["cubesat-master.svg", "cubesat.svg"],
+];
+
+function copySvgMasters() {
+  for (const [src, out] of SVG_COPIES) {
+    const buf = readFileSync(join(SRC, src));
+    const prev = safeRead(join(OUT, out));
+    if (!prev || !prev.equals(buf)) writeFileSync(join(OUT, out), buf);
+    console.log(`  ✓ ${out.padEnd(22)} (마스터 복사, ${kb(buf.length)})`);
+  }
+}
 
 async function run() {
   const executablePath = process.env.GAME_BG_CHROMIUM || undefined;
   const browser = await chromium.launch({ executablePath });
   try {
+    copySvgMasters();
     injectStars();
     await renderLandLayer(browser);
     await renderMasters(browser);

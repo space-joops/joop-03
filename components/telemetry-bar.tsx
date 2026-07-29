@@ -30,6 +30,8 @@ export function launchEventLabel(l: Dictionary["launch"], id: LaunchEventId): st
       return l.boosterLanding;
     case "seco":
       return l.seco;
+    case "fairing":
+      return l.fairing;
     case "deploy":
       return l.deploy;
     case "orbitInsertion":

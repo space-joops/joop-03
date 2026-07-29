@@ -1,7 +1,9 @@
 {
   "common": {
     "appName": "JOOPS",
-    "skip": "Skip"
+    "skip": "Skip",
+    "soundOn": "Sound on",
+    "soundOff": "Sound off"
   },
   "meta": {
     "title": "JOOPS — clean up space together",
@@ -124,6 +126,7 @@
     "secondIgnition": "Second engine start",
     "boosterLanding": "Booster landing",
     "seco": "SECO",
+    "fairing": "Fairing separation",
     "deploy": "Joops deploy",
     "speedLabel": "Speed",
     "altitudeLabel": "Altitude",
