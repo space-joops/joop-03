@@ -1,7 +1,9 @@
 {
   "common": {
     "appName": "줍스",
-    "skip": "건너뛰기"
+    "skip": "건너뛰기",
+    "soundOn": "소리 켜짐",
+    "soundOff": "소리 꺼짐"
   },
   "meta": {
     "title": "JOOPS — 함께 우주를 청소합니다",
@@ -124,6 +126,7 @@
     "secondIgnition": "2단 엔진 점화",
     "boosterLanding": "부스터 착륙",
     "seco": "2단 엔진 정지",
+    "fairing": "페어링 분리",
     "deploy": "줍스 사출",
     "speedLabel": "속도",
     "altitudeLabel": "고도",

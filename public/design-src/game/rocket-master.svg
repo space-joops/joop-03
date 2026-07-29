@@ -1,23 +1,82 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 160">
-  <!-- 발사체(로켓) 마스터. 프레임 64×160 · anchor 하단 중앙 [32, 152](노즐 끝).
-       발사 중계·카운트다운 화면용. 화염·연기는 이펙트 레이어(코드/CSS)로 분리 — handoff-m4.md §3.
-       파생 런타임: ../../game/rocket.svg (동일 지오메트리). 규칙: 텍스트·필터 금지(librsvg). -->
-  <!-- 노즈콘 -->
-  <path d="M32 6 Q42 22 42 38 L22 38 Q22 22 32 6 Z" fill="#c8d2c4" stroke="#5c6b5e" stroke-width="2"/>
-  <!-- 동체 -->
-  <rect x="22" y="38" width="20" height="86" fill="#c8d2c4" stroke="#5c6b5e" stroke-width="2"/>
-  <!-- 앰버 밴드 + 심볼 점 -->
-  <rect x="22" y="46" width="20" height="8" fill="#ffb000" opacity=".9"/>
-  <circle cx="32" cy="70" r="5" fill="none" stroke="#1d7a10" stroke-width="2"/>
-  <circle cx="35.5" cy="66.5" r="1.6" fill="#39ff14"/>
-  <rect x="22" y="108" width="20" height="4" fill="#8ba08c"/>
-  <!-- 패널 라인 -->
-  <path d="M22 92h20M32 38v70" stroke="#8ba08c" stroke-width="1" opacity=".6"/>
-  <!-- 핀 -->
-  <path d="M22 112 L10 138 L22 132 Z" fill="#8ba08c" stroke="#5c6b5e" stroke-width="2"/>
-  <path d="M42 112 L54 138 L42 132 Z" fill="#8ba08c" stroke="#5c6b5e" stroke-width="2"/>
-  <!-- 엔진부 -->
-  <path d="M24 124 H40 L42 134 H22 Z" fill="#414d43" stroke="#5c6b5e" stroke-width="1.5"/>
-  <path d="M26 134 H38 L36 148 H28 Z" fill="#2a332c" stroke="#5c6b5e" stroke-width="1.5"/>
-  <ellipse cx="32" cy="149" rx="5" ry="2.5" fill="#05080a" stroke="#414d43" stroke-width="1.5"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="256" viewBox="0 0 64 256">
+  <!-- 발사체 마스터 (실사풍, Falcon 9 실루엣) — 파생: ../../game/rocket.svg
+       재생성: npm run gen:game (SVG 패스스루 복사 — 손 복사 금지)
+       프레임 64×256(ratio 0.25), 노즐 배출구 anchor [32, 250].
+         NOSE_FRAC   = 62/256   페어링 끝(분리 후 크롭 시작점)
+         STAGE1_FRAC = 130/256  1단 시작(단 분리 후 크롭 끝점)
+       규칙 갱신(2026-07-29): 런타임 경로는 브라우저가 이 SVG 를 직접 래스터한다
+       (launch-sequence.tsx 의 new Image()). gen:game 도 Chromium 이다 — 즉
+       **그라디언트·필터 사용 가능**. 기존 "필터 금지(librsvg)"는 sharp 경로 전용
+       규칙이라 이 파일에는 적용되지 않는다. 단 텍스트·외부 폰트는 여전히 금지. -->
+  <defs>
+    <linearGradient id="body" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#7c8790"/>
+      <stop offset="20%" stop-color="#eef3f7"/>
+      <stop offset="42%" stop-color="#ffffff"/>
+      <stop offset="70%" stop-color="#c9d3db"/>
+      <stop offset="100%" stop-color="#5f6b75"/>
+    </linearGradient>
+    <linearGradient id="dark" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#20252a"/>
+      <stop offset="45%" stop-color="#3a4148"/>
+      <stop offset="100%" stop-color="#14181c"/>
+    </linearGradient>
+    <linearGradient id="soot" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#101214" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#101214" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="bell" cx="0.5" cy="0.15">
+      <stop offset="0%" stop-color="#0a0d10"/>
+      <stop offset="100%" stop-color="#39414a"/>
+    </radialGradient>
+    <filter id="soften"><feGaussianBlur stdDeviation="0.35"/></filter>
+  </defs>
+
+  <!-- 페어링(ogive) -->
+  <path d="M32 3 C45 26 47 46 47 62 L17 62 C17 46 19 26 32 3 Z" fill="url(#body)"/>
+  <path d="M32 3 V62" stroke="#aab5be" stroke-width="0.7" opacity="0.55"/>
+
+  <!-- 2단 동체 -->
+  <rect x="17" y="62" width="30" height="52" fill="url(#body)"/>
+  <rect x="17" y="72" width="30" height="9" fill="#ffb000" opacity="0.9"/>
+  <circle cx="32" cy="97" r="6" fill="none" stroke="#1d7a10" stroke-width="2"/>
+  <circle cx="36" cy="93" r="1.8" fill="#39ff14"/>
+
+  <!-- 인터스테이지(검정 밴드) — Falcon 9 식별 요소 -->
+  <rect x="17" y="114" width="30" height="16" fill="url(#dark)"/>
+
+  <!-- 그리드핀 4장(수납) — 뒤쪽 2장은 옅게 -->
+  <g opacity="0.45">
+    <path d="M17 128 L9 133 L9 143 L17 140 Z" fill="#3f474e" stroke="#6b757d" stroke-width="0.5"/>
+    <path d="M47 128 L55 133 L55 143 L47 140 Z" fill="#3f474e" stroke="#6b757d" stroke-width="0.5"/>
+  </g>
+  <path d="M17 132 L8 137 L8 148 L17 145 Z" fill="#4b535a" stroke="#79838b" stroke-width="0.6"/>
+  <path d="M10 139h6M10 143h6M12 137v10M14.5 137v10" stroke="#8e979e" stroke-width="0.4"/>
+  <path d="M47 132 L56 137 L56 148 L47 145 Z" fill="#4b535a" stroke="#79838b" stroke-width="0.6"/>
+  <path d="M48 139h6M48 143h6M50 137v10M52.5 137v10" stroke="#8e979e" stroke-width="0.4"/>
+
+  <!-- 1단 동체 -->
+  <rect x="17" y="130" width="30" height="100" fill="url(#body)"/>
+  <g filter="url(#soften)" opacity="0.4">
+    <path d="M17 152h30M17 174h30M17 196h30M17 216h30" stroke="#a3aeb6" stroke-width="0.45"/>
+  </g>
+  <path d="M32 130V230" stroke="#a3aeb6" stroke-width="0.4" opacity="0.2"/>
+
+  <!-- 착륙 다리(수납) -->
+  <path d="M17 198 L13 230 L17 230 Z" fill="#9aa4ac" stroke="#6b757d" stroke-width="0.6"/>
+  <path d="M47 198 L51 230 L47 230 Z" fill="#9aa4ac" stroke="#6b757d" stroke-width="0.6"/>
+
+  <!-- 엔진부 그을음 — 실사감의 절반 -->
+  <rect x="17" y="204" width="30" height="26" fill="url(#soot)"/>
+
+  <!-- 옥타웹 + 노즐 벨 3개(9기 축약) -->
+  <path d="M17 230 H47 L49 241 H15 Z" fill="url(#dark)" stroke="#5c6b5e" stroke-width="1"/>
+  <path d="M25 241 H39 L37 251 H27 Z" fill="url(#bell)"/>
+  <path d="M17 241 H24 L23 248 H18 Z" fill="url(#bell)" opacity="0.85"/>
+  <path d="M40 241 H47 L46 248 H41 Z" fill="url(#bell)" opacity="0.85"/>
+  <ellipse cx="32" cy="250" rx="7" ry="2.8" fill="#05080a" stroke="#414d43" stroke-width="1.2"/>
+
+  <!-- 림 라이팅(좌 하이라이트 / 우 그림자) -->
+  <rect x="18" y="62" width="1.8" height="168" fill="#ffffff" opacity="0.32"/>
+  <rect x="43.5" y="62" width="3" height="168" fill="#000000" opacity="0.2"/>
 </svg>

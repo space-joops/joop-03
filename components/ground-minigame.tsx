@@ -18,6 +18,7 @@ import {
   type MinigameConfig,
 } from "@/lib/minigame";
 import { submitMinigameResult } from "@/app/[lang]/joop/actions";
+import * as sfx from "@/lib/sound";
 import { trackMinigameCompleted } from "@/lib/analytics";
 import {
   JOOP_FEET_Y,
@@ -179,6 +180,10 @@ export function GroundMinigame({
     let caught = 0;
     let missed = 0;
     let hits = 0;
+    // 연속 수거(streak) — 0.9초 안에 이어 잡으면 음이 반음씩 올라간다
+    let streak = 0;
+    let lastCatchAt = -Infinity;
+    let lastWarnSec = -1;
 
     const spawn = () => {
       const item = pickItem(cfg, Math.random(), Math.random());
@@ -240,6 +245,9 @@ export function GroundMinigame({
       if (!running) return;
       running = false;
       cancelAnimationFrame(raf);
+      sfx.stopAll();
+      if (reason === "broken") sfx.gndLose();
+      else sfx.gndWin();
       setSummary({ caught, missed, hits, bond: bondFrom(caught, hits), reason });
       setPhase("over");
     };
@@ -549,10 +557,15 @@ export function GroundMinigame({
             hits += 1;
             joop.hurt = 0.55;
             joop.joy = 0;
+            streak = 0;
+            sfx.gndHit();
             floaters.push({ x: f.x, y: f.y, text: "!", color: dangerColor, life: 0.9 });
           } else {
             caught += 1;
             joop.joy = 0.5;
+            streak = elapsed - lastCatchAt <= 0.9 ? streak + 1 : 0;
+            lastCatchAt = elapsed;
+            sfx.gndCollect(streak);
             floaters.push({ x: f.x, y: f.y, text: "+1", color: color, life: 0.9 });
           }
           falling.splice(i, 1);
@@ -565,7 +578,11 @@ export function GroundMinigame({
 
         // 땅에 닿음
         if (f.y - r > gY) {
-          if (!f.item.hazard) missed += 1;
+          if (!f.item.hazard) {
+            missed += 1;
+            streak = 0;
+            sfx.gndMiss();
+          }
           falling.splice(i, 1);
         }
       }
@@ -643,6 +660,10 @@ export function GroundMinigame({
       ctx.fillStyle = fgColor;
       ctx.fillText(`${m.score} ${caught}`, pad, pad);
       ctx.textAlign = "right";
+      if (remain <= 10 && Math.ceil(remain) !== lastWarnSec) {
+        lastWarnSec = Math.ceil(remain);
+        sfx.gndWarnTick();
+      }
       ctx.fillStyle = remain <= 10 ? amber : mutedColor;
       ctx.fillText(`${m.time} ${Math.ceil(remain)}s`, W - pad, pad);
       ctx.textAlign = "left";
@@ -685,6 +706,7 @@ export function GroundMinigame({
     return () => {
       running = false;
       cancelAnimationFrame(raf);
+      sfx.stopAll();
       observer.disconnect();
       window.removeEventListener("resize", resize);
       window.removeEventListener("keydown", onKeyDown);
@@ -705,6 +727,7 @@ export function GroundMinigame({
       const res = await submitMinigameResult(summary.caught);
       if (res.ok) {
         trackMinigameCompleted(res.xpGained, res.level, res.xp);
+        sfx.gndSaved();
         setResult({ xpGained: res.xpGained, level: res.level });
         setPhase("saved");
       } else {
@@ -768,7 +791,11 @@ export function GroundMinigame({
             </p>
 
             <button
-              onClick={() => setPhase("playing")}
+              onClick={() => {
+                sfx.unlockAudio(); // 이 클릭이 오디오 언락 제스처(언락 3중 방어 3선)
+                sfx.gndStart();
+                setPhase("playing");
+              }}
               disabled={!assetsReady}
               className={buttonClass}
               style={buttonStyle}

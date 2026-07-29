@@ -380,14 +380,16 @@ export const CONFIG_SPECS: readonly ConfigSpec[] = [
     label: "발사 중계 길이",
     description:
       "카운트다운 이후 발사 중계(리프트오프~궤도 진입) 총 길이입니다(FR-5.2). " +
-      "단계 비율은 발사체 프로필(lib/vehicle-profiles.ts)이 정합니다. 배속 1×/4×/16× 제공.",
+      "단계 비율은 발사체 프로필(lib/vehicle-profiles.ts)이 정합니다. 배속 1×/4×/16× 제공. " +
+      "사출 시퀀스(지구 등장 → 페어링 → 큐브샛 → 줍스 전개 → 궤도 진입)가 총 길이의 뒤 38%를 " +
+      "쓰므로, 180초 미만으로 낮추면 사출 연출이 압축됩니다.",
     group: "launch",
     type: "int",
     min: 30,
     max: 300,
     step: 5,
     unit: "초",
-    fallback: 150,
+    fallback: 180,
     restartRequired: true,
   },
   {

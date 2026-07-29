@@ -5,6 +5,7 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getMyJoop } from "@/lib/profile";
 import { getMinigameConfig } from "@/lib/game-config";
 import { GroundMinigame } from "@/components/ground-minigame";
+import { SoundToggle } from "@/components/sound-toggle";
 
 export const dynamic = "force-dynamic";
 
@@ -27,9 +28,12 @@ export default async function TrainPage({ params }: PageProps<"/[lang]/joop/trai
         <Link href={`/${lang}/joop`} className="font-mono text-xs text-[var(--color-muted)] underline">
           {dict.joop.back}
         </Link>
-        <span className="font-mono text-xs uppercase tracking-widest text-[var(--color-muted)]">
-          {dict.minigame.title}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="font-mono text-xs uppercase tracking-widest text-[var(--color-muted)]">
+            {dict.minigame.title}
+          </span>
+          <SoundToggle dict={dict} />
+        </div>
       </header>
 
       {/* 조작 설명은 게임 안의 시작 브리핑에서 보여준다 — 화면 높이를 게임에 최대한 넘긴다. */}

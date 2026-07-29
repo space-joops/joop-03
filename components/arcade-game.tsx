@@ -21,6 +21,8 @@ import {
 import { DEBRIS_SHEET, DEBRIS_FRAME } from "@/lib/minigame";
 import { recordCollectedKinds, type DebrisKindId } from "@/lib/debris-kinds";
 import { DebrisIcon } from "@/components/debris-icon";
+import { SoundToggle } from "@/components/sound-toggle";
+import * as sfx from "@/lib/sound";
 import { JoopSprite } from "@/components/joop-sprite";
 import { JOOP_FRAME, joopSheetPath, sheetForColor, spriteFrame } from "@/lib/joop-sprite";
 import { payShadowEntry, submitArcadeResult } from "@/app/[lang]/joop/arcade/actions";
@@ -121,6 +123,7 @@ export function ArcadeGame({
   );
 
   const payAndStart = useCallback(async () => {
+    sfx.unlockAudio(); // await 이전 첫 줄 — 제스처 컨텍스트가 살아 있는 유일한 지점
     setPaying(true);
     setPayError(null);
     try {
@@ -231,6 +234,11 @@ export function ArcadeGame({
     let fuel = cfg.fuel;
     let emptySince: number | null = null; // 연료 0 이 된 경과시각(회생 허용)
     let collected = 0; // 조각(디브리 value 합)
+    // 분사·자석 루프 디바운스 — 짧은 끊김마다 오실레이터를 재생성하지 않게 유예를 준다
+    let thrustOffFor = 0;
+    let magnetOffFor = 0;
+    let magnetOn = false;
+    let lastFuelWarn = 0;
     let eaten = 0; // 개수
     let elapsed = 0;
     let spawnTimer = 0.8;
@@ -379,6 +387,7 @@ export function ArcadeGame({
       if (!running) return;
       running = false;
       cancelAnimationFrame(raf);
+      sfx.arcOver(); // 루프(분사·자석)를 먼저 끊고 종료음
       recordCollectedKinds(kindCounts); // 종류별 수거 로컬 누적(랭킹 기여도 아이콘용, 1회)
       setSummary({ collected, eaten });
       setPhase("over");
@@ -710,6 +719,16 @@ export function ArcadeGame({
       // 연료 소모(분사 세기 비례) — FR-7.6
       if (dir && strength > 0 && fuel > 0) {
         fuel = Math.max(0, fuel - cfg.fuelBurn * strength * dt);
+        thrustOffFor = 0;
+        sfx.arcThrust(strength); // 루프 생성은 1회, 이후는 세기만 조절
+      } else {
+        thrustOffFor += dt;
+        if (thrustOffFor > 0.12) sfx.arcThrustStop();
+      }
+      // 연료 경고 — 25% 미만에서 주기적으로(엔진의 gate 가 1.2초 간격을 보장)
+      if (fuel > 0 && fuel / cfg.fuel < 0.25 && elapsed - lastFuelWarn > 1.2) {
+        lastFuelWarn = elapsed;
+        sfx.arcFuelWarn();
       }
 
       // 분사가스 파티클 배출(reduced-motion 은 파티클 없이 분사염만 — handoff-m5 §3)
@@ -788,10 +807,12 @@ export function ArcadeGame({
         if (collides(joop.pos, JOOP_RADIUS, f.pos, f.item.size / 2)) {
           if (f.item.kind === "fuel") {
             fuel = Math.min(cfg.fuel, fuel + f.item.value);
+            sfx.arcFuel();
             pushFloater({ pos: { ...f.pos }, text: `⛽+${f.item.value}`, color: amber, life: 0.9 });
           } else {
             collected += f.item.value;
             eaten += 1;
+            sfx.arcCollect(eaten);
             joop.collectFx = 0.35;
             counterFlash = 0.25;
             const kid = f.item.id as DebrisKindId;
@@ -809,6 +830,20 @@ export function ArcadeGame({
         }
         if (Math.hypot(f.pos.x - joop.pos.x, f.pos.y - joop.pos.y) > despawnR) {
           items.splice(i, 1);
+        }
+      }
+      // 자석 팔 루프 — 흡인 대상이 있으면 "웅~", 끊기면 0.2초 유예 후 정지
+      if (magnetTargets.length > 0) {
+        magnetOffFor = 0;
+        if (!magnetOn) {
+          magnetOn = true;
+          sfx.arcMagnet();
+        }
+      } else if (magnetOn) {
+        magnetOffFor += dt;
+        if (magnetOffFor > 0.2) {
+          magnetOn = false;
+          sfx.arcMagnetStop();
         }
       }
       magnetTargets.sort((p, q) => p.d - q.d);
@@ -993,6 +1028,7 @@ export function ArcadeGame({
 
     const onVisibility = () => {
       cancelAnimationFrame(raf);
+      if (document.hidden) sfx.stopAll(); // 탭 전환 중 분사·자석 루프가 계속 울리지 않게
       if (!document.hidden && running) {
         last = performance.now();
         raf = requestAnimationFrame(frame);
@@ -1003,6 +1039,7 @@ export function ArcadeGame({
     return () => {
       running = false;
       cancelAnimationFrame(raf);
+      sfx.stopAll(); // 루프 누수 방지
       observer.disconnect();
       window.removeEventListener("resize", resize);
       window.removeEventListener("keydown", onKeyDown);
@@ -1082,11 +1119,24 @@ export function ArcadeGame({
             >
               {a.end}
             </button>
+            {/* 음소거 — 고스트 버튼 한 줄 위(엄지 사정권, 조이스틱 영역 밖) */}
+            <div
+              className="absolute right-2 bottom-[calc(env(safe-area-inset-bottom)+9.5rem)] rounded-md border"
+              style={{
+                borderColor: "var(--color-neutral-600)",
+                background: "color-mix(in srgb, var(--color-bg) 70%, transparent)",
+              }}
+            >
+              <SoundToggle dict={dict} />
+            </div>
           </>
         )}
 
         {phase === "ready" && (
           <div className={overlayClass}>
+            <div className="absolute right-3 top-3">
+              <SoundToggle dict={dict} />
+            </div>
             <h2
               className="font-mono text-base font-semibold"
               style={{
@@ -1203,7 +1253,10 @@ export function ArcadeGame({
               </>
             ) : (
               <button
-                onClick={() => setPhase("playing")}
+                onClick={() => {
+                  sfx.unlockAudio();
+                  setPhase("playing");
+                }}
                 disabled={!assetsReady}
                 className={buttonClass}
                 style={buttonStyle}
