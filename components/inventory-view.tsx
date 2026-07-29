@@ -19,11 +19,15 @@ import type { Locale } from "@/lib/i18n/config";
 // SSR 스냅샷은 "" → 첫 렌더는 빈 상태와 같은 마크업이라 하이드레이션 안전(debris-kinds 관용구).
 // ⚠️ 초대코드는 복사 대상이므로 .game-surface(user-select:none)로 감싸지 말 것.
 
-/** 공유: navigator.share 우선 → clipboard 폴백. 반환 = 사용자 피드백 종류. */
-async function shareCode(text: string): Promise<"shared" | "copied" | "failed"> {
+/**
+ * 공유: navigator.share 우선 → clipboard 폴백. 반환 = 사용자 피드백 종류.
+ * url 을 text 에 섞지 않고 별도 필드로 넘긴다 — 카카오톡 등 공유 시트가 이 필드로
+ * 링크 미리보기(OG 카드)를 만든다. clipboard 폴백은 필드가 없어 텍스트에 이어붙인다.
+ */
+async function shareCode(text: string, url: string): Promise<"shared" | "copied" | "failed"> {
   try {
     if (typeof navigator.share === "function") {
-      await navigator.share({ text });
+      await navigator.share({ text, url });
       return "shared";
     }
   } catch (e) {
@@ -32,7 +36,7 @@ async function shareCode(text: string): Promise<"shared" | "copied" | "failed"> 
     // 그 외(권한 등)는 clipboard 로 폴백
   }
   try {
-    await navigator.clipboard.writeText(text);
+    await navigator.clipboard.writeText(`${text}\n${url}`);
     return "copied";
   } catch {
     return "failed"; // 최후 수단: 코드 박스가 select-all 이라 길게 눌러 복사 가능
@@ -138,6 +142,11 @@ export function InventoryView({ lang, dict }: { lang: Locale; dict: Dictionary }
               );
             }
             const shareText = inv.shareText.replace("{code}", dock.code);
+            // 하드코딩 도메인 대신 현재 접속 origin — 배포 도메인이 바뀌어도 항상 일치한다.
+            const shareUrl =
+              typeof window !== "undefined"
+                ? `${window.location.origin}/${lang}/onboarding?code=${encodeURIComponent(dock.code)}`
+                : "";
             const fb = feedback?.brandId === sat.id ? feedback.text : null;
             return (
               <li
@@ -197,7 +206,7 @@ export function InventoryView({ lang, dict }: { lang: Locale; dict: Dictionary }
                   </button>
                   <button
                     onClick={async () => {
-                      const r = await shareCode(shareText);
+                      const r = await shareCode(shareText, shareUrl);
                       if (r === "copied") setFeedback({ brandId: sat.id, text: inv.copied });
                     }}
                     className="rounded-md px-3 py-1 font-mono text-[11px] uppercase tracking-widest"

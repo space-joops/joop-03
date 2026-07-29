@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   redeemInvite,
@@ -33,6 +33,15 @@ export function OnboardingForm({ lang, dict }: { lang: Locale; dict: Dictionary 
     if (waitState?.error === "joined") trackWaitlistJoined();
   }, [waitState]);
 
+  // 인벤토리 공유 링크(?code=)로 들어온 경우 코드 입력창을 미리 채운다.
+  // useSearchParams 대신 마운트 후 DOM 을 직접 갱신 — 서버 렌더와 다른 값이라
+  // 렌더 함수에서 초기값으로 쓰면 하이드레이션 불일치가 난다(effect 후 반영이 안전).
+  const codeInputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    const code = new URLSearchParams(window.location.search).get("code");
+    if (code && codeInputRef.current) codeInputRef.current.value = code.toUpperCase();
+  }, []);
+
   const fieldClass =
     "w-full rounded-md border px-3 py-2.5 font-mono text-sm text-[var(--color-fg)] outline-none";
   const fieldStyle = {
@@ -49,6 +58,7 @@ export function OnboardingForm({ lang, dict }: { lang: Locale; dict: Dictionary 
           {t.inviteLabel}
         </label>
         <input
+          ref={codeInputRef}
           name="code"
           placeholder={t.invitePlaceholder}
           autoComplete="off"
