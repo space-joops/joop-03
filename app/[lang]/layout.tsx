@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { VersionBadge } from "../version-badge";
 import { PwaPrompt } from "@/components/pwa-prompt";
 import { SplashScreen } from "@/components/splash-screen";
-import { locales, isLocale } from "@/lib/i18n/config";
+import { locales, isLocale, isRtlLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import packageJson from "../../package.json";
 import "../globals.css";
@@ -127,6 +127,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
   return (
     <html
       lang={lang}
+      dir={isRtlLocale(lang) ? "rtl" : "ltr"}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <GoogleTagManager gtmId={GTM_ID} />

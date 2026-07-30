@@ -226,8 +226,46 @@
   },
   "language": {
     "label": "언어",
+    "auto": "자동 (기본값)",
     "en": "English",
-    "ko": "한국어"
+    "ko": "한국어",
+    "fr": "Français",
+    "it": "Italiano",
+    "de": "Deutsch",
+    "es": "Español",
+    "zh": "中文",
+    "ja": "日本語",
+    "ru": "Русский",
+    "pt": "Português",
+    "id": "Bahasa Indonesia",
+    "th": "ไทย",
+    "vi": "Tiếng Việt",
+    "hi": "हिन्दी",
+    "ar": "العربية"
+  },
+  "nav": {
+    "home": "홈",
+    "myJoop": "내줍스",
+    "inventory": "인벤토리",
+    "map": "우주지도",
+    "settings": "설정"
+  },
+  "settings": {
+    "title": "설정",
+    "language": {
+      "title": "언어"
+    },
+    "baseStation": {
+      "title": "기지국 설정",
+      "searchPlaceholder": "도시 검색…",
+      "noResults": "일치하는 도시가 없어요",
+      "current": "현재 기지국",
+      "none": "설정 안 됨",
+      "note": "추후 음영 지역 계산과 연동될 예정이에요."
+    },
+    "returnEarth": {
+      "title": "지구로 복귀"
+    }
   },
   "pwa": {
     "install": {

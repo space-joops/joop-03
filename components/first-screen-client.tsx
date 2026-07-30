@@ -10,8 +10,8 @@ import type { Locale } from "@/lib/i18n/config";
 import { OrbitViewer, useOrbitalSnapshot } from "@/components/orbit-viewer";
 import { CleanupGauge } from "@/components/cleanup-gauge";
 import { RankingList } from "@/components/ranking-list";
-import { LanguageSwitcher } from "@/components/language-switcher";
 import { StatusBar } from "@/components/status-bar";
+import { BottomNav } from "@/components/bottom-nav";
 import { trackSetupCompleted } from "@/lib/analytics";
 
 export function FirstScreen({
@@ -77,7 +77,6 @@ export function FirstScreen({
             </span>
             <span aria-hidden className="speedlines" />
           </span>
-          <LanguageSwitcher current={lang} />
         </div>
       </header>
 
@@ -153,6 +152,8 @@ export function FirstScreen({
           </a>
         )}
       </div>
+
+      <BottomNav lang={lang} dict={dict} items={["myJoop", "inventory", "map", "settings"]} />
     </main>
   );
 }

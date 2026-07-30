@@ -84,6 +84,12 @@ const OCEANS: { name: GeoName; test: (lat: number, lon: number) => boolean }[] =
   { name: { ko: "태평양", en: "Pacific Ocean" }, test: () => true }, // 폴백
 ];
 
+// 지역명은 ko/en 두 언어만 보유(50여개 국가·해역 전체를 15개 언어로 옮기는 건 범위 밖).
+// ko 외 나머지 13개 언어는 en으로 폴백한다(앱의 기본 폴백 언어와 동일한 방침).
+export function regionName(geo: GeoName, lang: string): string {
+  return lang === "ko" ? geo.ko : geo.en;
+}
+
 /** 위경도(도) → 지역 이름. 국가 bbox 우선, 아니면 해역. */
 export function regionAt(lat: number, lon: number): GeoName {
   // 경도 정규화 (−180~180)

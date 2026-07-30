@@ -11,7 +11,7 @@ function getLocale(request: NextRequest): string {
   const cookieLocale = request.cookies.get("NEXT_LOCALE")?.value;
   if (cookieLocale && isLocale(cookieLocale)) return cookieLocale;
 
-  // 2) Accept-Language 경량 파싱 (2개 로케일이라 라이브러리 없이)
+  // 2) Accept-Language 경량 파싱 (지원 로케일 수가 적어 라이브러리 없이 직접 파싱)
   const header = request.headers.get("accept-language");
   if (header) {
     const ranked = header

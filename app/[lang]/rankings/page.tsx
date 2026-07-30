@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getMyRanking, getRankings } from "@/lib/rankings";
@@ -25,10 +24,7 @@ export default async function RankingsPage({ params }: PageProps<"/[lang]/rankin
       className="mx-auto flex w-full max-w-md flex-1 flex-col px-4 pb-8 pt-[calc(env(safe-area-inset-top)+1rem)]"
       style={{ background: "var(--color-bg)" }}
     >
-      <header className="mb-3 flex items-center justify-between">
-        <Link href={`/${lang}`} className="font-mono text-xs text-[var(--color-muted)] underline">
-          {dict.joop.back}
-        </Link>
+      <header className="mb-3 flex items-center justify-center">
         <span className="font-mono text-xs uppercase tracking-widest text-[var(--color-muted)]">
           {dict.rankings.title}
         </span>

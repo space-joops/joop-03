@@ -10,7 +10,7 @@ import {
 import { tickOrbitClock, type OrbitClock } from "@/lib/orbit-clock";
 import { JOOP_FRAME, joopSheetPath, sheetForColor, spriteFrame } from "@/lib/joop-sprite";
 import { WORLD_GRID_W, WORLD_GRID_H, isLandCell } from "@/lib/world-map-grid";
-import { regionAt } from "@/lib/geo-regions";
+import { regionAt, regionName } from "@/lib/geo-regions";
 import type { OrbitalSnapshot } from "@/lib/joops";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
@@ -341,7 +341,7 @@ export function OrbitTrackMap({
 
   const latH = ground ? `${Math.abs(ground.latitude).toFixed(0)}°${ground.latitude >= 0 ? "N" : "S"}` : "—";
   const lonH = ground ? `${Math.abs(ground.longitude).toFixed(0)}°${ground.longitude >= 0 ? "E" : "W"}` : "—";
-  const region = ground ? regionAt(ground.latitude, ground.longitude)[lang] : "—";
+  const region = ground ? regionName(regionAt(ground.latitude, ground.longitude), lang) : "—";
 
   return (
     <div>
