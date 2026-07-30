@@ -3,7 +3,8 @@
     "appName": "JOOPS",
     "skip": "छोड़ें",
     "soundOn": "साउंड चालू",
-    "soundOff": "साउंड बंद"
+    "soundOff": "साउंड बंद",
+    "back": "वापस"
   },
   "meta": {
     "title": "JOOPS — मिलकर स्पेस साफ करें",
@@ -111,7 +112,8 @@
     "saveError": "सेव नहीं हो सका। फिर से कोशिश करें।",
     "retry": "फिर से ट्रेनिंग करें",
     "nowLevel": "लेवल",
-    "toDashboard": "वापस"
+    "toDashboard": "वापस",
+    "quit": "रोकें"
   },
   "launch": {
     "title": "लॉन्च बुक करें",
@@ -144,9 +146,12 @@
     "pending": "वेटलिस्ट में",
     "rejected": "अस्वीकृत",
     "needLevel": "लेवल {level} चाहिए",
+    "bookedTitle": "बुकिंग हो गई!",
+    "backToHub": "वापस",
     "errors": {
       "auth": "साइन इन करना ज़रूरी है",
       "no_joop": "कोई जूप नहीं मिला",
+      "already_booked": "आपके पास पहले से एक लॉन्च बुकिंग है",
       "under_level": "लेवल बहुत कम है",
       "not_found": "व्हीकल नहीं मिला",
       "duplicate": "पहले से बुक है",
@@ -248,6 +253,7 @@
     "myJoop": "मेरा जूप",
     "inventory": "इन्वेंट्री",
     "map": "मैप",
+    "launch": "लॉन्च",
     "settings": "सेटिंग्स"
   },
   "settings": {
@@ -265,6 +271,9 @@
     },
     "returnEarth": {
       "title": "पृथ्वी पर लौटें"
+    },
+    "about": {
+      "title": "जानकारी"
     }
   },
   "pwa": {

@@ -3,7 +3,8 @@
     "appName": "JOOPS",
     "skip": "Lewati",
     "soundOn": "Suara aktif",
-    "soundOff": "Suara nonaktif"
+    "soundOff": "Suara nonaktif",
+    "back": "Kembali"
   },
   "meta": {
     "title": "JOOPS — bersihkan luar angkasa bersama",
@@ -111,7 +112,8 @@
     "saveError": "Gagal menyimpan. Coba lagi ya.",
     "retry": "Latihan lagi",
     "nowLevel": "Level",
-    "toDashboard": "Kembali"
+    "toDashboard": "Kembali",
+    "quit": "Berhenti"
   },
   "launch": {
     "title": "Pesan peluncuran",
@@ -144,9 +146,12 @@
     "pending": "Daftar tunggu",
     "rejected": "Ditolak",
     "needLevel": "Butuh level {level}",
+    "bookedTitle": "Pemesanan berhasil!",
+    "backToHub": "Kembali",
     "errors": {
       "auth": "Perlu masuk akun",
       "no_joop": "Joop tidak ditemukan",
+      "already_booked": "Kamu sudah punya pemesanan peluncuran",
       "under_level": "Level terlalu rendah",
       "not_found": "Wahana tidak ditemukan",
       "duplicate": "Sudah dipesan",
@@ -248,6 +253,7 @@
     "myJoop": "Joop Saya",
     "inventory": "Inventaris",
     "map": "Peta",
+    "launch": "Peluncuran",
     "settings": "Pengaturan"
   },
   "settings": {
@@ -265,6 +271,9 @@
     },
     "returnEarth": {
       "title": "Kembali ke Bumi"
+    },
+    "about": {
+      "title": "Tentang"
     }
   },
   "pwa": {

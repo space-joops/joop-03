@@ -13,6 +13,9 @@ export default async function LaunchPage({ params }: PageProps<"/[lang]/launch">
 
   const mine = await getMyJoop();
   if (!mine) redirect(`/${lang}/onboarding`);
+  // 이미 확정 청약(queued)이나 궤도(orbit)면 새로 청약할 수 없다(bookLaunch 서버 액션과
+  // 동일한 규칙) — 애초에 화면에 들어오지 못하게 막아 중복 확정 버그(#29)를 예방한다.
+  if (mine.status !== "ground") redirect(`/${lang}/joop`);
 
   const [dict, vehicles] = await Promise.all([getDictionary(lang), getLaunchVehicles()]);
 

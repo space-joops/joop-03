@@ -7,7 +7,10 @@ import { levelFromXp } from "@/lib/minigame";
 
 export type BookingResult =
   | { ok: true; status: "confirmed" | "pending" }
-  | { ok: false; error: "auth" | "no_joop" | "under_level" | "not_found" | "duplicate" | "save" };
+  | {
+      ok: false;
+      error: "auth" | "no_joop" | "already_booked" | "under_level" | "not_found" | "duplicate" | "save";
+    };
 
 // 발사체 청약 + 자동 선별.
 // 자격(레벨) 충족 + 정원 내 → confirmed, 정원 초과 → pending, 자격 미달 → 거부.
@@ -22,10 +25,13 @@ export async function bookLaunch(lang: string, vehicleId: string): Promise<Booki
 
   const { data: joop } = await admin
     .from("joop_03_joops")
-    .select("id,xp")
+    .select("id,xp,status")
     .eq("owner_id", user.id)
     .maybeSingle();
   if (!joop) return { ok: false, error: "no_joop" };
+  // 이미 확정 청약을 보유(queued)했거나 궤도(orbit)면 새 발사체 청약을 막는다 —
+  // 이게 없으면 서로 다른 발사체에 중복 confirmed 가 생겨 발사 완료가 영영 안 되는 버그(#29)로 이어진다.
+  if (joop.status !== "ground") return { ok: false, error: "already_booked" };
 
   const { data: vehicle } = await admin
     .from("joop_03_launch_vehicles")

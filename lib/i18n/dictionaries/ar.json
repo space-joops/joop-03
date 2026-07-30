@@ -3,7 +3,8 @@
     "appName": "JOOPS",
     "skip": "تخطي",
     "soundOn": "الصوت مفعّل",
-    "soundOff": "الصوت مطفأ"
+    "soundOff": "الصوت مطفأ",
+    "back": "رجوع"
   },
   "meta": {
     "title": "JOOPS — ننظّف الفضاء معًا",
@@ -111,7 +112,8 @@
     "saveError": "تعذّر الحفظ. حاول مرة أخرى.",
     "retry": "درّب مرة أخرى",
     "nowLevel": "المستوى",
-    "toDashboard": "رجوع"
+    "toDashboard": "رجوع",
+    "quit": "إيقاف"
   },
   "launch": {
     "title": "احجز إطلاقًا",
@@ -144,9 +146,12 @@
     "pending": "في قائمة الانتظار",
     "rejected": "مرفوض",
     "needLevel": "يتطلب المستوى {level}",
+    "bookedTitle": "تم الحجز!",
+    "backToHub": "رجوع",
     "errors": {
       "auth": "يلزم تسجيل الدخول",
       "no_joop": "لم يُعثر على جوب",
+      "already_booked": "لديك بالفعل حجز إطلاق",
       "under_level": "المستوى منخفض جدًا",
       "not_found": "لم يُعثر على المركبة",
       "duplicate": "تم الحجز مسبقًا",
@@ -248,6 +253,7 @@
     "myJoop": "جوبي",
     "inventory": "المخزون",
     "map": "الخريطة",
+    "launch": "الإطلاق",
     "settings": "الإعدادات"
   },
   "settings": {
@@ -265,6 +271,9 @@
     },
     "returnEarth": {
       "title": "العودة إلى الأرض"
+    },
+    "about": {
+      "title": "حول"
     }
   },
   "pwa": {

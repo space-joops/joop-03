@@ -11,10 +11,12 @@ export function SettingsView({
   lang,
   dict,
   mine,
+  version,
 }: {
   lang: Locale;
   dict: Dictionary;
   mine: MyJoop | null;
+  version: string;
 }) {
   return (
     <div className="flex flex-col gap-3">
@@ -36,6 +38,16 @@ export function SettingsView({
           <ReturnEarthButton lang={lang} dict={dict} />
         </section>
       )}
+
+      <section
+        className="crt-brackets px-3 py-2"
+        style={{ "--bracket-color": "var(--color-neutral-600)" } as React.CSSProperties}
+      >
+        <h2 className="font-mono text-xs uppercase tracking-widest text-[var(--color-secondary)]">
+          {dict.settings.about.title}
+        </h2>
+        <p className="mt-1 font-mono text-xs text-[var(--color-muted)]">v{version}</p>
+      </section>
     </div>
   );
 }

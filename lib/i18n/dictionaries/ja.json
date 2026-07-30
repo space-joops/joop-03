@@ -3,7 +3,8 @@
     "appName": "JOOPS",
     "skip": "スキップ",
     "soundOn": "サウンドON",
-    "soundOff": "サウンドOFF"
+    "soundOff": "サウンドOFF",
+    "back": "戻る"
   },
   "meta": {
     "title": "JOOPS — みんなで宇宙をきれいに",
@@ -111,7 +112,8 @@
     "saveError": "保存に失敗しました。もう一度お試しください。",
     "retry": "もう一度訓練する",
     "nowLevel": "レベル",
-    "toDashboard": "戻る"
+    "toDashboard": "戻る",
+    "quit": "中断"
   },
   "launch": {
     "title": "打ち上げを予約",
@@ -144,9 +146,12 @@
     "pending": "補欠",
     "rejected": "却下",
     "needLevel": "レベル{level}が必要です",
+    "bookedTitle": "予約完了！",
+    "backToHub": "戻る",
     "errors": {
       "auth": "ログインが必要です",
       "no_joop": "joopが見つかりません",
+      "already_booked": "すでに発射予約があります",
       "under_level": "レベルが足りません",
       "not_found": "機体が見つかりません",
       "duplicate": "すでに予約済みです",
@@ -248,6 +253,7 @@
     "myJoop": "マイJoop",
     "inventory": "インベントリ",
     "map": "マップ",
+    "launch": "発射",
     "settings": "設定"
   },
   "settings": {
@@ -265,6 +271,9 @@
     },
     "returnEarth": {
       "title": "地球に帰還"
+    },
+    "about": {
+      "title": "情報"
     }
   },
   "pwa": {

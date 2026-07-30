@@ -3,7 +3,8 @@
     "appName": "JOOPS",
     "skip": "Skip",
     "soundOn": "Sound on",
-    "soundOff": "Sound off"
+    "soundOff": "Sound off",
+    "back": "Back"
   },
   "meta": {
     "title": "JOOPS — clean up space together",
@@ -111,7 +112,8 @@
     "saveError": "Couldn't save. Please try again.",
     "retry": "Train again",
     "nowLevel": "Level",
-    "toDashboard": "Back"
+    "toDashboard": "Back",
+    "quit": "Quit"
   },
   "launch": {
     "title": "Book a launch",
@@ -144,9 +146,12 @@
     "pending": "Waitlisted",
     "rejected": "Rejected",
     "needLevel": "Needs level {level}",
+    "bookedTitle": "Booking confirmed!",
+    "backToHub": "Back",
     "errors": {
       "auth": "Sign in required",
       "no_joop": "No joop found",
+      "already_booked": "You already have a launch booked",
       "under_level": "Level too low",
       "not_found": "Vehicle not found",
       "duplicate": "Already booked",
@@ -248,6 +253,7 @@
     "myJoop": "My Joop",
     "inventory": "Inventory",
     "map": "Map",
+    "launch": "Launch",
     "settings": "Settings"
   },
   "settings": {
@@ -265,6 +271,9 @@
     },
     "returnEarth": {
       "title": "Return to Earth"
+    },
+    "about": {
+      "title": "About"
     }
   },
   "pwa": {

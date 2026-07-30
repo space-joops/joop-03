@@ -3,7 +3,8 @@
     "appName": "JOOPS",
     "skip": "Überspringen",
     "soundOn": "Ton an",
-    "soundOff": "Ton aus"
+    "soundOff": "Ton aus",
+    "back": "Zurück"
   },
   "meta": {
     "title": "JOOPS — gemeinsam den Weltraum aufräumen",
@@ -111,7 +112,8 @@
     "saveError": "Speichern fehlgeschlagen. Bitte erneut versuchen.",
     "retry": "Erneut trainieren",
     "nowLevel": "Level",
-    "toDashboard": "Zurück"
+    "toDashboard": "Zurück",
+    "quit": "Abbrechen"
   },
   "launch": {
     "title": "Start buchen",
@@ -144,9 +146,12 @@
     "pending": "Auf Warteliste",
     "rejected": "Abgelehnt",
     "needLevel": "Benötigt Level {level}",
+    "bookedTitle": "Buchung bestätigt!",
+    "backToHub": "Zurück",
     "errors": {
       "auth": "Anmeldung erforderlich",
       "no_joop": "Kein Joop gefunden",
+      "already_booked": "Du hast bereits einen Start gebucht",
       "under_level": "Level zu niedrig",
       "not_found": "Fahrzeug nicht gefunden",
       "duplicate": "Bereits gebucht",
@@ -248,6 +253,7 @@
     "myJoop": "Mein Joop",
     "inventory": "Inventar",
     "map": "Karte",
+    "launch": "Rakete",
     "settings": "Einstellungen"
   },
   "settings": {
@@ -265,6 +271,9 @@
     },
     "returnEarth": {
       "title": "Zur Erde zurückkehren"
+    },
+    "about": {
+      "title": "Info"
     }
   },
   "pwa": {

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { InventoryView } from "@/components/inventory-view";
+import { BackButton } from "@/components/back-button";
 
 // 인벤토리 — 수집 쓰레기·도킹 위성·초대코드가 전부 localStorage 라 서버 조회·가드가 없다.
 // (일반 스크롤 화면이라 game-fullbleed 는 쓰지 않는다 — 버전 배지 유지)
@@ -17,7 +18,7 @@ export default async function InventoryPage({
 
   return (
     <main
-      className="mx-auto flex w-full max-w-md flex-1 flex-col pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-[calc(env(safe-area-inset-top)+1rem)]"
+      className="mx-auto flex w-full max-w-md flex-1 flex-col pb-24 pt-[calc(env(safe-area-inset-top)+1rem)]"
       style={{ background: "var(--color-bg)" }}
     >
       <header className="mb-2 flex items-center justify-center px-4">
@@ -26,6 +27,8 @@ export default async function InventoryPage({
         </span>
       </header>
       <InventoryView lang={lang} dict={dict} />
+
+      <BackButton href={`/${lang}/joop`} dict={dict} />
     </main>
   );
 }

@@ -27,13 +27,15 @@ export async function completeLaunch(): Promise<LaunchResult> {
   if (joop.status !== "queued") return { ok: false, error: "not_ready" };
 
   // 확정 청약 보유 확인
-  const { data: booking } = await admin
+  // limit(1) + maybeSingle 미사용: 서로 다른 발사체에 중복 확정된 비정상 데이터(#29)가
+  // 있으면 maybeSingle()은 PGRST116 에러로 data를 null 처리해 발사가 영영 완료되지 않는다.
+  const { data: bookings } = await admin
     .from("joop_03_launch_bookings")
     .select("id")
     .eq("owner_id", user.id)
     .eq("status", "confirmed")
-    .maybeSingle();
-  if (!booking) return { ok: false, error: "no_booking" };
+    .limit(1);
+  if (!bookings?.length) return { ok: false, error: "no_booking" };
 
   // 궤도 파라미터 생성(게임용 단순화, 서버에서 난수 허용)
   const orbit = {

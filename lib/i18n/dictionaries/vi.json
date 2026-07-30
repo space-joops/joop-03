@@ -3,7 +3,8 @@
     "appName": "JOOPS",
     "skip": "Bỏ qua",
     "soundOn": "Bật âm thanh",
-    "soundOff": "Tắt âm thanh"
+    "soundOff": "Tắt âm thanh",
+    "back": "Quay lại"
   },
   "meta": {
     "title": "JOOPS — cùng nhau dọn dẹp không gian",
@@ -111,7 +112,8 @@
     "saveError": "Không thể lưu. Vui lòng thử lại.",
     "retry": "Huấn luyện lại",
     "nowLevel": "Cấp độ",
-    "toDashboard": "Quay lại"
+    "toDashboard": "Quay lại",
+    "quit": "Dừng"
   },
   "launch": {
     "title": "Đặt chỗ phóng",
@@ -144,9 +146,12 @@
     "pending": "Đang chờ",
     "rejected": "Bị từ chối",
     "needLevel": "Cần cấp {level}",
+    "bookedTitle": "Đặt chỗ thành công!",
+    "backToHub": "Quay lại",
     "errors": {
       "auth": "Cần đăng nhập",
       "no_joop": "Không tìm thấy joop",
+      "already_booked": "Bạn đã có một lượt đặt phóng rồi",
       "under_level": "Cấp độ quá thấp",
       "not_found": "Không tìm thấy phương tiện",
       "duplicate": "Đã đặt chỗ rồi",
@@ -248,6 +253,7 @@
     "myJoop": "Joop của tôi",
     "inventory": "Kho đồ",
     "map": "Bản đồ",
+    "launch": "Phóng",
     "settings": "Cài đặt"
   },
   "settings": {
@@ -265,6 +271,9 @@
     },
     "returnEarth": {
       "title": "Quay về Trái Đất"
+    },
+    "about": {
+      "title": "Giới thiệu"
     }
   },
   "pwa": {

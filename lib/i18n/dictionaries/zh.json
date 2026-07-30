@@ -3,7 +3,8 @@
     "appName": "JOOPS",
     "skip": "跳过",
     "soundOn": "声音开启",
-    "soundOff": "声音关闭"
+    "soundOff": "声音关闭",
+    "back": "返回"
   },
   "meta": {
     "title": "JOOPS — 一起清理太空",
@@ -111,7 +112,8 @@
     "saveError": "保存失败，请再试一次。",
     "retry": "再次训练",
     "nowLevel": "等级",
-    "toDashboard": "返回"
+    "toDashboard": "返回",
+    "quit": "退出"
   },
   "launch": {
     "title": "预约发射",
@@ -144,9 +146,12 @@
     "pending": "候补中",
     "rejected": "已拒绝",
     "needLevel": "需要 {level} 级",
+    "bookedTitle": "预约成功！",
+    "backToHub": "返回",
     "errors": {
       "auth": "需要登录",
       "no_joop": "未找到 joop",
+      "already_booked": "你已经有一个发射预约了",
       "under_level": "等级不足",
       "not_found": "未找到载具",
       "duplicate": "已预约过",
@@ -248,6 +253,7 @@
     "myJoop": "我的 Joop",
     "inventory": "背包",
     "map": "地图",
+    "launch": "发射",
     "settings": "设置"
   },
   "settings": {
@@ -265,6 +271,9 @@
     },
     "returnEarth": {
       "title": "返回地球"
+    },
+    "about": {
+      "title": "关于"
     }
   },
   "pwa": {

@@ -3,7 +3,8 @@
     "appName": "JOOPS",
     "skip": "Salta",
     "soundOn": "Audio attivo",
-    "soundOff": "Audio disattivato"
+    "soundOff": "Audio disattivato",
+    "back": "Indietro"
   },
   "meta": {
     "title": "JOOPS — puliamo lo spazio insieme",
@@ -111,7 +112,8 @@
     "saveError": "Impossibile salvare. Riprova.",
     "retry": "Allenati di nuovo",
     "nowLevel": "Livello",
-    "toDashboard": "Indietro"
+    "toDashboard": "Indietro",
+    "quit": "Interrompi"
   },
   "launch": {
     "title": "Prenota un lancio",
@@ -144,9 +146,12 @@
     "pending": "In lista d'attesa",
     "rejected": "Rifiutato",
     "needLevel": "Richiede livello {level}",
+    "bookedTitle": "Prenotazione confermata!",
+    "backToHub": "Indietro",
     "errors": {
       "auth": "Accesso richiesto",
       "no_joop": "Nessun joop trovato",
+      "already_booked": "Hai già una prenotazione di lancio",
       "under_level": "Livello troppo basso",
       "not_found": "Veicolo non trovato",
       "duplicate": "Già prenotato",
@@ -248,6 +253,7 @@
     "myJoop": "Il mio Joop",
     "inventory": "Inventario",
     "map": "Mappa",
+    "launch": "Lancio",
     "settings": "Impostazioni"
   },
   "settings": {
@@ -265,6 +271,9 @@
     },
     "returnEarth": {
       "title": "Torna sulla Terra"
+    },
+    "about": {
+      "title": "Informazioni"
     }
   },
   "pwa": {

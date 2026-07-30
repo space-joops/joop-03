@@ -3,7 +3,8 @@
     "appName": "JOOPS",
     "skip": "Pular",
     "soundOn": "Som ativado",
-    "soundOff": "Som desativado"
+    "soundOff": "Som desativado",
+    "back": "Voltar"
   },
   "meta": {
     "title": "JOOPS — limpe o espaço junto",
@@ -111,7 +112,8 @@
     "saveError": "Não foi possível salvar. Tente novamente.",
     "retry": "Treinar de novo",
     "nowLevel": "Nível",
-    "toDashboard": "Voltar"
+    "toDashboard": "Voltar",
+    "quit": "Sair"
   },
   "launch": {
     "title": "Reservar um lançamento",
@@ -144,9 +146,12 @@
     "pending": "Na lista de espera",
     "rejected": "Rejeitado",
     "needLevel": "Requer nível {level}",
+    "bookedTitle": "Reserva confirmada!",
+    "backToHub": "Voltar",
     "errors": {
       "auth": "É necessário fazer login",
       "no_joop": "Nenhum joop encontrado",
+      "already_booked": "Você já tem um lançamento reservado",
       "under_level": "Nível muito baixo",
       "not_found": "Veículo não encontrado",
       "duplicate": "Já reservado",
@@ -248,6 +253,7 @@
     "myJoop": "Meu Joop",
     "inventory": "Inventário",
     "map": "Mapa",
+    "launch": "Lançamento",
     "settings": "Ajustes"
   },
   "settings": {
@@ -265,6 +271,9 @@
     },
     "returnEarth": {
       "title": "Retornar à Terra"
+    },
+    "about": {
+      "title": "Sobre"
     }
   },
   "pwa": {

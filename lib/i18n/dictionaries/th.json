@@ -3,7 +3,8 @@
     "appName": "JOOPS",
     "skip": "ข้าม",
     "soundOn": "เปิดเสียง",
-    "soundOff": "ปิดเสียง"
+    "soundOff": "ปิดเสียง",
+    "back": "ย้อนกลับ"
   },
   "meta": {
     "title": "JOOPS — มาช่วยกันเก็บขยะอวกาศ",
@@ -111,7 +112,8 @@
     "saveError": "บันทึกไม่สำเร็จ ลองอีกครั้ง",
     "retry": "ฝึกอีกครั้ง",
     "nowLevel": "เลเวล",
-    "toDashboard": "ย้อนกลับ"
+    "toDashboard": "ย้อนกลับ",
+    "quit": "ยกเลิก"
   },
   "launch": {
     "title": "จองการปล่อยจรวด",
@@ -144,9 +146,12 @@
     "pending": "อยู่ในคิวรอ",
     "rejected": "ถูกปฏิเสธ",
     "needLevel": "ต้องการเลเวล {level}",
+    "bookedTitle": "จองสำเร็จ!",
+    "backToHub": "ย้อนกลับ",
     "errors": {
       "auth": "ต้องเข้าสู่ระบบก่อน",
       "no_joop": "ไม่พบจูป",
+      "already_booked": "คุณมีการจองการปล่อยยานอยู่แล้ว",
       "under_level": "เลเวลต่ำเกินไป",
       "not_found": "ไม่พบยานปล่อย",
       "duplicate": "จองไปแล้ว",
@@ -248,6 +253,7 @@
     "myJoop": "จูปของฉัน",
     "inventory": "คลังไอเทม",
     "map": "แผนที่",
+    "launch": "ปล่อยยาน",
     "settings": "ตั้งค่า"
   },
   "settings": {
@@ -265,6 +271,9 @@
     },
     "returnEarth": {
       "title": "กลับสู่โลก"
+    },
+    "about": {
+      "title": "เกี่ยวกับ"
     }
   },
   "pwa": {
