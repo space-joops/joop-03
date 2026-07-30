@@ -3,7 +3,8 @@
     "appName": "JOOPS",
     "skip": "Lewati",
     "soundOn": "Suara aktif",
-    "soundOff": "Suara nonaktif"
+    "soundOff": "Suara nonaktif",
+    "back": "Kembali"
   },
   "meta": {
     "title": "JOOPS — bersihkan luar angkasa bersama",

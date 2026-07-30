@@ -3,7 +3,8 @@
     "appName": "JOOPS",
     "skip": "スキップ",
     "soundOn": "サウンドON",
-    "soundOff": "サウンドOFF"
+    "soundOff": "サウンドOFF",
+    "back": "戻る"
   },
   "meta": {
     "title": "JOOPS — みんなで宇宙をきれいに",

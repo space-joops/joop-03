@@ -3,7 +3,8 @@
     "appName": "줍스",
     "skip": "건너뛰기",
     "soundOn": "소리 켜짐",
-    "soundOff": "소리 꺼짐"
+    "soundOff": "소리 꺼짐",
+    "back": "뒤로가기"
   },
   "meta": {
     "title": "JOOPS — 함께 우주를 청소합니다",

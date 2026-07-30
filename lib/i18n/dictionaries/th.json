@@ -3,7 +3,8 @@
     "appName": "JOOPS",
     "skip": "ข้าม",
     "soundOn": "เปิดเสียง",
-    "soundOff": "ปิดเสียง"
+    "soundOff": "ปิดเสียง",
+    "back": "ย้อนกลับ"
   },
   "meta": {
     "title": "JOOPS — มาช่วยกันเก็บขยะอวกาศ",

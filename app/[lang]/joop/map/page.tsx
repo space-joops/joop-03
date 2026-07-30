@@ -8,6 +8,7 @@ import { getArcadeShadowXpCost } from "@/lib/game-config";
 import { OrbitViewer } from "@/components/orbit-viewer";
 import { OrbitStatus } from "@/components/orbit-status";
 import { LinkStatus } from "@/components/link-status";
+import { BackButton } from "@/components/back-button";
 
 export const dynamic = "force-dynamic";
 
@@ -32,7 +33,7 @@ export default async function MapPage({ params }: PageProps<"/[lang]/joop/map">)
 
   return (
     <main
-      className="mx-auto flex w-full max-w-md flex-1 flex-col px-4 pb-8 pt-[calc(env(safe-area-inset-top)+1rem)]"
+      className="mx-auto flex w-full max-w-md flex-1 flex-col px-4 pb-24 pt-[calc(env(safe-area-inset-top)+1rem)]"
       style={{ background: "var(--color-bg)" }}
     >
       <header className="mb-3 flex items-center justify-center">
@@ -98,6 +99,8 @@ export default async function MapPage({ params }: PageProps<"/[lang]/joop/map">)
           {dict.space.hint}
         </p>
       </details>
+
+      <BackButton href={`/${lang}/joop`} dict={dict} />
     </main>
   );
 }

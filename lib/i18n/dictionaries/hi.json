@@ -3,7 +3,8 @@
     "appName": "JOOPS",
     "skip": "छोड़ें",
     "soundOn": "साउंड चालू",
-    "soundOff": "साउंड बंद"
+    "soundOff": "साउंड बंद",
+    "back": "वापस"
   },
   "meta": {
     "title": "JOOPS — मिलकर स्पेस साफ करें",

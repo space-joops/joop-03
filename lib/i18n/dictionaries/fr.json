@@ -3,7 +3,8 @@
     "appName": "JOOPS",
     "skip": "Passer",
     "soundOn": "Son activé",
-    "soundOff": "Son coupé"
+    "soundOff": "Son coupé",
+    "back": "Retour"
   },
   "meta": {
     "title": "JOOPS — nettoyons l'espace ensemble",

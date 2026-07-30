@@ -3,7 +3,8 @@
     "appName": "JOOPS",
     "skip": "تخطي",
     "soundOn": "الصوت مفعّل",
-    "soundOff": "الصوت مطفأ"
+    "soundOff": "الصوت مطفأ",
+    "back": "رجوع"
   },
   "meta": {
     "title": "JOOPS — ننظّف الفضاء معًا",

@@ -3,7 +3,8 @@
     "appName": "JOOPS",
     "skip": "跳过",
     "soundOn": "声音开启",
-    "soundOff": "声音关闭"
+    "soundOff": "声音关闭",
+    "back": "返回"
   },
   "meta": {
     "title": "JOOPS — 一起清理太空",

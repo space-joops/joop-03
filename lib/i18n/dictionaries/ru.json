@@ -3,7 +3,8 @@
     "appName": "JOOPS",
     "skip": "Пропустить",
     "soundOn": "Звук вкл.",
-    "soundOff": "Звук выкл."
+    "soundOff": "Звук выкл.",
+    "back": "Назад"
   },
   "meta": {
     "title": "JOOPS — очищаем орбиту вместе",
