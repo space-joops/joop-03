@@ -150,6 +150,7 @@
     "errors": {
       "auth": "ログインが必要です",
       "no_joop": "joopが見つかりません",
+      "already_booked": "すでに発射予約があります",
       "under_level": "レベルが足りません",
       "not_found": "機体が見つかりません",
       "duplicate": "すでに予約済みです",

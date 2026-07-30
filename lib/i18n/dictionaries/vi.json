@@ -150,6 +150,7 @@
     "errors": {
       "auth": "Cần đăng nhập",
       "no_joop": "Không tìm thấy joop",
+      "already_booked": "Bạn đã có một lượt đặt phóng rồi",
       "under_level": "Cấp độ quá thấp",
       "not_found": "Không tìm thấy phương tiện",
       "duplicate": "Đã đặt chỗ rồi",

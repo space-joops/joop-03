@@ -150,6 +150,7 @@
     "errors": {
       "auth": "Sign in required",
       "no_joop": "No joop found",
+      "already_booked": "You already have a launch booked",
       "under_level": "Level too low",
       "not_found": "Vehicle not found",
       "duplicate": "Already booked",

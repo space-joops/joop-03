@@ -150,6 +150,7 @@
     "errors": {
       "auth": "需要登录",
       "no_joop": "未找到 joop",
+      "already_booked": "你已经有一个发射预约了",
       "under_level": "等级不足",
       "not_found": "未找到载具",
       "duplicate": "已预约过",

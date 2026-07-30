@@ -150,6 +150,7 @@
     "errors": {
       "auth": "Inicio de sesión requerido",
       "no_joop": "No se encontró ningún joop",
+      "already_booked": "Ya tienes un lanzamiento reservado",
       "under_level": "Nivel demasiado bajo",
       "not_found": "Vehículo no encontrado",
       "duplicate": "Ya reservado",

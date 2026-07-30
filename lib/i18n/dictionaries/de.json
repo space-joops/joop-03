@@ -150,6 +150,7 @@
     "errors": {
       "auth": "Anmeldung erforderlich",
       "no_joop": "Kein Joop gefunden",
+      "already_booked": "Du hast bereits einen Start gebucht",
       "under_level": "Level zu niedrig",
       "not_found": "Fahrzeug nicht gefunden",
       "duplicate": "Bereits gebucht",

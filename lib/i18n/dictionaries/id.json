@@ -150,6 +150,7 @@
     "errors": {
       "auth": "Perlu masuk akun",
       "no_joop": "Joop tidak ditemukan",
+      "already_booked": "Kamu sudah punya pemesanan peluncuran",
       "under_level": "Level terlalu rendah",
       "not_found": "Wahana tidak ditemukan",
       "duplicate": "Sudah dipesan",

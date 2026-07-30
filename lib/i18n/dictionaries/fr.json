@@ -150,6 +150,7 @@
     "errors": {
       "auth": "Connexion requise",
       "no_joop": "Aucun joop trouvé",
+      "already_booked": "Vous avez déjà une réservation de lancement",
       "under_level": "Niveau trop bas",
       "not_found": "Véhicule introuvable",
       "duplicate": "Déjà réservé",

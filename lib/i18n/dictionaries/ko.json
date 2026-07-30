@@ -150,6 +150,7 @@
     "errors": {
       "auth": "로그인이 필요해요",
       "no_joop": "줍스가 없어요",
+      "already_booked": "이미 발사 예약이 있어요",
       "under_level": "레벨이 부족해요",
       "not_found": "발사체를 찾을 수 없어요",
       "duplicate": "이미 청약했어요",

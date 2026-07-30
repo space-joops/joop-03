@@ -150,6 +150,7 @@
     "errors": {
       "auth": "É necessário fazer login",
       "no_joop": "Nenhum joop encontrado",
+      "already_booked": "Você já tem um lançamento reservado",
       "under_level": "Nível muito baixo",
       "not_found": "Veículo não encontrado",
       "duplicate": "Já reservado",

@@ -150,6 +150,7 @@
     "errors": {
       "auth": "Accesso richiesto",
       "no_joop": "Nessun joop trovato",
+      "already_booked": "Hai già una prenotazione di lancio",
       "under_level": "Livello troppo basso",
       "not_found": "Veicolo non trovato",
       "duplicate": "Già prenotato",
