@@ -111,7 +111,8 @@
     "saveError": "सेव नहीं हो सका। फिर से कोशिश करें।",
     "retry": "फिर से ट्रेनिंग करें",
     "nowLevel": "लेवल",
-    "toDashboard": "वापस"
+    "toDashboard": "वापस",
+    "quit": "रोकें"
   },
   "launch": {
     "title": "लॉन्च बुक करें",
@@ -144,6 +145,8 @@
     "pending": "वेटलिस्ट में",
     "rejected": "अस्वीकृत",
     "needLevel": "लेवल {level} चाहिए",
+    "bookedTitle": "बुकिंग हो गई!",
+    "backToHub": "वापस",
     "errors": {
       "auth": "साइन इन करना ज़रूरी है",
       "no_joop": "कोई जूप नहीं मिला",

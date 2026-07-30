@@ -111,7 +111,8 @@
     "saveError": "No se pudo guardar. Inténtalo de nuevo.",
     "retry": "Entrenar de nuevo",
     "nowLevel": "Nivel",
-    "toDashboard": "Atrás"
+    "toDashboard": "Atrás",
+    "quit": "Salir"
   },
   "launch": {
     "title": "Reservar un lanzamiento",
@@ -144,6 +145,8 @@
     "pending": "En lista de espera",
     "rejected": "Rechazado",
     "needLevel": "Requiere nivel {level}",
+    "bookedTitle": "¡Reserva confirmada!",
+    "backToHub": "Atrás",
     "errors": {
       "auth": "Inicio de sesión requerido",
       "no_joop": "No se encontró ningún joop",

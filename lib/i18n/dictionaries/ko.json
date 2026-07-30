@@ -111,7 +111,8 @@
     "saveError": "저장에 실패했어요. 다시 시도해 주세요.",
     "retry": "다시 훈련",
     "nowLevel": "레벨",
-    "toDashboard": "돌아가기"
+    "toDashboard": "돌아가기",
+    "quit": "중단"
   },
   "launch": {
     "title": "발사체 청약",
@@ -144,6 +145,8 @@
     "pending": "대기 중",
     "rejected": "거부됨",
     "needLevel": "레벨 {level} 필요",
+    "bookedTitle": "청약 완료!",
+    "backToHub": "돌아가기",
     "errors": {
       "auth": "로그인이 필요해요",
       "no_joop": "줍스가 없어요",

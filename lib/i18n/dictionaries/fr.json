@@ -111,7 +111,8 @@
     "saveError": "Impossible d'enregistrer. Réessayez.",
     "retry": "S'entraîner à nouveau",
     "nowLevel": "Niveau",
-    "toDashboard": "Retour"
+    "toDashboard": "Retour",
+    "quit": "Abandonner"
   },
   "launch": {
     "title": "Réserver un lancement",
@@ -144,6 +145,8 @@
     "pending": "En liste d'attente",
     "rejected": "Refusé",
     "needLevel": "Nécessite le niveau {level}",
+    "bookedTitle": "Réservation confirmée !",
+    "backToHub": "Retour",
     "errors": {
       "auth": "Connexion requise",
       "no_joop": "Aucun joop trouvé",

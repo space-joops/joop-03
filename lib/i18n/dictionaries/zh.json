@@ -111,7 +111,8 @@
     "saveError": "保存失败，请再试一次。",
     "retry": "再次训练",
     "nowLevel": "等级",
-    "toDashboard": "返回"
+    "toDashboard": "返回",
+    "quit": "退出"
   },
   "launch": {
     "title": "预约发射",
@@ -144,6 +145,8 @@
     "pending": "候补中",
     "rejected": "已拒绝",
     "needLevel": "需要 {level} 级",
+    "bookedTitle": "预约成功！",
+    "backToHub": "返回",
     "errors": {
       "auth": "需要登录",
       "no_joop": "未找到 joop",

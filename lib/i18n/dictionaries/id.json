@@ -111,7 +111,8 @@
     "saveError": "Gagal menyimpan. Coba lagi ya.",
     "retry": "Latihan lagi",
     "nowLevel": "Level",
-    "toDashboard": "Kembali"
+    "toDashboard": "Kembali",
+    "quit": "Berhenti"
   },
   "launch": {
     "title": "Pesan peluncuran",
@@ -144,6 +145,8 @@
     "pending": "Daftar tunggu",
     "rejected": "Ditolak",
     "needLevel": "Butuh level {level}",
+    "bookedTitle": "Pemesanan berhasil!",
+    "backToHub": "Kembali",
     "errors": {
       "auth": "Perlu masuk akun",
       "no_joop": "Joop tidak ditemukan",

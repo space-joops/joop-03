@@ -111,7 +111,8 @@
     "saveError": "Não foi possível salvar. Tente novamente.",
     "retry": "Treinar de novo",
     "nowLevel": "Nível",
-    "toDashboard": "Voltar"
+    "toDashboard": "Voltar",
+    "quit": "Sair"
   },
   "launch": {
     "title": "Reservar um lançamento",
@@ -144,6 +145,8 @@
     "pending": "Na lista de espera",
     "rejected": "Rejeitado",
     "needLevel": "Requer nível {level}",
+    "bookedTitle": "Reserva confirmada!",
+    "backToHub": "Voltar",
     "errors": {
       "auth": "É necessário fazer login",
       "no_joop": "Nenhum joop encontrado",

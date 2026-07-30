@@ -24,14 +24,19 @@ export function LaunchList({
   const [pending, startTransition] = useTransition();
   const [localStatus, setLocalStatus] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [booked, setBooked] = useState<{ name: string; status: string } | null>(null);
 
-  const book = (id: string) => {
+  const statusLabel = (s: string) =>
+    s === "confirmed" ? t.confirmed : s === "pending" ? t.pending : t.rejected;
+
+  const book = (id: string, name: string) => {
     setErrors((e) => ({ ...e, [id]: "" }));
     startTransition(async () => {
       const res = await bookLaunch(lang, id);
       if (res.ok) {
         trackLaunchBooked(res.status);
         setLocalStatus((s) => ({ ...s, [id]: res.status }));
+        setBooked({ name, status: res.status });
         router.refresh();
       } else {
         setErrors((e) => ({ ...e, [id]: res.error }));
@@ -39,11 +44,9 @@ export function LaunchList({
     });
   };
 
-  const statusLabel = (s: string) =>
-    s === "confirmed" ? t.confirmed : s === "pending" ? t.pending : t.rejected;
-
   return (
-    <ul className="flex flex-col gap-3">
+    <>
+      <ul className="flex flex-col gap-3">
       {vehicles.map((v) => {
         const myStatus = localStatus[v.id] ?? v.myStatus;
         const eligible = myLevel >= v.requiredLevel;
@@ -88,7 +91,7 @@ export function LaunchList({
                 </span>
               ) : eligible ? (
                 <button
-                  onClick={() => book(v.id)}
+                  onClick={() => book(v.id, v.name)}
                   disabled={pending}
                   className="rounded-md px-4 py-2 font-mono text-xs font-semibold uppercase tracking-widest disabled:opacity-60"
                   style={{ background: "var(--color-primary)", color: "var(--color-bg)" }}
@@ -109,6 +112,34 @@ export function LaunchList({
           </li>
         );
       })}
-    </ul>
+      </ul>
+
+      {booked && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-6"
+        >
+          <div
+            className="crt-brackets flex w-full max-w-xs flex-col items-center gap-3 px-5 py-6 text-center"
+            style={{ "--bracket-color": "var(--color-primary)", background: "var(--color-bg)" } as React.CSSProperties}
+          >
+            <h2 className="font-mono text-base font-semibold text-[var(--color-primary)]">
+              {t.bookedTitle}
+            </h2>
+            <p className="font-mono text-sm text-[var(--color-fg)]">
+              {booked.name} · {statusLabel(booked.status)}
+            </p>
+            <button
+              onClick={() => router.push(`/${lang}/joop`)}
+              className="rounded-md px-6 py-2.5 font-mono text-sm font-semibold uppercase tracking-widest"
+              style={{ background: "var(--color-primary)", color: "var(--color-bg)" }}
+            >
+              {t.backToHub}
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

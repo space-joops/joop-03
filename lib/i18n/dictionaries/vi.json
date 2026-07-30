@@ -111,7 +111,8 @@
     "saveError": "Không thể lưu. Vui lòng thử lại.",
     "retry": "Huấn luyện lại",
     "nowLevel": "Cấp độ",
-    "toDashboard": "Quay lại"
+    "toDashboard": "Quay lại",
+    "quit": "Dừng"
   },
   "launch": {
     "title": "Đặt chỗ phóng",
@@ -144,6 +145,8 @@
     "pending": "Đang chờ",
     "rejected": "Bị từ chối",
     "needLevel": "Cần cấp {level}",
+    "bookedTitle": "Đặt chỗ thành công!",
+    "backToHub": "Quay lại",
     "errors": {
       "auth": "Cần đăng nhập",
       "no_joop": "Không tìm thấy joop",

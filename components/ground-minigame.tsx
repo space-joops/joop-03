@@ -765,6 +765,24 @@ export function GroundMinigame({
             만 주면 canvas 의 고유 종횡비가 이겨서 화면 위쪽 일부만 게임 화면이 되어 버렸다. */}
         <canvas ref={canvasRef} className="absolute inset-0 block h-full w-full touch-none" />
 
+        {phase === "playing" && (
+          <button
+            type="button"
+            onClick={() => {
+              sfx.stopAll();
+              router.push(`/${lang}/joop`);
+            }}
+            className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-md border px-3 py-1 font-mono text-[10px] uppercase tracking-widest"
+            style={{
+              borderColor: "var(--color-neutral-600)",
+              background: "color-mix(in srgb, var(--color-bg) 70%, transparent)",
+              color: "var(--color-muted)",
+            }}
+          >
+            {m.quit}
+          </button>
+        )}
+
         {phase === "ready" && (
           <div className={overlayClass}>
             {/* 훈련 주인공 — 내 줍스 (idle 애니메이션, reduced-motion 시 정지) */}

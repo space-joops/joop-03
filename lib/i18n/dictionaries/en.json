@@ -111,7 +111,8 @@
     "saveError": "Couldn't save. Please try again.",
     "retry": "Train again",
     "nowLevel": "Level",
-    "toDashboard": "Back"
+    "toDashboard": "Back",
+    "quit": "Quit"
   },
   "launch": {
     "title": "Book a launch",
@@ -144,6 +145,8 @@
     "pending": "Waitlisted",
     "rejected": "Rejected",
     "needLevel": "Needs level {level}",
+    "bookedTitle": "Booking confirmed!",
+    "backToHub": "Back",
     "errors": {
       "auth": "Sign in required",
       "no_joop": "No joop found",

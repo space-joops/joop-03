@@ -111,7 +111,8 @@
     "saveError": "Impossibile salvare. Riprova.",
     "retry": "Allenati di nuovo",
     "nowLevel": "Livello",
-    "toDashboard": "Indietro"
+    "toDashboard": "Indietro",
+    "quit": "Interrompi"
   },
   "launch": {
     "title": "Prenota un lancio",
@@ -144,6 +145,8 @@
     "pending": "In lista d'attesa",
     "rejected": "Rifiutato",
     "needLevel": "Richiede livello {level}",
+    "bookedTitle": "Prenotazione confermata!",
+    "backToHub": "Indietro",
     "errors": {
       "auth": "Accesso richiesto",
       "no_joop": "Nessun joop trovato",

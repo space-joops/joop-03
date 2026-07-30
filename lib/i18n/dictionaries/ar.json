@@ -111,7 +111,8 @@
     "saveError": "تعذّر الحفظ. حاول مرة أخرى.",
     "retry": "درّب مرة أخرى",
     "nowLevel": "المستوى",
-    "toDashboard": "رجوع"
+    "toDashboard": "رجوع",
+    "quit": "إيقاف"
   },
   "launch": {
     "title": "احجز إطلاقًا",
@@ -144,6 +145,8 @@
     "pending": "في قائمة الانتظار",
     "rejected": "مرفوض",
     "needLevel": "يتطلب المستوى {level}",
+    "bookedTitle": "تم الحجز!",
+    "backToHub": "رجوع",
     "errors": {
       "auth": "يلزم تسجيل الدخول",
       "no_joop": "لم يُعثر على جوب",
