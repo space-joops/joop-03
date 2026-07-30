@@ -1,8 +1,8 @@
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { JoopSprite } from "@/components/joop-sprite";
-import { ReturnEarthButton } from "@/components/return-earth-button";
 import { ReplayLaunchButton } from "@/components/replay-launch-button";
+import { BottomNav } from "@/components/bottom-nav";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getMyJoop } from "@/lib/profile";
@@ -25,10 +25,7 @@ export default async function JoopPage({ params }: PageProps<"/[lang]/joop">) {
       className="mx-auto flex w-full max-w-md flex-1 flex-col px-5 pt-[calc(env(safe-area-inset-top)+1.5rem)] pb-8"
       style={{ background: "var(--color-bg)" }}
     >
-      <header className="mb-6 flex items-center justify-between">
-        <Link href={`/${lang}`} className="font-mono text-xs text-[var(--color-muted)] underline">
-          {j.back}
-        </Link>
+      <header className="mb-6 flex items-center justify-center">
         <span className="font-mono text-xs uppercase tracking-widest text-[var(--color-muted)]">
           {j.title}
         </span>
@@ -101,7 +98,6 @@ export default async function JoopPage({ params }: PageProps<"/[lang]/joop">) {
             >
               {j.openMap}
             </Link>
-            <ReturnEarthButton lang={lang} dict={dict} />
             <ReplayLaunchButton lang={lang} dict={dict} />
           </>
         ) : mine.status === "queued" ? (
@@ -143,6 +139,13 @@ export default async function JoopPage({ params }: PageProps<"/[lang]/joop">) {
       <p className="mt-4 font-mono text-xs leading-relaxed text-[var(--color-muted)]">
         {mine.status === "orbit" ? j.hintOrbit : mine.status === "queued" ? j.hintQueued : j.hint}
       </p>
+
+      <BottomNav
+        lang={lang}
+        dict={dict}
+        items={["home", "myJoop", "inventory", "map", "settings"]}
+        active="myJoop"
+      />
     </main>
   );
 }

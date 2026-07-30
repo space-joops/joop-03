@@ -1,28 +1,7 @@
-"use client";
-
-import { useEffect, useState } from "react";
-
 // 단말기 상단 장식 상태바 — 이슈 #5 CRT 컨셉 (앰버 위계).
-// G.S.T.(Ground Station Time) 시계 + 신호/배터리 글리프. 순수 장식이라 aria-hidden,
-// 문구도 i18n 하지 않는다. 마운트 전에는 플레이스홀더를 렌더해 hydration 불일치를 피한다.
+// 신호/배터리 글리프 + 상단 안전영역 패딩. 순수 장식이라 aria-hidden,
+// 문구도 i18n 하지 않는다.
 export function StatusBar() {
-  const [time, setTime] = useState<string | null>(null);
-
-  useEffect(() => {
-    const tick = () =>
-      setTime(
-        new Date().toLocaleTimeString("en-GB", {
-          hour12: false,
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-        }),
-      );
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
-  }, []);
-
   return (
     <div
       aria-hidden
@@ -33,7 +12,6 @@ export function StatusBar() {
       }}
     >
       <span>▚▚▚</span>
-      <span>{time ?? "--:--:--"} G.S.T.</span>
       <span>▮▮▮▯</span>
     </div>
   );

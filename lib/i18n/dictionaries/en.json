@@ -226,8 +226,46 @@
   },
   "language": {
     "label": "Language",
+    "auto": "Automatic (default)",
     "en": "English",
-    "ko": "한국어"
+    "ko": "한국어",
+    "fr": "Français",
+    "it": "Italiano",
+    "de": "Deutsch",
+    "es": "Español",
+    "zh": "中文",
+    "ja": "日本語",
+    "ru": "Русский",
+    "pt": "Português",
+    "id": "Bahasa Indonesia",
+    "th": "ไทย",
+    "vi": "Tiếng Việt",
+    "hi": "हिन्दी",
+    "ar": "العربية"
+  },
+  "nav": {
+    "home": "Home",
+    "myJoop": "My Joop",
+    "inventory": "Inventory",
+    "map": "Map",
+    "settings": "Settings"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": {
+      "title": "Language"
+    },
+    "baseStation": {
+      "title": "Base station",
+      "searchPlaceholder": "Search a city…",
+      "noResults": "No matching city",
+      "current": "Current base station",
+      "none": "Not set",
+      "note": "This will link to shadow-zone calculations in a future update."
+    },
+    "returnEarth": {
+      "title": "Return to Earth"
+    }
   },
   "pwa": {
     "install": {

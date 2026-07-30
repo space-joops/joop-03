@@ -1,5 +1,4 @@
 import { notFound, redirect } from "next/navigation";
-import Link from "next/link";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getMyOrbitState, getSpaceConfig, settleIdleCollection } from "@/lib/space";
@@ -9,7 +8,6 @@ import { getArcadeShadowXpCost } from "@/lib/game-config";
 import { OrbitViewer } from "@/components/orbit-viewer";
 import { OrbitStatus } from "@/components/orbit-status";
 import { LinkStatus } from "@/components/link-status";
-import { ReturnEarthButton } from "@/components/return-earth-button";
 
 export const dynamic = "force-dynamic";
 
@@ -37,10 +35,7 @@ export default async function MapPage({ params }: PageProps<"/[lang]/joop/map">)
       className="mx-auto flex w-full max-w-md flex-1 flex-col px-4 pb-8 pt-[calc(env(safe-area-inset-top)+1rem)]"
       style={{ background: "var(--color-bg)" }}
     >
-      <header className="mb-3 flex items-center justify-between">
-        <Link href={`/${lang}/joop`} className="font-mono text-xs text-[var(--color-muted)] underline">
-          {dict.joop.back}
-        </Link>
+      <header className="mb-3 flex items-center justify-center">
         <span className="font-mono text-xs uppercase tracking-widest text-[var(--color-muted)]">
           {dict.space.title}
         </span>
@@ -103,9 +98,6 @@ export default async function MapPage({ params }: PageProps<"/[lang]/joop/map">)
           {dict.space.hint}
         </p>
       </details>
-
-      {/* 지구 복귀 — 발사 루프를 처음부터 다시(수거량·XP 유지) */}
-      <ReturnEarthButton lang={lang} dict={dict} />
     </main>
   );
 }

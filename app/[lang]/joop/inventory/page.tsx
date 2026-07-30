@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { InventoryView } from "@/components/inventory-view";
@@ -21,10 +20,7 @@ export default async function InventoryPage({
       className="mx-auto flex w-full max-w-md flex-1 flex-col pb-[calc(env(safe-area-inset-bottom)+1rem)] pt-[calc(env(safe-area-inset-top)+1rem)]"
       style={{ background: "var(--color-bg)" }}
     >
-      <header className="mb-2 flex items-center justify-between px-4">
-        <Link href={`/${lang}/joop`} className="font-mono text-xs text-[var(--color-muted)] underline">
-          {dict.joop.back}
-        </Link>
+      <header className="mb-2 flex items-center justify-center px-4">
         <span className="font-mono text-xs uppercase tracking-widest text-[var(--color-muted)]">
           {dict.inventory.title}
         </span>
