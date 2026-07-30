@@ -248,6 +248,7 @@
     "myJoop": "Мой Joop",
     "inventory": "Инвентарь",
     "map": "Карта",
+    "launch": "Запуск",
     "settings": "Настройки"
   },
   "settings": {
@@ -265,6 +266,9 @@
     },
     "returnEarth": {
       "title": "Вернуться на Землю"
+    },
+    "about": {
+      "title": "О приложении"
     }
   },
   "pwa": {

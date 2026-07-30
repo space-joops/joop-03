@@ -248,6 +248,7 @@
     "myJoop": "我的 Joop",
     "inventory": "背包",
     "map": "地图",
+    "launch": "发射",
     "settings": "设置"
   },
   "settings": {
@@ -265,6 +266,9 @@
     },
     "returnEarth": {
       "title": "返回地球"
+    },
+    "about": {
+      "title": "关于"
     }
   },
   "pwa": {

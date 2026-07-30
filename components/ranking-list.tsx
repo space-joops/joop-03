@@ -32,7 +32,7 @@ function RankRow({
 }) {
   return (
     <li
-      className={`flex items-center gap-2 ${compact ? "py-0.5" : "py-1.5"} ${
+      className={`flex items-center ${compact ? "gap-1.5 py-0.5" : "gap-2 py-1.5"} ${
         mine ? "rounded-sm border px-1" : ""
       }`}
       style={mine ? { borderColor: "var(--color-primary)", background: "color-mix(in srgb, var(--color-primary) 8%, transparent)" } : undefined}
@@ -89,10 +89,10 @@ export function RankingList({
   const myInList = !!myRanking && rows.some((r) => r.joopId === myRanking.joopId);
 
   return (
-    <section className={compact ? "px-4 py-1" : ""}>
-      <div className={`panel-amber px-3 ${compact ? "py-1.5" : "py-2"}`}>
+    <section className={compact ? "px-4 py-0.5" : ""}>
+      <div className={`panel-amber px-3 ${compact ? "py-1" : "py-2"}`}>
         <div
-          className="mb-1 flex items-center justify-between pb-1.5"
+          className={`flex items-center justify-between ${compact ? "mb-0.5 pb-1" : "mb-1 pb-1.5"}`}
           style={{
             borderBottom: "1px solid color-mix(in srgb, var(--color-secondary) 45%, transparent)",
           }}

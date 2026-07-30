@@ -248,6 +248,7 @@
     "myJoop": "マイJoop",
     "inventory": "インベントリ",
     "map": "マップ",
+    "launch": "発射",
     "settings": "設定"
   },
   "settings": {
@@ -265,6 +266,9 @@
     },
     "returnEarth": {
       "title": "地球に帰還"
+    },
+    "about": {
+      "title": "情報"
     }
   },
   "pwa": {

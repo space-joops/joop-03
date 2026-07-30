@@ -248,6 +248,7 @@
     "myJoop": "Il mio Joop",
     "inventory": "Inventario",
     "map": "Mappa",
+    "launch": "Lancio",
     "settings": "Impostazioni"
   },
   "settings": {
@@ -265,6 +266,9 @@
     },
     "returnEarth": {
       "title": "Torna sulla Terra"
+    },
+    "about": {
+      "title": "Informazioni"
     }
   },
   "pwa": {

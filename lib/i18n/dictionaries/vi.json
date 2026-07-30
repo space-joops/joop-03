@@ -248,6 +248,7 @@
     "myJoop": "Joop của tôi",
     "inventory": "Kho đồ",
     "map": "Bản đồ",
+    "launch": "Phóng",
     "settings": "Cài đặt"
   },
   "settings": {
@@ -265,6 +266,9 @@
     },
     "returnEarth": {
       "title": "Quay về Trái Đất"
+    },
+    "about": {
+      "title": "Giới thiệu"
     }
   },
   "pwa": {

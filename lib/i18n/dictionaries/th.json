@@ -248,6 +248,7 @@
     "myJoop": "จูปของฉัน",
     "inventory": "คลังไอเทม",
     "map": "แผนที่",
+    "launch": "ปล่อยยาน",
     "settings": "ตั้งค่า"
   },
   "settings": {
@@ -265,6 +266,9 @@
     },
     "returnEarth": {
       "title": "กลับสู่โลก"
+    },
+    "about": {
+      "title": "เกี่ยวกับ"
     }
   },
   "pwa": {

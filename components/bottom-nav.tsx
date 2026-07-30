@@ -2,7 +2,13 @@ import Link from "next/link";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
 
-export type NavItem = "home" | "myJoop" | "inventory" | "map" | "settings";
+export type NavItem = "home" | "myJoop" | "inventory" | "map" | "launch" | "settings";
+
+// 발사 전(궤도 진입 전)엔 "우주지도" 탭을 눌러도 map/page.tsx 가드가 바로 /joop 로
+// 튕겨내므로, 그 자리를 "발사 청약" 탭으로 대체한다.
+export function withLaunchOrMap(items: NavItem[], inOrbit: boolean): NavItem[] {
+  return items.map((item) => (item === "map" ? (inOrbit ? "map" : "launch") : item));
+}
 
 function hrefFor(item: NavItem, lang: Locale): string {
   switch (item) {
@@ -14,6 +20,8 @@ function hrefFor(item: NavItem, lang: Locale): string {
       return `/${lang}/joop/inventory`;
     case "map":
       return `/${lang}/joop/map`;
+    case "launch":
+      return `/${lang}/launch`;
     case "settings":
       return `/${lang}/settings`;
   }
@@ -60,6 +68,15 @@ function Icon({ item }: { item: NavItem }) {
           <path d="M12 4c-3 4-3 12 0 16" />
         </svg>
       );
+    case "launch":
+      return (
+        <svg {...common} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 3c2.5 2 3.5 5.5 2.8 10.2l-2.8 2.6-2.8-2.6C8.5 8.5 9.5 5 12 3z" />
+          <path d="M9.2 13.8L6.5 16l.6 2.8 2.6-1.9" />
+          <path d="M14.8 13.8l2.7 2.2-.6 2.8-2.6-1.9" />
+          <circle cx="12" cy="9" r="1.3" fill="currentColor" stroke="none" />
+        </svg>
+      );
     case "settings":
       return (
         <svg {...common} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="square">
@@ -87,7 +104,7 @@ export function BottomNav({
 }) {
   return (
     <nav
-      className="mt-2 flex items-stretch gap-1 border-t px-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-2"
+      className="fixed inset-x-0 bottom-0 z-40 mx-auto flex w-full max-w-md items-stretch gap-1 border-t px-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-2"
       style={{ borderColor: "var(--color-neutral-700)", background: "var(--color-bg)" }}
     >
       {items.map((item) => (

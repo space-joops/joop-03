@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { notFound } from "next/navigation";
-import { VersionBadge } from "../version-badge";
 import { PwaPrompt } from "@/components/pwa-prompt";
 import { SplashScreen } from "@/components/splash-screen";
 import { locales, isLocale, isRtlLocale } from "@/lib/i18n/config";
@@ -135,10 +134,14 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
       <body className="crt-scanlines min-h-full flex flex-col">
         {children}
         {/* 인앱 스플래시 — 매 방문(전체 로드)마다, 스킵 가능 (admin 미적용) */}
-        <SplashScreen appName={dict.common.appName} skipLabel={dict.common.skip} />
+        <SplashScreen
+          appName={dict.common.appName}
+          skipLabel={dict.common.skip}
+          version={packageJson.version}
+        />
         {/* PWA 설치 안내 + 새 배포 업데이트 안내 (게임 트리 전용, admin 미적용) */}
         <PwaPrompt dict={dict.pwa} currentVersion={packageJson.version} />
-        <VersionBadge />
+        {/* 버전 표시는 설정 화면으로 이동(2026-07-30) — admin 콘솔은 별개로 VersionBadge 유지 */}
       </body>
     </html>
   );

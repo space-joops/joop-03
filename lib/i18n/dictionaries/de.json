@@ -248,6 +248,7 @@
     "myJoop": "Mein Joop",
     "inventory": "Inventar",
     "map": "Karte",
+    "launch": "Rakete",
     "settings": "Einstellungen"
   },
   "settings": {
@@ -265,6 +266,9 @@
     },
     "returnEarth": {
       "title": "Zur Erde zurückkehren"
+    },
+    "about": {
+      "title": "Info"
     }
   },
   "pwa": {

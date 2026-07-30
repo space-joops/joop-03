@@ -2,7 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { JoopSprite } from "@/components/joop-sprite";
 import { ReplayLaunchButton } from "@/components/replay-launch-button";
-import { BottomNav } from "@/components/bottom-nav";
+import { BottomNav, withLaunchOrMap } from "@/components/bottom-nav";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getMyJoop } from "@/lib/profile";
@@ -22,7 +22,7 @@ export default async function JoopPage({ params }: PageProps<"/[lang]/joop">) {
 
   return (
     <main
-      className="mx-auto flex w-full max-w-md flex-1 flex-col px-5 pt-[calc(env(safe-area-inset-top)+1.5rem)] pb-8"
+      className="mx-auto flex w-full max-w-md flex-1 flex-col px-5 pb-24 pt-[calc(env(safe-area-inset-top)+1.5rem)]"
       style={{ background: "var(--color-bg)" }}
     >
       <header className="mb-6 flex items-center justify-center">
@@ -109,31 +109,15 @@ export default async function JoopPage({ params }: PageProps<"/[lang]/joop">) {
             {j.launchNow}
           </Link>
         ) : (
-          <>
-            <Link
-              href={`/${lang}/joop/train`}
-              className="crt-brackets btn-brackets"
-              style={{ "--bracket-color": "var(--color-primary)", color: "var(--color-primary)" } as React.CSSProperties}
-            >
-              {j.train}
-            </Link>
-            <Link
-              href={`/${lang}/launch`}
-              className="crt-brackets btn-brackets"
-              style={{ "--bracket-color": "var(--color-neutral-600)" } as React.CSSProperties}
-            >
-              {j.launch}
-            </Link>
-          </>
+          // "발사 청약"(→ /launch)은 하단 네비 launch 탭과 목적지가 같아 중복이라 제거
+          <Link
+            href={`/${lang}/joop/train`}
+            className="crt-brackets btn-brackets"
+            style={{ "--bracket-color": "var(--color-primary)", color: "var(--color-primary)" } as React.CSSProperties}
+          >
+            {j.train}
+          </Link>
         )}
-        {/* 인벤토리 — 상태 무관 공통(로컬 기록이라 지상/궤도 어디서든 볼 것이 있다) */}
-        <Link
-          href={`/${lang}/joop/inventory`}
-          className="crt-brackets btn-brackets"
-          style={{ "--bracket-color": "var(--color-neutral-600)" } as React.CSSProperties}
-        >
-          {j.inventory}
-        </Link>
       </div>
 
       <p className="mt-4 font-mono text-xs leading-relaxed text-[var(--color-muted)]">
@@ -143,7 +127,7 @@ export default async function JoopPage({ params }: PageProps<"/[lang]/joop">) {
       <BottomNav
         lang={lang}
         dict={dict}
-        items={["home", "myJoop", "inventory", "map", "settings"]}
+        items={withLaunchOrMap(["home", "myJoop", "inventory", "map", "settings"], mine.status === "orbit")}
         active="myJoop"
       />
     </main>

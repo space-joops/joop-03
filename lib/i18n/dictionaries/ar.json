@@ -248,6 +248,7 @@
     "myJoop": "جوبي",
     "inventory": "المخزون",
     "map": "الخريطة",
+    "launch": "الإطلاق",
     "settings": "الإعدادات"
   },
   "settings": {
@@ -265,6 +266,9 @@
     },
     "returnEarth": {
       "title": "العودة إلى الأرض"
+    },
+    "about": {
+      "title": "حول"
     }
   },
   "pwa": {

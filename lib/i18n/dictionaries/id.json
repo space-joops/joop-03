@@ -248,6 +248,7 @@
     "myJoop": "Joop Saya",
     "inventory": "Inventaris",
     "map": "Peta",
+    "launch": "Peluncuran",
     "settings": "Pengaturan"
   },
   "settings": {
@@ -265,6 +266,9 @@
     },
     "returnEarth": {
       "title": "Kembali ke Bumi"
+    },
+    "about": {
+      "title": "Tentang"
     }
   },
   "pwa": {

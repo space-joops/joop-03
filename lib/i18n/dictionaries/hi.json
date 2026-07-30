@@ -248,6 +248,7 @@
     "myJoop": "मेरा जूप",
     "inventory": "इन्वेंट्री",
     "map": "मैप",
+    "launch": "लॉन्च",
     "settings": "सेटिंग्स"
   },
   "settings": {
@@ -265,6 +266,9 @@
     },
     "returnEarth": {
       "title": "पृथ्वी पर लौटें"
+    },
+    "about": {
+      "title": "जानकारी"
     }
   },
   "pwa": {

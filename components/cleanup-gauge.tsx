@@ -15,9 +15,9 @@ export function CleanupGauge({
   const milestones = [25, 50, 75];
 
   return (
-    <section className="px-4 py-1.5">
+    <section className="px-4 py-1">
       <div
-        className="crt-brackets px-3 py-2"
+        className="crt-brackets px-3 py-1.5"
         style={
           {
             "--bracket-color": "color-mix(in srgb, var(--color-secondary) 60%, transparent)",
@@ -32,7 +32,7 @@ export function CleanupGauge({
         </div>
 
         <div
-          className="relative mt-1 h-5 overflow-hidden rounded-[2px]"
+          className="relative mt-1 h-4 overflow-hidden rounded-[2px]"
           style={{
             background: "var(--color-surface)",
             border: "1px solid color-mix(in srgb, var(--color-secondary) 45%, transparent)",
@@ -60,7 +60,7 @@ export function CleanupGauge({
         </div>
 
         {/* 마일스톤 ▲ 틱 마커 (25/50/75%) */}
-        <div className="relative mt-0.5 h-3.5" aria-hidden>
+        <div className="relative mt-0.5 h-3" aria-hidden>
           {milestones.map((m) => (
             <span
               key={m}
@@ -74,7 +74,7 @@ export function CleanupGauge({
 
         {/* 수치 행 — 쓰레기 봉투(채움 = percent, 서버 렌더) + 대형 숫자 + 목표 대비 (UX 리뷰) */}
         <div className="flex items-center gap-2">
-          <svg width="22" height="26" viewBox="0 0 22 26" aria-hidden className="shrink-0">
+          <svg width="18" height="21" viewBox="0 0 22 26" aria-hidden className="shrink-0">
             {/* 봉투 외곽 + percent 만큼 아래에서 차오르는 채움 */}
             <path
               d="M7 5 L7 2.5 L15 2.5 L15 5 L19 8 L19 22.5 a1.5 1.5 0 0 1 -1.5 1.5 L4.5 24 A1.5 1.5 0 0 1 3 22.5 L3 8 Z"
@@ -96,8 +96,8 @@ export function CleanupGauge({
             />
           </svg>
           <p
-            className="font-mono font-semibold leading-7 text-[var(--color-secondary)]"
-            style={{ fontSize: "var(--text-display-md)", textShadow: "var(--glow-secondary)" }}
+            className="font-mono text-2xl font-semibold leading-6 text-[var(--color-secondary)]"
+            style={{ textShadow: "var(--glow-secondary)" }}
           >
             {totals.debris.toLocaleString()}{" "}
             <span className="text-sm font-normal text-[var(--color-muted)]" style={{ textShadow: "none" }}>

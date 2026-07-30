@@ -12,7 +12,15 @@ import { SplashMark } from "@/components/splash-mark";
 const SPLASH_MS = 2800;
 const FADE_MS = 300;
 
-export function SplashScreen({ appName, skipLabel }: { appName: string; skipLabel: string }) {
+export function SplashScreen({
+  appName,
+  skipLabel,
+  version,
+}: {
+  appName: string;
+  skipLabel: string;
+  version: string;
+}) {
   const [stage, setStage] = useState<"shown" | "leaving" | "gone">("shown");
 
   useEffect(() => {
@@ -37,6 +45,10 @@ export function SplashScreen({ appName, skipLabel }: { appName: string; skipLabe
       {/* 디자이너 원본 스플래시(네이티브 PNG 와 동일 배치) + 궤도·세그먼트 애니메이션.
           궤도 점이 한 바퀴 도는 데 걸리는 시간이 SPLASH_MS 와 같아 진행 신호 역할을 한다. */}
       <SplashMark />
+
+      <span className="absolute bottom-[calc(env(safe-area-inset-bottom)+3.5rem)] font-mono text-[10px] text-[var(--color-muted)]">
+        v{version}
+      </span>
 
       <button
         type="button"

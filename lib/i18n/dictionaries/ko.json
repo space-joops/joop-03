@@ -248,6 +248,7 @@
     "myJoop": "내줍스",
     "inventory": "인벤토리",
     "map": "우주지도",
+    "launch": "발사청약",
     "settings": "설정"
   },
   "settings": {
@@ -265,6 +266,9 @@
     },
     "returnEarth": {
       "title": "지구로 복귀"
+    },
+    "about": {
+      "title": "정보"
     }
   },
   "pwa": {
