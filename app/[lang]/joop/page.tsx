@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
-import { JoopSprite } from "@/components/joop-sprite";
+import { JoopSprite } from "@joop/arcade-engine";
 import { ReplayLaunchButton } from "@/components/replay-launch-button";
 import { BottomNav, withLaunchOrMap } from "@/components/bottom-nav";
 import { isLocale } from "@/lib/i18n/config";

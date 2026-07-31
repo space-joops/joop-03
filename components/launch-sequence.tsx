@@ -12,9 +12,9 @@ import {
   type LaunchEventId,
 } from "@/lib/vehicle-profiles";
 import { recordLaunch } from "@/lib/launch-replay";
-import { JOOP_FRAME, joopSheetPath, sheetForColor, spriteFrame } from "@/lib/joop-sprite";
+import { JOOP_FRAME, joopSheetPath, sheetForColor, spriteFrame } from "@joop/arcade-engine";
 import { TelemetryBar, launchEventLabel } from "@/components/telemetry-bar";
-import * as sfx from "@/lib/sound";
+import * as sfx from "@joop/arcade-engine";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
 import { trackLaunchCompleted } from "@/lib/analytics";

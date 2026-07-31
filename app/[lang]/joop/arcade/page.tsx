@@ -4,7 +4,7 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getMyJoop } from "@/lib/profile";
 import { getMyOrbitState } from "@/lib/space";
 import { getArcadeConfig, getArcadeShadowXpCost } from "@/lib/game-config";
-import { ArcadeGame } from "@/components/arcade-game";
+import { ArcadeClientWrapper } from "./arcade-client";
 
 export const dynamic = "force-dynamic";
 
@@ -33,7 +33,7 @@ export default async function ArcadePage({ params }: PageProps<"/[lang]/joop/arc
 
   return (
     <main className="game-fullbleed flex w-full flex-1 flex-col" style={{ background: "var(--color-bg)" }}>
-      <ArcadeGame
+      <ArcadeClientWrapper
         lang={lang}
         dict={dict}
         color={mine.color}

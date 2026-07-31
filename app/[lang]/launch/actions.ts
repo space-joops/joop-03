@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createSessionClient } from "@/lib/supabase/session";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { levelFromXp } from "@/lib/minigame";
+import { levelFromXp } from "@joop/arcade-engine";
 
 export type BookingResult =
   | { ok: true; status: "confirmed" | "pending" }

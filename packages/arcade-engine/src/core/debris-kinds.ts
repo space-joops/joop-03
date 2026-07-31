@@ -7,7 +7,7 @@
 //     SSR/CSR 이 같은 결과를 내야 하이드레이션이 안전하다(순수 해시).
 // 추후 DB 에 종류 컬럼이 생기면 DebrisKindIcons 의 데이터 소스만 바꾸면 된다.
 
-import { ARCADE_DEBRIS } from "@/lib/arcade";
+import { ARCADE_DEBRIS } from "./arcade";
 
 export type DebrisKindId = "can" | "bolt" | "nut" | "panel" | "strut" | "chip";
 

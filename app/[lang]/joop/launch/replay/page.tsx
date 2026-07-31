@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { LaunchReplay } from "@/components/launch-replay";
-import { SoundToggle } from "@/components/sound-toggle";
+import { SoundToggle } from "@joop/arcade-engine";
 
 // 발사 다시 보기 — 기록이 localStorage 에만 있으므로 서버 조회·가드가 없다.
 // (launch/page.tsx 는 queued 전용 가드라 쿼리 방식 대신 전용 라우트로 분리)

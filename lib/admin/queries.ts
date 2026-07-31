@@ -1,6 +1,6 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { levelFromXp } from "@/lib/minigame";
+import { levelFromXp } from "@joop/arcade-engine";
 
 // 관리자 콘솔 전용 조회.
 //

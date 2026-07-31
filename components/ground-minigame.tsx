@@ -16,9 +16,9 @@ import {
   spawnIntervalAt,
   type FallingItem,
   type MinigameConfig,
-} from "@/lib/minigame";
+} from "@joop/arcade-engine";
 import { submitMinigameResult } from "@/app/[lang]/joop/actions";
-import * as sfx from "@/lib/sound";
+import * as sfx from "@joop/arcade-engine";
 import { trackMinigameCompleted } from "@/lib/analytics";
 import {
   JOOP_FEET_Y,
@@ -27,8 +27,8 @@ import {
   sheetForColor,
   spriteFrame,
   type JoopSpriteState,
-} from "@/lib/joop-sprite";
-import { JoopSprite } from "@/components/joop-sprite";
+} from "@joop/arcade-engine";
+import { JoopSprite } from "@joop/arcade-engine";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
 

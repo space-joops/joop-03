@@ -8,7 +8,7 @@
 // 저장값이 "off" 인 사용자는 첫 페인트에서 잠깐 켜짐 아이콘을 보게 되지만,
 // **소리는 sound.ts 의 setMuted 가 통제**하므로 실제로 울리지는 않는다.
 
-import { setMuted } from "@/lib/sound";
+import { setMuted } from "./sound";
 
 const STORAGE_KEY = "joop03.sound.v1";
 const EVENT = "joop03:sound";

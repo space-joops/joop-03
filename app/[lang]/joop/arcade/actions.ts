@@ -4,9 +4,9 @@ import { createSessionClient } from "@/lib/supabase/session";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getArcadeMaxPerRun, getArcadeShadowXpCost } from "@/lib/game-config";
 import { getMyOrbitState } from "@/lib/space";
-import { levelFromXp } from "@/lib/minigame";
+import { levelFromXp } from "@joop/arcade-engine";
 import { fetchMyRanking, fetchRankings, type RankingRow } from "@/lib/rankings";
-import { adSatelliteById } from "@/lib/ad-satellites";
+import { adSatelliteById } from "@joop/arcade-engine";
 import { CODE_PREFIX, nextInviteCodes, randomLabel } from "@/lib/admin/invite-codes";
 
 export type ShadowEntryResult =

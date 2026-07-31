@@ -5,7 +5,7 @@ import { getMyJoop } from "@/lib/profile";
 import { getSpaceConfig } from "@/lib/space";
 import { getMyConfirmedVehicle } from "@/lib/launch";
 import { LaunchSequence } from "@/components/launch-sequence";
-import { SoundToggle } from "@/components/sound-toggle";
+import { SoundToggle } from "@joop/arcade-engine";
 
 export const dynamic = "force-dynamic";
 

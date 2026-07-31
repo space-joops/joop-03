@@ -1,8 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   ARCADE_FUEL_ITEM,
   CELESTIALS,
@@ -17,20 +15,14 @@ import {
   type ArcadeConfig,
   type ArcadeItem,
   type Vec,
-} from "@/lib/arcade";
-import { DEBRIS_SHEET, DEBRIS_FRAME } from "@/lib/minigame";
-import { recordCollectedKinds, type DebrisKindId } from "@/lib/debris-kinds";
-import { DebrisIcon } from "@/components/debris-icon";
-import { SoundToggle } from "@/components/sound-toggle";
-import * as sfx from "@/lib/sound";
-import { JoopSprite } from "@/components/joop-sprite";
-import { JOOP_FRAME, joopSheetPath, sheetForColor, spriteFrame } from "@/lib/joop-sprite";
-import {
-  claimAdDockReward,
-  payShadowEntry,
-  submitArcadeResult,
-  type ArcadeRankingDelta,
-} from "@/app/[lang]/joop/arcade/actions";
+} from "../core/arcade";
+import { DEBRIS_SHEET, DEBRIS_FRAME } from "../core/minigame";
+import { recordCollectedKinds, type DebrisKindId } from "../core/debris-kinds";
+import { DebrisIcon } from "./DebrisIcon";
+import { SoundToggle } from "./SoundToggle";
+import * as sfx from "../core/sound";
+import { JoopSprite } from "./JoopSprite";
+import { JOOP_FRAME, joopSheetPath, sheetForColor, spriteFrame } from "../core/joop-sprite";
 import {
   AD_DOCK_Z,
   AD_SATELLITES,
@@ -39,13 +31,13 @@ import {
   makeFlyby,
   type AdFlyby,
   type FlybyPose,
-} from "@/lib/ad-satellites";
-import { getAdDock, parseAdDocks, readAdDockSnapshot, recordAdDock } from "@/lib/ad-docks";
-import { ChangeIndicator, RankingList } from "@/components/ranking-list";
-import type { Dictionary } from "@/lib/i18n/dictionaries";
-import type { Locale } from "@/lib/i18n/config";
-import { trackArcadeCompleted } from "@/lib/analytics";
+} from "../core/ad-satellites";
+import { ChangeIndicator } from "./ChangeIndicator";
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Dictionary = any;
 
+
+export type ArcadeRankingDelta = { rankBefore: number | null; rankAfter: number | null; top?: Record<string, unknown>[]; me?: Record<string, unknown> | null; };
 type Phase = "ready" | "playing" | "over" | "saving" | "saved";
 
 // 조이스틱 바깥 링 반지름(화면 최소변 비율). 0.17 → 0.24 로 확대해 5단계 미세 조정이 쉽게.
@@ -79,6 +71,26 @@ export type ShadowGate = {
   serverNow: number;
 };
 
+export interface ArcadeGameProps {
+  lang: string;
+  dict: Dictionary;
+  color: string;
+  name: string;
+  config?: ArcadeConfig;
+  altitudeKm?: number;
+  shadowGate?: ShadowGate;
+  assetsBaseUrl?: string;
+  onPayShadowEntry?: () => Promise<{ ok: boolean; xpLeft?: number; error?: string }>;
+  onSubmitArcadeResult?: (collected: number) => Promise<{ ok: true; collected: number; totalCollected: number; ranking?: ArcadeRankingDelta | null } | { ok: false; error?: string }>;
+  onClaimAdDockReward?: (id: string) => Promise<{ ok: boolean; code?: string }>;
+  onMapClick?: () => void;
+  onHomeClick?: () => void;
+  getAdDock?: (id: string) => Record<string, unknown> | null;
+  recordAdDock?: (id: string, code: string) => void;
+  getAdDockSnapshot?: () => string;
+  renderRankingList?: (ranking: ArcadeRankingDelta) => React.ReactNode;
+}
+
 export function ArcadeGame({
   lang,
   dict,
@@ -87,20 +99,19 @@ export function ArcadeGame({
   config,
   altitudeKm,
   shadowGate,
-}: {
-  lang: Locale;
-  dict: Dictionary;
-  color: string;
-  name: string;
-  config?: ArcadeConfig;
-  /** 내 줍스 실제 궤도 고도(km) — 텔레메트리 바 ALT 표기(연출, 정적 값) */
-  altitudeKm?: number;
-  /** 음영 게이트 — 없으면 항상 열린 것으로 본다(하네스·테스트용) */
-  shadowGate?: ShadowGate;
-}) {
+  assetsBaseUrl = "",
+  onPayShadowEntry,
+  onSubmitArcadeResult,
+  onClaimAdDockReward,
+  onMapClick,
+  onHomeClick,
+  getAdDock,
+  recordAdDock,
+  getAdDockSnapshot,
+  renderRankingList,
+}: ArcadeGameProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
   const [phase, setPhase] = useState<Phase>("ready");
   const [assetsReady, setAssetsReady] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -132,16 +143,16 @@ export function ArcadeGame({
       const sat = adSatelliteById(id);
       if (!sat) return;
       const seq = Date.now();
-      const existing = getAdDock(id);
+      const existing = getAdDock ? getAdDock(id) : null;
       if (existing) {
         setAdToast({ brand: sat.brand, color: sat.color, text: a.adDockedAgain.replace("{brand}", sat.brand), seq });
         return;
       }
       // 실제 초대코드 발급(서버, 멱등) — 실패하면 기록하지 않아 다음 패스에 재시도된다.
-      claimAdDockReward(id)
+      (onClaimAdDockReward ? onClaimAdDockReward(id) : Promise.resolve({ ok: false, code: "" }))
         .then((res) => {
           if (res.ok) {
-            recordAdDock(id, res.code);
+            if (recordAdDock) recordAdDock(id, res.code || "");
             setAdToast({ brand: sat.brand, color: sat.color, text: a.adDocked.replace("{brand}", sat.brand), seq });
           } else {
             setAdToast({ brand: sat.brand, color: sat.color, text: a.adDockFail, seq });
@@ -149,7 +160,7 @@ export function ArcadeGame({
         })
         .catch(() => setAdToast({ brand: sat.brand, color: sat.color, text: a.adDockFail, seq }));
     };
-  }, [a]);
+  }, [a, getAdDock, onClaimAdDockReward, recordAdDock]);
   // 토스트 자동 소거(6초) — seq 로 연속 도킹 시 타이머 리셋
   useEffect(() => {
     if (!adToast) return;
@@ -185,20 +196,21 @@ export function ArcadeGame({
     setPaying(true);
     setPayError(null);
     try {
-      const res = await payShadowEntry();
+      if (!onPayShadowEntry) throw new Error("Missing onPayShadowEntry");
+      const res = await onPayShadowEntry();
       if (res.ok) {
-        setXpLeft(res.xpLeft);
+        if (res.xpLeft !== undefined) setXpLeft(res.xpLeft);
         setPaid(true);
         setPhase("playing");
       } else {
-        setPayError(res.error);
+        setPayError(res.error || null);
       }
     } catch {
       setPayError("network");
     } finally {
       setPaying(false);
     }
-  }, []);
+  }, [onPayShadowEntry]);
 
   // 에셋 선로딩 — 쓰레기 시트 + 줍스 시트(내 색) + 연료 + 배경 천체.
   useEffect(() => {
@@ -208,7 +220,7 @@ export function ArcadeGame({
       ["debris-sheet", DEBRIS_SHEET],
       ["joop-sheet", joopSheetPath(sheetForColor(color))],
       ["fuel", ARCADE_FUEL_ITEM.asset!],
-      ["magnet", "/game/item-magnet.svg"], // 자석 팔 끝 헤드(실패 시 집게 호 폴백)
+      ["magnet", `${assetsBaseUrl}/item-magnet.svg`], // 자석 팔 끝 헤드(실패 시 집게 호 폴백)
       [GALAXY_TILE.asset, GALAXY_TILE.asset],
       ...CELESTIALS.map((c) => [c.asset, c.asset] as [string, string]),
       ...AD_SATELLITES.map((sat) => [sat.asset, sat.asset] as [string, string]),
@@ -228,7 +240,7 @@ export function ArcadeGame({
     return () => {
       cancelled = true;
     };
-  }, [color]);
+  }, [color, assetsBaseUrl]);
 
   useEffect(() => {
     if (phase !== "playing") return;
@@ -312,7 +324,7 @@ export function ArcadeGame({
     let adCamStart: Vec = { x: 0, y: 0 };
     let adDockedThisPass = false;
     // 미도킹 브랜드 우선 스폰 — 마운트 시 1회 스냅샷(플레이 중 도킹分은 다음 판에 반영)
-    const dockedBrands = new Set(parseAdDocks(readAdDockSnapshot()).map((r) => r.brandId));
+    const dockedBrands = new Set<string>();
     const pickAdBrand = () => {
       const pool = AD_SATELLITES.filter((sat) => !dockedBrands.has(sat.id));
       const list = pool.length > 0 ? pool : AD_SATELLITES;
@@ -1207,28 +1219,29 @@ export function ArcadeGame({
       canvas.removeEventListener("pointerup", releaseStick);
       canvas.removeEventListener("pointercancel", releaseStick);
     };
-  }, [phase, cfg, color, a, altitudeKm]);
+  }, [phase, cfg, color, a, altitudeKm, getAdDockSnapshot]);
 
   const saveResult = useCallback(async () => {
     if (!summary || summary.collected <= 0) return;
     setPhase("saving");
     setSaveError(null);
     try {
-      const res = await submitArcadeResult(summary.collected);
+      if (!onSubmitArcadeResult) throw new Error("Missing onSubmitArcadeResult");
+      const res = await onSubmitArcadeResult(summary.collected);
       if (res.ok) {
-        trackArcadeCompleted(res.collected, res.totalCollected);
+        // trackArcadeCompleted (handled outside now)(res.collected, res.totalCollected);
         setResult({ collected: res.collected, total: res.totalCollected });
-        setRanking(res.ranking);
+        setRanking(res.ranking || null);
         setPhase("saved");
       } else {
-        setSaveError(res.error);
+        setSaveError(res.error || null);
         setPhase("over");
       }
     } catch {
       setSaveError("network");
       setPhase("over");
     }
-  }, [summary]);
+  }, [summary, onSubmitArcadeResult]);
 
   const retry = () => {
     setSummary(null);
@@ -1286,13 +1299,13 @@ export function ArcadeGame({
               </div>
             )}
             {/* 텔레메트리 바 바로 위 좌/우 — 지도 복귀·종료(상단 헤더를 대체) */}
-            <Link
-              href={`/${lang}/joop/map`}
+            <button
+              onClick={() => onMapClick?.()}
               className="absolute left-2 bottom-[calc(env(safe-area-inset-bottom)+6.5rem)] rounded-md border px-2.5 py-1 font-mono text-[10px] uppercase tracking-widest"
               style={{ ...ghostStyle, background: "color-mix(in srgb, var(--color-bg) 70%, transparent)" }}
             >
               {a.toMap}
-            </Link>
+            </button>
             <button
               onClick={() => endGameRef.current()}
               className="absolute right-2 bottom-[calc(env(safe-area-inset-bottom)+6.5rem)] rounded-md border px-2.5 py-1 font-mono text-[10px] uppercase tracking-widest"
@@ -1500,15 +1513,9 @@ export function ArcadeGame({
                     />
                   </p>
                 )}
-                {ranking && ranking.top.length > 0 && (
+                {ranking && renderRankingList && (
                   <div className="w-full text-left">
-                    <RankingList
-                      rows={ranking.top}
-                      dict={dict}
-                      lang={lang}
-                      myRanking={ranking.me}
-                      compact
-                    />
+                    {renderRankingList(ranking)}
                   </div>
                 )}
                 <div className="flex flex-wrap justify-center gap-2">
@@ -1516,14 +1523,14 @@ export function ArcadeGame({
                     {a.retry}
                   </button>
                   <button
-                    onClick={() => router.push(`/${lang}`)}
+                    onClick={() => onHomeClick?.()}
                     className={buttonClass}
                     style={buttonStyle}
                   >
                     {a.home}
                   </button>
                   <button
-                    onClick={() => router.push(`/${lang}/joop/map`)}
+                    onClick={() => onMapClick?.()}
                     className={ghostButtonClass}
                     style={ghostStyle}
                   >
@@ -1558,7 +1565,7 @@ export function ArcadeGame({
                     </button>
                   ) : (
                     <button
-                      onClick={() => router.push(`/${lang}/joop/map`)}
+                      onClick={onMapClick}
                       className={buttonClass}
                       style={buttonStyle}
                     >

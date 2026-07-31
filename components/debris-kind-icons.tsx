@@ -1,13 +1,13 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { DebrisIcon } from "@/components/debris-icon";
+import { DebrisIcon } from "@joop/arcade-engine";
 import {
   decorativeKindsFor,
   parseTopKinds,
   subscribeKindStore,
   readKindStoreSnapshot,
-} from "@/lib/debris-kinds";
+} from "@joop/arcade-engine";
 
 // 랭킹 행의 "수거 종류" 아이콘 묶음(UX 리뷰 기여도 표시).
 // SSR/첫 하이드레이션은 결정적 장식(decorativeKindsFor) — 서버·클라 동일해 안전.

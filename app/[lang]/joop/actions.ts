@@ -2,7 +2,7 @@
 
 import { createSessionClient } from "@/lib/supabase/session";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { levelFromXp } from "@/lib/minigame";
+import { levelFromXp } from "@joop/arcade-engine";
 import { getMinigameConfig, getMaxDebrisPerRun } from "@/lib/game-config";
 
 export type MinigameResult =
