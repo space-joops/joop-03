@@ -7,9 +7,10 @@ import {
   soundOnFrom,
   subscribeSoundStore,
   syncSoundFromStorage,
-} from "@/lib/sound-prefs";
-import { installAutoUnlock, unlockAudio } from "@/lib/sound";
-import type { Dictionary } from "@/lib/i18n/dictionaries";
+} from "../core/sound-prefs";
+import { installAutoUnlock, unlockAudio } from "../core/sound";
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Dictionary = any;
 
 // 게임 화면 음소거 토글. 에셋 0(인라인 SVG 스피커), 상태는 localStorage.
 //

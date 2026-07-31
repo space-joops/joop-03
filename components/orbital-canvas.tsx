@@ -2,9 +2,9 @@
 
 import { useEffect, useRef } from "react";
 import { positionAt, project2D } from "@/lib/orbit";
-import { starHash } from "@/lib/arcade";
+import { starHash } from "@joop/arcade-engine";
 import { tickOrbitClock, type OrbitClock } from "@/lib/orbit-clock";
-import { JOOP_FRAME, joopSheetPath, sheetForColor, spriteFrame } from "@/lib/joop-sprite";
+import { JOOP_FRAME, joopSheetPath, sheetForColor, spriteFrame } from "@joop/arcade-engine";
 import type { OrbitalSnapshot } from "@/lib/joops";
 
 // 지구 + 궤도 줍스 100개를 Canvas 2D로 렌더 (docs/architecture/adr/0003-rendering-canvas2d.md).

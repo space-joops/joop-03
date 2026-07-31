@@ -2,16 +2,16 @@
 
 import { useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
-import { DebrisIcon } from "@/components/debris-icon";
-import { ARCADE_DEBRIS } from "@/lib/arcade";
+import { DebrisIcon } from "@joop/arcade-engine";
+import { ARCADE_DEBRIS } from "@joop/arcade-engine";
 import {
   parseKindCounts,
   readKindStoreSnapshot,
   subscribeKindStore,
   type DebrisKindId,
-} from "@/lib/debris-kinds";
+} from "@joop/arcade-engine";
 import { parseAdDocks, readAdDockSnapshot, subscribeAdDocks } from "@/lib/ad-docks";
-import { AD_SATELLITES } from "@/lib/ad-satellites";
+import { AD_SATELLITES } from "@joop/arcade-engine";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
 

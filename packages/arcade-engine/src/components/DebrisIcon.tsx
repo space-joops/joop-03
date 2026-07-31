@@ -1,6 +1,6 @@
-import { ARCADE_DEBRIS } from "@/lib/arcade";
-import { DEBRIS_SHEET } from "@/lib/minigame";
-import type { DebrisKindId } from "@/lib/debris-kinds";
+import { ARCADE_DEBRIS } from "../core/arcade";
+import { DEBRIS_SHEET } from "../core/minigame";
+import type { DebrisKindId } from "../core/debris-kinds";
 
 // 쓰레기 종류 아이콘 — debris-sheet.png(64px 6프레임)를 CSS background-position 으로
 // 잘라 쓴다(components/joop-sprite.tsx 패턴). 서버 컴포넌트에서도 렌더 가능.

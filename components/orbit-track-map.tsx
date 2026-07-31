@@ -8,7 +8,7 @@ import {
   type GroundState,
 } from "@/lib/orbit";
 import { tickOrbitClock, type OrbitClock } from "@/lib/orbit-clock";
-import { JOOP_FRAME, joopSheetPath, sheetForColor, spriteFrame } from "@/lib/joop-sprite";
+import { JOOP_FRAME, joopSheetPath, sheetForColor, spriteFrame } from "@joop/arcade-engine";
 import { WORLD_GRID_W, WORLD_GRID_H, isLandCell } from "@/lib/world-map-grid";
 import { regionAt, regionName } from "@/lib/geo-regions";
 import type { OrbitalSnapshot } from "@/lib/joops";

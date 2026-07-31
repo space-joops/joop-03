@@ -1,4 +1,4 @@
-import { joopSheetPath, sheetForColor } from "@/lib/joop-sprite";
+import { joopSheetPath, sheetForColor } from "../core/joop-sprite";
 
 // DOM 용 줍스 캐릭터 — 시트의 idle 2프레임을 CSS steps() 로 2fps 루프.
 // 애니메이션·reduced-motion 정지는 globals.css 의 .joop-sprite-idle 이 담당(JS 불필요).

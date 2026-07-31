@@ -4,7 +4,7 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getMyJoop } from "@/lib/profile";
 import { getMinigameConfig } from "@/lib/game-config";
 import { GroundMinigame } from "@/components/ground-minigame";
-import { SoundToggle } from "@/components/sound-toggle";
+import { SoundToggle } from "@joop/arcade-engine";
 
 export const dynamic = "force-dynamic";
 

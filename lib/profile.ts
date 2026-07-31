@@ -1,5 +1,5 @@
 import { createSessionClient } from "@/lib/supabase/session";
-import { levelFromXp } from "@/lib/minigame";
+import { levelFromXp } from "@joop/arcade-engine";
 
 export type MyJoop = {
   id: string;

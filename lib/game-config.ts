@@ -1,8 +1,8 @@
 import "server-only";
 import { cache } from "react";
 import { createServerClient } from "@/lib/supabase/server";
-import { DEFAULT_CONFIG, type MinigameConfig } from "@/lib/minigame";
-import { DEFAULT_ARCADE_CONFIG, type ArcadeConfig } from "@/lib/arcade";
+import { DEFAULT_CONFIG, type MinigameConfig } from "@joop/arcade-engine";
+import { DEFAULT_ARCADE_CONFIG, type ArcadeConfig } from "@joop/arcade-engine";
 import { CONFIG_SPEC_BY_KEY, coerceConfigNumber } from "@/lib/config-specs";
 
 // joop_03_game_config 조회를 한곳으로 모은다.
