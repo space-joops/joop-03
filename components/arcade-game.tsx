@@ -1252,7 +1252,7 @@ export function ArcadeGame({
   const ghostStyle = { borderColor: "var(--color-neutral-600)", color: "var(--color-fg)" } as const;
 
   return (
-    <div className="relative flex flex-1 flex-col">
+    <div className="relative flex flex-1 flex-col arcade-healing">
       {/* 풀블리드 — 테두리 없이 폰 화면을 꽉 채운다(UX 라운드 2026-07-29).
           boxRef(크기 측정)·game-surface(iOS 제스처 차단)는 반드시 유지. */}
       <div
