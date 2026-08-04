@@ -369,3 +369,15 @@ body:has(main.game-fullbleed) .pwa-prompt {
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
+
+/* Arcade Healing Mode Additions */
+.arcade-healing canvas {
+  filter: drop-shadow(0 0 12px rgba(53, 224, 122, 0.25)); /* Soft glow */
+}
+.arcade-healing .joystick-base, .arcade-healing .joystick-knob {
+  opacity: 0.3 !important;
+  transition: opacity 0.5s ease;
+}
+.arcade-healing:active .joystick-base, .arcade-healing:active .joystick-knob {
+  opacity: 0.6 !important;
+}
