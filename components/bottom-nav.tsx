@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/config";
 
-export type NavItem = "home" | "myJoop" | "inventory" | "map" | "launch" | "settings";
+export type NavItem = "home" | "inventory" | "map" | "launch" | "settings";
 
 // 발사 전(궤도 진입 전)엔 "우주지도" 탭을 눌러도 map/page.tsx 가드가 바로 /joop 로
 // 튕겨내므로, 그 자리를 "발사 청약" 탭으로 대체한다.
@@ -14,8 +14,6 @@ function hrefFor(item: NavItem, lang: Locale): string {
   switch (item) {
     case "home":
       return `/${lang}`;
-    case "myJoop":
-      return `/${lang}/joop`;
     case "inventory":
       return `/${lang}/joop/inventory`;
     case "map":
@@ -40,15 +38,6 @@ function Icon({ item }: { item: NavItem }) {
         <svg {...common} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
           <path d="M4 11l8-7 8 7" />
           <path d="M6 10v9h12v-9" />
-        </svg>
-      );
-    case "myJoop":
-      return (
-        <svg {...common} fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-          <rect x="6" y="7" width="12" height="10" rx="2" />
-          <path d="M12 7V4" />
-          <circle cx="10" cy="12" r="1.1" fill="currentColor" stroke="none" />
-          <circle cx="14" cy="12" r="1.1" fill="currentColor" stroke="none" />
         </svg>
       );
     case "inventory":
