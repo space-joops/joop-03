@@ -30,7 +30,7 @@ export default async function SettingsPage({
       <BottomNav
         lang={lang}
         dict={dict}
-        items={withLaunchOrMap(["home", "myJoop", "inventory", "map", "settings"], mine?.status === "orbit")}
+        items={withLaunchOrMap(["home", "inventory", "map", "settings"], mine?.status === "orbit")}
         active="settings"
       />
     </main>
